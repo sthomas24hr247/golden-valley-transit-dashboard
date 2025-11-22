@@ -11,8 +11,8 @@ def get_db_connection():
     connection_string = (
         "DRIVER={ODBC Driver 18 for SQL Server};"
         "SERVER=partnership-sql-server-v2.database.windows.net;"
-        "DATABASE=golden-valley-transit-dev;"
-        "UID=info;"
+        "DATABASE=golden-valley-transit-prod;"
+        "UID=sqladmin;"
         "PWD=SaQu12022!;"
         "Encrypt=yes;"
         "TrustServerCertificate=no;"
