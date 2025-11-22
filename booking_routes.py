@@ -30,7 +30,7 @@ def get_db_connection():
 
 def generate_patient_id(cursor):
     """Generate unique patient ID (GVT-XXX format)"""
-    cursor.execute("SELECT MAX(PatientID) FROM Patients WHERE PatientID LIKE 'GVT-%'")
+    cursor.execute("SELECT MAX(PatientID) FROM medical.patients WHERE PatientID LIKE 'GVT-%'")
     result = cursor.fetchone()
     
     if result and result[0]:
@@ -55,12 +55,12 @@ def check_existing_patient(cursor, phone, email=None):
     """Check if patient already exists"""
     if email:
         cursor.execute("""
-            SELECT PatientID, UserID FROM Patients 
+            SELECT PatientID, UserID FROM medical.patients 
             WHERE PhoneNumber = ? OR Email = ?
         """, (phone, email))
     else:
         cursor.execute("""
-            SELECT PatientID, UserID FROM Patients 
+            SELECT PatientID, UserID FROM medical.patients 
             WHERE PhoneNumber = ?
         """, (phone,))
     
@@ -102,7 +102,7 @@ def create_booking():
             print(f"Creating new patient: {patient_id}")  # Debug log
             
             cursor.execute("""
-                INSERT INTO Users (
+                INSERT INTO security.users (
                     Username, PasswordHash, Email, PhoneNumber, 
                     UserType, IsActive, CreatedDate
                 ) VALUES (?, ?, ?, ?, 'Patient', 1, GETDATE())
@@ -112,7 +112,7 @@ def create_booking():
             user_id = cursor.fetchone()[0]
             
             cursor.execute("""
-                INSERT INTO Patients (
+                INSERT INTO medical.patients (
                     PatientID, UserID, FirstName, LastName, 
                     PhoneNumber, Email, Address, IsActive, CreatedDate
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, GETDATE())
@@ -126,7 +126,7 @@ def create_booking():
             is_new_patient = True
         
         cursor.execute("""
-            INSERT INTO Trips (
+            INSERT INTO operations.trips (
                 PatientID, PickupAddress, DropoffAddress,
                 AppointmentDate, AppointmentTime, Status, CreatedDate
             ) VALUES (?, ?, ?, ?, ?, 'Pending', GETDATE())
