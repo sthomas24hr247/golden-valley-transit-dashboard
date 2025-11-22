@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Golden Valley Transit - Driver App</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            color: white;
+            padding-bottom: 80px;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .driver-info h2 { font-size: 1.2em; margin-bottom: 5px; }
+        .driver-info p { opacity: 0.9; font-size: 0.9em; }
+        .status-badge {
+            background: #43e97b;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        .status-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 20px;
+        }
+        .status-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .status-btn:active { transform: scale(0.95); }
+        .status-btn.available { background: #43e97b; color: #1a1a2e; }
+        .status-btn.break { background: #feca57; color: #1a1a2e; }
+        .status-btn.busy { background: #ee5a6f; color: white; }
+        .status-btn.offline { background: #576574; color: white; }
+        
+        .trip-card {
+            background: #16213e;
+            margin: 20px;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .trip-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .trip-header h3 { font-size: 1.1em; }
+        .trip-badge {
+            background: #667eea;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+        .patient-info {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: #1a1a2e;
+            border-radius: 10px;
+        }
+        .patient-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+        .patient-details strong { display: block; margin-bottom: 5px; }
+        .patient-details p { opacity: 0.7; font-size: 0.9em; }
+        
+        .location {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            padding: 12px;
+            background: #1a1a2e;
+            border-radius: 8px;
+        }
+        .location-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 1.2em;
+        }
+        .pickup .location-icon { background: #43e97b; color: #1a1a2e; }
+        .dropoff .location-icon { background: #ee5a6f; color: white; }
+        .location-details strong { display: block; margin-bottom: 3px; }
+        .location-details p { font-size: 0.9em; opacity: 0.9; }
+        .location-details small { opacity: 0.7; font-size: 0.85em; }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #43e97b; color: #1a1a2e; }
+        .btn-secondary { background: #576574; color: white; }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 20px;
+        }
+        .stat-card {
+            background: #16213e;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-value { 
+            font-size: 1.8em; 
+            font-weight: bold; 
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        .stat-label { font-size: 0.8em; opacity: 0.7; }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #16213e;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid #2d3561;
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.8em;
+            color: #a0aec0;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .nav-item.active { color: #667eea; }
+        .nav-icon { font-size: 1.5em; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="driver-info">
+            <h2 id="driverName">Mike Johnson</h2>
+            <p id="vehicleInfo">Vehicle: GVT-001</p>
+        </div>
+        <div class="status-badge" id="statusBadge">Available</div>
+    </div>
+
+    <div class="status-controls">
+        <button class="status-btn available" onclick="setStatus('available')">✓ Available</button>
+        <button class="status-btn break" onclick="setStatus('break')">☕ On Break</button>
+        <button class="status-btn busy" onclick="setStatus('busy')">🚗 On Trip</button>
+        <button class="status-btn offline" onclick="setStatus('offline')">⏸ Off Duty</button>
+    </div>
+
+    <div class="trip-card" id="currentTrip">
+        <div class="trip-header">
+            <h3>Current Trip</h3>
+            <span class="trip-badge" id="tripStatus">En Route to Pickup</span>
+        </div>
+        
+        <div class="patient-info">
+            <div class="patient-avatar">👤</div>
+            <div class="patient-details">
+                <strong id="patientName">Elena Garcia</strong>
+                <p>Dialysis Appointment</p>
+            </div>
+        </div>
+
+        <div class="location pickup">
+            <div class="location-icon">📍</div>
+            <div class="location-details">
+                <strong>Pickup</strong>
+                <p id="pickupAddress">123 Main St, Bakersfield, CA</p>
+                <small>2:30 PM</small>
+            </div>
+        </div>
+
+        <div class="location dropoff">
+            <div class="location-icon">🏥</div>
+            <div class="location-details">
+                <strong>Dropoff</strong>
+                <p id="dropoffAddress">Bakersfield Dialysis Center</p>
+                <small>3:00 PM</small>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-success" onclick="arrivedAtPickup()">✓ Arrived</button>
+            <button class="btn btn-primary" onclick="startTrip()">▶ Start Trip</button>
+            <button class="btn btn-secondary" onclick="callPatient()">📞 Call</button>
+            <button class="btn btn-secondary" onclick="navigate()">🗺 Navigate</button>
+        </div>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-value" id="dailyTrips">6</div>
+            <div class="stat-label">Trips Today</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="dailyHours">8.5h</div>
+            <div class="stat-label">Hours</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="dailyEarnings">$247</div>
+            <div class="stat-label">Earnings</div>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <div class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div>Dashboard</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">📅</div>
+            <div>Trips</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">💰</div>
+            <div>Earnings</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">💬</div>
+            <div>Messages</div>
+        </div>
+        <div class="nav-item">
+            <div class="nav-icon">👤</div>
+            <div>Profile</div>
+        </div>
+    </nav>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5001';
+        let currentDriverId = 'mike-johnson';
+        let currentTripId = 'trip-123';
+        
+        // Driver status management with workflow trigger
+        function setStatus(status) {
+            const badges = {
+                'available': '✓ Available',
+                'break': '☕ On Break',
+                'busy': '🚗 On Trip',
+                'offline': '⏸ Off Duty'
+            };
+            
+            document.getElementById('statusBadge').textContent = badges[status];
+            
+            // Trigger workflow by calling API
+            fetch(`${API_BASE}/api/driver-status`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    driver_id: currentDriverId,
+                    status: status,
+                    timestamp: new Date().toISOString()
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ Status updated, workflow triggered');
+                alert(`Status updated to: ${badges[status]}`);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(`Status updated to: ${badges[status]}`);
+            });
+        }
+
+        // Arrived at pickup with workflow trigger
+        function arrivedAtPickup() {
+            document.getElementById('tripStatus').textContent = 'At Pickup Location';
+            
+            // Trigger workflow to notify patient
+            fetch(`${API_BASE}/api/trip-event`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    trip_id: currentTripId,
+                    event: 'arrived_at_pickup',
+                    timestamp: new Date().toISOString(),
+                    driver_id: currentDriverId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ Arrival event triggered, patient notified');
+                alert('✓ Marked as arrived - Patient has been notified!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('✓ Marked as arrived at pickup location');
+            });
+        }
+
+        // Start trip
+        function startTrip() {
+            document.getElementById('tripStatus').textContent = 'In Progress';
+            
+            fetch(`${API_BASE}/api/trip-event`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    trip_id: currentTripId,
+                    event: 'trip_started',
+                    timestamp: new Date().toISOString(),
+                    driver_id: currentDriverId
+                })
+            })
+            .then(() => {
+                alert('▶ Trip started! Drive safely.');
+            })
+            .catch(error => {
+                alert('▶ Trip started!');
+            });
+        }
+
+        // Call patient
+        function callPatient() {
+            alert('📞 Calling Elena Garcia...\n\nPhone: (661) 555-1234');
+            // In production: window.location.href = 'tel:+16615551234';
+        }
+
+        // Navigate to pickup
+        function navigate() {
+            const pickup = document.getElementById('pickupAddress').textContent;
+            alert(`🗺 Opening navigation to:\n${pickup}`);
+            // In production: Open Google Maps or Apple Maps
+            // window.location.href = `https://maps.google.com/?q=${encodeURIComponent(pickup)}`;
+        }
+
+        // Load driver data from API
+        async function loadDriverData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dynamics/drivers`);
+                const data = await response.json();
+                if (data.success && data.drivers.length > 0) {
+                    const driver = data.drivers[0];
+                    document.getElementById('driverName').textContent = 
+                        `${driver.firstname} ${driver.lastname}`;
+                    currentDriverId = driver.contactid;
+                }
+            } catch (error) {
+                console.error('Error loading driver data:', error);
+            }
+        }
+
+        // Load current trip data
+        async function loadCurrentTrip() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dynamics/trips`);
+                const data = await response.json();
+                if (data.success && data.trips.length > 0) {
+                    const trip = data.trips[0];
+                    // Update UI with real trip data
+                    currentTripId = trip.activityid;
+                }
+            } catch (error) {
+                console.error('Error loading trip data:', error);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDriverData();
+            loadCurrentTrip();
+            
+            console.log('🚀 Golden Valley Transit Driver App Loaded');
+            console.log('📱 Workflow triggers active');
+        });
+
+        // Simulate real-time updates (every 30 seconds)
+        setInterval(() => {
+            // In production: fetch latest trip status
+            console.log('🔄 Checking for updates...');
+        }, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Valley Transit - Book Your Ride</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .booking-form {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .appointment-type {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .type-option {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .type-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .type-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        .type-option input[type="radio"] {
+            display: none;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .submit-btn:hover {
+            background: #5568d3;
+        }
+        .submit-btn:active {
+            transform: scale(0.98);
+        }
+        .success-message {
+            display: none;
+            background: #43e97b;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .info-box {
+            background: #f8f9ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+        }
+        .info-box h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .required {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚐 Golden Valley Transit</h1>
+            <p>Medical Transportation Services - Bakersfield, CA</p>
+        </div>
+
+        <div class="booking-form">
+            <div class="info-box">
+                <h3>📋 Service Information</h3>
+                <p>We provide non-emergency medical transportation (NEMT) for dialysis, physical therapy, doctor appointments, and other medical needs throughout Bakersfield and Kern County.</p>
+            </div>
+
+            <form id="bookingForm">
+                <!-- Patient Information -->
+                <div class="section-title">Patient Information</div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name <span class="required">*</span></label>
+                        <input type="text" id="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name <span class="required">*</span></label>
+                        <input type="text" id="lastName" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="phone" placeholder="(661) 555-1234" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" placeholder="your.email@example.com">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Date of Birth <span class="required">*</span></label>
+                    <input type="date" id="dob" required>
+                </div>
+
+                <!-- Pickup Information -->
+                <div class="section-title">Pickup Information</div>
+                
+                <div class="form-group">
+                    <label>Pickup Address <span class="required">*</span></label>
+                    <input type="text" id="pickupAddress" placeholder="123 Main St, Bakersfield, CA 93301" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Pickup Date <span class="required">*</span></label>
+                        <input type="date" id="pickupDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pickup Time <span class="required">*</span></label>
+                        <input type="time" id="pickupTime" required>
+                    </div>
+                </div>
+
+                <!-- Appointment Information -->
+                <div class="section-title">Appointment Details</div>
+
+                <div class="form-group">
+                    <label>Appointment Type <span class="required">*</span></label>
+                    <div class="appointment-type">
+                        <label class="type-option">
+                            <input type="radio" name="appointmentType" value="Dialysis" required>
+                            <div>💉 Dialysis</div>
+                        </label>
+                        <label class="type-option">
+                            <input type="radio" name="appointmentType" value="Physical Therapy">
+                            <div>🏃 Physical Therapy</div>
+                        </label>
+                        <label class="type-option">
+                            <input type="radio" name="appointmentType" value="Doctor Appointment">
+                            <div>👨‍⚕️ Doctor Visit</div>
+                        </label>
+                        <label class="type-option">
+                            <input type="radio" name="appointmentType" value="Lab Work">
+                            <div>🔬 Lab Work</div>
+                        </label>
+                        <label class="type-option">
+                            <input type="radio" name="appointmentType" value="X-Ray/Imaging">
+                            <div>📷 Imaging</div>
+                        </label>
+                        <label class="type-option">
+                            <input type="radio" name="appointmentType" value="Other">
+                            <div>📋 Other</div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Appointment Location <span class="required">*</span></label>
+                    <input type="text" id="appointmentLocation" placeholder="Bakersfield Dialysis Center, 456 Medical Blvd" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Appointment Time</label>
+                    <input type="time" id="appointmentTime">
+                </div>
+
+                <!-- Insurance Information -->
+                <div class="section-title">Insurance Information</div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Insurance Provider</label>
+                        <select id="insuranceProvider">
+                            <option value="">Select Insurance</option>
+                            <option value="Medi-Cal">Medi-Cal</option>
+                            <option value="Medicare">Medicare</option>
+                            <option value="Blue Cross">Blue Cross</option>
+                            <option value="Kaiser">Kaiser Permanente</option>
+                            <option value="Anthem">Anthem Blue Cross</option>
+                            <option value="Aetna">Aetna</option>
+                            <option value="Other">Other</option>
+                            <option value="Self-Pay">Self-Pay</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Insurance ID Number</label>
+                        <input type="text" id="insuranceId" placeholder="ABC123456789">
+                    </div>
+                </div>
+
+                <!-- Return Trip -->
+                <div class="section-title">Return Trip</div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="needsReturn" style="width: auto; margin-right: 10px;">
+                        I need a return trip after my appointment
+                    </label>
+                </div>
+
+                <div id="returnTripDetails" style="display: none;">
+                    <div class="form-group">
+                        <label>Estimated Appointment Duration</label>
+                        <select id="appointmentDuration">
+                            <option value="30">30 minutes</option>
+                            <option value="60">1 hour</option>
+                            <option value="90">1.5 hours</option>
+                            <option value="120">2 hours</option>
+                            <option value="180">3 hours</option>
+                            <option value="240" selected>4 hours (Dialysis)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Special Requirements -->
+                <div class="section-title">Special Requirements</div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="wheelchair" style="width: auto; margin-right: 10px;">
+                        Wheelchair accessible vehicle required
+                    </label>
+                </div>
+
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea id="notes" placeholder="Any special instructions, medical equipment needs, or other information we should know..."></textarea>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="submit-btn">📅 Request Transportation</button>
+
+                <div class="success-message" id="successMessage">
+                    <h2>✅ Booking Request Submitted!</h2>
+                    <p>We've received your transportation request. Our team will contact you within 1 hour to confirm your appointment.</p>
+                    <p style="margin-top: 15px;"><strong>Confirmation Number: <span id="confirmationNumber"></span></strong></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5001';
+
+        // Appointment type selection
+        document.querySelectorAll('.type-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                this.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
+        // Return trip toggle
+        document.getElementById('needsReturn').addEventListener('change', function() {
+            document.getElementById('returnTripDetails').style.display = 
+                this.checked ? 'block' : 'none';
+        });
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('pickupDate').min = today;
+        document.getElementById('dob').max = today;
+
+        // Form submission
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                patient: {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
+                    dateOfBirth: document.getElementById('dob').value
+                },
+                trip: {
+                    pickupAddress: document.getElementById('pickupAddress').value,
+                    pickupDate: document.getElementById('pickupDate').value,
+                    pickupTime: document.getElementById('pickupTime').value,
+                    appointmentType: document.querySelector('input[name="appointmentType"]:checked').value,
+                    appointmentLocation: document.getElementById('appointmentLocation').value,
+                    appointmentTime: document.getElementById('appointmentTime').value,
+                    needsReturn: document.getElementById('needsReturn').checked,
+                    appointmentDuration: document.getElementById('appointmentDuration').value,
+                    wheelchair: document.getElementById('wheelchair').checked,
+                    notes: document.getElementById('notes').value
+                },
+                insurance: {
+                    provider: document.getElementById('insuranceProvider').value,
+                    insuranceId: document.getElementById('insuranceId').value
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/booking/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Generate confirmation number
+                    const confirmationNumber = 'GVT-' + Date.now().toString().slice(-8);
+                    document.getElementById('confirmationNumber').textContent = confirmationNumber;
+                    
+                    // Show success message
+                    document.getElementById('successMessage').style.display = 'block';
+                    
+                    // Hide form
+                    document.getElementById('bookingForm').style.display = 'none';
+                    
+                    // Scroll to success message
+                    document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('There was an error submitting your request. Please call us at (661) 555-RIDE');
+                }
+            } catch (error) {
+                console.error('Booking error:', error);
+                alert('Unable to submit booking. Please call (661) 555-RIDE for assistance.');
+            }
+        });
+
+        // Phone number formatting
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 3) {
+                    value = `(${value}`;
+                } else if (value.length <= 6) {
+                    value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+                } else {
+                    value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+                }
+            }
+            e.target.value = value;
+        });
+    </script>
+</body>
+</html>

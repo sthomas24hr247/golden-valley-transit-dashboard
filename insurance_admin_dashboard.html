@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Valley Transit - Insurance Administrator Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gold-gradient: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .metric-card {
+            background: var(--info-gradient);
+            color: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+        }
+        
+        .metric-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .status-approved {
+            background: var(--success-gradient);
+            color: white;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .status-pending {
+            background: var(--warning-gradient);
+            color: white;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .status-rejected {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .premium-button {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            padding: 0.75rem 1.5rem;
+        }
+        
+        .premium-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .table-row {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .table-row:hover {
+            background: rgba(255, 255, 255, 1);
+            transform: translateX(4px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .insurance-card {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .insurance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .billing-card {
+            background: var(--gold-gradient);
+            color: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .billing-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--warning-gradient);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        .approval-workflow {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .approval-workflow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='7' cy='7' r='7'/%3E%3Ccircle cx='53' cy='53' r='7'/%3E%3Ccircle cx='30' cy='30' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+        
+        .demo-notification {
+            position: fixed;
+            top: 4rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: 1000;
+            max-width: 350px;
+        }
+        
+        .demo-notification.show {
+            transform: translateX(0);
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #10b981, #059669);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+        
+        .search-bar {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            border-radius: 15px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .search-bar:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Controls -->
+    <div class="fixed top-4 left-4 z-50 space-y-2">
+        <button onclick="startInsuranceDemo()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-green-700">
+            🎬 Insurance Demo
+        </button>
+        <button onclick="simulateApproval()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-blue-700">
+            ✅ Auto-Approve
+        </button>
+        <button onclick="simulateBilling()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-purple-700">
+            💰 Process Claims
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="glass-card mx-6 mt-6 p-6">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center floating-animation">
+                    <i data-lucide="shield-check" class="w-8 h-8 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Insurance Administration</h1>
+                    <p class="text-gray-600 font-medium">Golden Valley Transit • Partner Portal</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <i data-lucide="bell" class="w-6 h-6 text-gray-600"></i>
+                    <div class="notification-badge" id="notification-count">7</div>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold text-gray-800">Sarah Mitchell</p>
+                    <p class="text-sm text-gray-600">Insurance Administrator</p>
+                </div>
+                <div class="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-500 rounded-full flex items-center justify-center">
+                    <i data-lucide="user" class="w-5 h-5 text-white"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="container mx-auto px-6 py-6 max-w-7xl">
+        <!-- Key Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="metric-card" onclick="showMetricDetails('pending')">
+                <i data-lucide="clock" class="w-8 h-8 mx-auto mb-2"></i>
+                <p class="text-3xl font-bold" id="pending-claims">23</p>
+                <p class="text-sm opacity-90">Pending Claims</p>
+            </div>
+            <div class="metric-card" style="background: var(--success-gradient);" onclick="showMetricDetails('approved')">
+                <i data-lucide="check-circle" class="w-8 h-8 mx-auto mb-2"></i>
+                <p class="text-3xl font-bold" id="approved-claims">147</p>
+                <p class="text-sm opacity-90">Approved This Week</p>
+            </div>
+            <div class="metric-card" style="background: var(--gold-gradient);" onclick="showMetricDetails('revenue')">
+                <i data-lucide="dollar-sign" class="w-8 h-8 mx-auto mb-2"></i>
+                <p class="text-3xl font-bold" id="revenue-amount">$6,615</p>
+                <p class="text-sm opacity-90">Weekly Revenue</p>
+            </div>
+            <div class="metric-card" style="background: var(--warning-gradient);" onclick="showMetricDetails('processing')">
+                <i data-lucide="refresh-cw" class="w-8 h-8 mx-auto mb-2"></i>
+                <p class="text-3xl font-bold" id="processing-time">2.3</p>
+                <p class="text-sm opacity-90">Avg Processing (hrs)</p>
+            </div>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="glass-card p-6 mb-6">
+            <div class="flex flex-col md:flex-row gap-4 items-center">
+                <div class="flex-1">
+                    <input type="text" placeholder="Search claims, patients, or trip numbers..." class="search-bar" id="search-input">
+                </div>
+                <div class="flex space-x-3">
+                    <select class="search-bar" style="width: auto;" id="status-filter">
+                        <option>All Status</option>
+                        <option>Pending Review</option>
+                        <option>Approved</option>
+                        <option>Rejected</option>
+                        <option>Processing</option>
+                    </select>
+                    <select class="search-bar" style="width: auto;" id="insurance-filter">
+                        <option>All Insurers</option>
+                        <option>Kern Family Health</option>
+                        <option>Medi-Cal</option>
+                        <option>Medicare</option>
+                        <option>Blue Cross</option>
+                    </select>
+                    <button class="premium-button" onclick="applyFilters()">
+                        <i data-lucide="filter" class="w-4 h-4 mr-2 inline"></i>
+                        Filter
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Recent Claims -->
+            <div class="glass-card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                        <i data-lucide="file-text" class="w-6 h-6 mr-3 text-blue-600"></i>
+                        Recent Claims
+                    </h3>
+                    <button class="text-blue-600 hover:text-blue-800 font-semibold text-sm" onclick="viewAllClaims()">View All</button>
+                </div>
+                
+                <div class="space-y-3" id="claims-list">
+                    <div class="table-row p-4" onclick="selectClaim(this, 'GVT-20250819-001')">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <p class="font-semibold text-gray-800">Elena Garcia • Dialysis</p>
+                                <p class="text-sm text-gray-600">Trip #GVT-20250819-001</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="status-pending mb-1">Pending Review</div>
+                                <p class="text-sm font-semibold text-gray-800">$45.00</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>Kern Family Health Care</span>
+                            <span>Submitted 2 hours ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="table-row p-4" onclick="selectClaim(this, 'GVT-20250819-002')">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <p class="font-semibold text-gray-800">Maria Santos • Physical Therapy</p>
+                                <p class="text-sm text-gray-600">Trip #GVT-20250819-002</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="status-approved mb-1">Approved</div>
+                                <p class="text-sm font-semibold text-gray-800">$35.00</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>Medi-Cal</span>
+                            <span>Processed 1 hour ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="table-row p-4" onclick="selectClaim(this, 'GVT-20250819-003')">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <p class="font-semibold text-gray-800">Robert Johnson • Doctor Visit</p>
+                                <p class="text-sm text-gray-600">Trip #GVT-20250819-003</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="status-pending mb-1">Processing</div>
+                                <p class="text-sm font-semibold text-gray-800">$42.50</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>Medicare</span>
+                            <span>Submitted 4 hours ago</span>
+                        </div>
+                    </div>
+                    
+                    <div class="table-row p-4" onclick="selectClaim(this, 'GVT-20250819-004')">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <p class="font-semibold text-gray-800">Carmen Rodriguez • Chemotherapy</p>
+                                <p class="text-sm text-gray-600">Trip #GVT-20250819-004</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="status-approved mb-1">Approved</div>
+                                <p class="text-sm font-semibold text-gray-800">$55.00</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between text-xs text-gray-500">
+                            <span>Blue Cross Blue Shield</span>
+                            <span>Processed 30 minutes ago</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="w-full mt-6 premium-button py-3 font-semibold" onclick="bulkProcessClaims()">
+                    <i data-lucide="zap" class="w-4 h-4 mr-2 inline"></i>
+                    Bulk Process Claims
+                </button>
+            </div>
+
+            <!-- Insurance Partners -->
+            <div class="insurance-card relative z-10">
+                <div class="relative z-10">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold flex items-center">
+                            <i data-lucide="building" class="w-6 h-6 mr-3"></i>
+                            Insurance Partners
+                        </h3>
+                        <button class="text-white opacity-80 hover:opacity-100 font-semibold text-sm" onclick="managePartners()">Manage</button>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white bg-opacity-20 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
+                                    <span class="font-semibold">Kern Family Health Care</span>
+                                </div>
+                                <span class="text-sm font-bold">Connected</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p class="opacity-80">Weekly Claims</p>
+                                    <p class="font-bold">89</p>
+                                </div>
+                                <div>
+                                    <p class="opacity-80">Approval Rate</p>
+                                    <p class="font-bold">96%</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white bg-opacity-20 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
+                                    <span class="font-semibold">Medi-Cal</span>
+                                </div>
+                                <span class="text-sm font-bold">Connected</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p class="opacity-80">Weekly Claims</p>
+                                    <p class="font-bold">34</p>
+                                </div>
+                                <div>
+                                    <p class="opacity-80">Approval Rate</p>
+                                    <p class="font-bold">94%</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white bg-opacity-20 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center">
+                                    <div class="w-3 h-3 bg-green-400 rounded-full mr-3"></div>
+                                    <span class="font-semibold">Medicare</span>
+                                </div>
+                                <span class="text-sm font-bold">Connected</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p class="opacity-80">Weekly Claims</p>
+                                    <p class="font-bold">24</p>
+                                </div>
+                                <div>
+                                    <p class="opacity-80">Approval Rate</p>
+                                    <p class="font-bold">98%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full mt-6 bg-white bg-opacity-20 text-white py-3 rounded-xl font-semibold hover:bg-opacity-30 transition-all" onclick="addInsurancePartner()">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2 inline"></i>
+                        Add Insurance Partner
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Approval Workflow & Billing -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Auto-Approval Workflow -->
+            <div class="approval-workflow relative z-10">
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-lucide="zap" class="w-6 h-6 mr-3"></i>
+                        Smart Approval System
+                    </h3>
+                    <p class="text-white text-opacity-90 mb-6">Automated insurance verification and claim processing</p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-white bg-opacity-20 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-semibold">Auto-Verification Rate</span>
+                                <span class="font-bold">89%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 89%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white bg-opacity-20 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-semibold">Same-Day Processing</span>
+                                <span class="font-bold">94%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 94%"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white bg-opacity-20 rounded-xl p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="font-semibold">Error Rate</span>
+                                <span class="font-bold">0.8%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 8%; background: linear-gradient(90deg, #ef4444, #dc2626);"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="w-full mt-6 bg-white bg-opacity-20 text-white py-3 rounded-xl font-semibold hover:bg-opacity-30 transition-all" onclick="configureAutoApproval()">
+                        <i data-lucide="settings" class="w-4 h-4 mr-2 inline"></i>
+                        Configure Auto-Approval Rules
+                    </button>
+                </div>
+            </div>
+
+            <!-- Billing Summary -->
+            <div class="billing-card relative z-10">
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-lucide="credit-card" class="w-6 h-6 mr-3"></i>
+                        Billing Summary
+                    </h3>
+                    <p class="text-white text-opacity-90 mb-6">Weekly financial performance overview</p>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-white bg-opacity-20 rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold" id="weekly-revenue">$6,615</p>
+                            <p class="text-sm opacity-90">Weekly Revenue</p>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold" id="outstanding-claims">$1,240</p>
+                            <p class="text-sm opacity-90">Outstanding</p>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold" id="avg-claim-value">$44.75</p>
+                            <p class="text-sm opacity-90">Avg Claim</p>
+                        </div>
+                        <div class="bg-white bg-opacity-20 rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold" id="collection-rate">97%</p>
+                            <p class="text-sm opacity-90">Collection Rate</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button class="flex-1 bg-white bg-opacity-20 text-white py-3 rounded-xl font-semibold hover:bg-opacity-30 transition-all" onclick="generateInvoices()">
+                            <i data-lucide="file-plus" class="w-4 h-4 mr-2 inline"></i>
+                            Generate Invoices
+                        </button>
+                        <button class="flex-1 bg-white bg-opacity-20 text-white py-3 rounded-xl font-semibold hover:bg-opacity-30 transition-all" onclick="viewReports()">
+                            <i data-lucide="bar-chart" class="w-4 h-4 mr-2 inline"></i>
+                            View Reports
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="glass-card p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-gray-800 flex items-center">
+                    <i data-lucide="activity" class="w-6 h-6 mr-3 text-green-600"></i>
+                    Recent Activity
+                </h3>
+                <button class="text-blue-600 hover:text-blue-800 font-semibold text-sm" onclick="viewActivityLog()">View Full Log</button>
+            </div>
+            
+            <div class="space-y-4" id="activity-feed">
+                <div class="flex items-center space-x-4 p-3 bg-green-50 rounded-lg">
+                    <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                        <i data-lucide="check" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-800">Auto-approved 5 claims from Kern Family Health Care</p>
+                        <p class="text-sm text-gray-600">Total value: $225.00 • 2 minutes ago</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-3 bg-blue-50 rounded-lg">
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                        <i data-lucide="upload" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-800">Submitted batch invoice to Medicare</p>
+                        <p class="text-sm text-gray-600">24 claims • $1,074.00 • 15 minutes ago</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-3 bg-yellow-50 rounded-lg">
+                    <div class="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-800">Manual review required for high-value claim</p>
+                        <p class="text-sm text-gray-600">Elena Garcia dialysis transport • $55.00 • 1 hour ago</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 p-3 bg-purple-50 rounded-lg">
+                    <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
+                        <i data-lucide="building" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-800">New insurance partner connection established</p>
+                        <p class="text-sm text-gray-600">Blue Cross Blue Shield • API integration active • 3 hours ago</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Lucide icons with fallback
+        function initializeIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            } else {
+                const iconMap = {
+                    'shield-check': '��️', 'bell': '🔔', 'user': '👤', 'clock': '🕐',
+                    'check-circle': '✅', 'dollar-sign': '💰', 'refresh-cw': '🔄', 'file-text': '📄',
+                    'filter': '🔍', 'building': '🏢', 'zap': '⚡', 'settings': '⚙️',
+                    'credit-card': '💳', 'plus': '➕', 'activity': '📊', 'check': '✓',
+                    'upload': '📤', 'alert-triangle': '⚠️', 'file-plus': '📄', 'bar-chart': '📊'
+                };
+                
+                document.querySelectorAll('[data-lucide]').forEach(el => {
+                    const iconName = el.getAttribute('data-lucide');
+                    const emoji = iconMap[iconName] || '●';
+                    el.innerHTML = emoji;
+                    el.style.fontSize = '1em';
+                    el.style.display = 'inline-flex';
+                    el.style.alignItems = 'center';
+                    el.style.justifyContent = 'center';
+                });
+            }
+        }
+
+        // Demo functions
+        function startInsuranceDemo() {
+            showNotification('🎬 Insurance Demo Started', 'Demonstrating automated insurance processing and billing');
+            
+            setTimeout(() => {
+                showNotification('💼 Insurance Integration', '4 major insurance partners connected with 96% approval rate');
+            }, 3000);
+            
+            setTimeout(() => {
+                showNotification('⚡ Auto-Processing', '89% of claims auto-verified • 2.3 hour average processing time');
+            }, 6000);
+            
+            setTimeout(() => {
+                showNotification('💰 Revenue Impact', '$6,615 weekly revenue • 97% collection rate • $44.75 avg claim');
+            }, 9000);
+        }
+
+        function simulateApproval() {
+            showNotification('✅ Auto-Approval Active', 'Processing pending claims automatically');
+            
+            let approvalCount = 0;
+            const interval = setInterval(() => {
+                approvalCount++;
+                
+                switch(approvalCount) {
+                    case 1:
+                        showNotification('✅ Claim Approved', 'Elena Garcia dialysis trip • $45.00 • Kern Family Health');
+                        updateClaimStatus('GVT-20250819-001', 'approved');
+                        break;
+                    case 2:
+                        showNotification('✅ Claim Approved', 'Robert Johnson doctor visit • $42.50 • Medicare');
+                        updateClaimStatus('GVT-20250819-003', 'approved');
+                        incrementMetric('approved-claims', 2);
+                        break;
+                    case 3:
+                        showNotification('💰 Revenue Updated', 'Weekly revenue increased to $6,702.50');
+                        updateRevenue(87.50);
+                        clearInterval(interval);
+                        break;
+                }
+            }, 3000);
+        }
+
+        function simulateBilling() {
+            showNotification('💰 Billing Process Started', 'Generating invoices and processing claims');
+            
+            setTimeout(() => {
+                showNotification('📄 Invoices Generated', '24 claims ready for submission to Medicare');
+            }, 2000);
+            
+            setTimeout(() => {
+                showNotification('📤 Claims Submitted', 'Batch submitted to insurance partners • $1,074.00 total');
+                addActivity('Submitted batch invoice to Medicare', '24 claims • $1,074.00', 'upload', 'blue');
+            }, 5000);
+            
+            setTimeout(() => {
+                showNotification('✅ Processing Complete', 'All pending claims processed and submitted');
+            }, 8000);
+        }
+
+        // Interactive functions
+        function showMetricDetails(type) {
+            switch(type) {
+                case 'pending':
+                    showNotification('📋 Pending Claims', '23 claims awaiting review • Average wait time: 1.2 hours');
+                    break;
+                case 'approved':
+                    showNotification('✅ Approved Claims', '147 claims approved this week • 96% approval rate');
+                    break;
+                case 'revenue':
+                    showNotification('💰 Revenue Details', '$6,615 weekly revenue • 30% growth vs last week');
+                    break;
+                case 'processing':
+                    showNotification('⏱️ Processing Time', '2.3 hours average • 89% same-day processing');
+                    break;
+            }
+        }
+
+        function selectClaim(element, tripId) {
+            element.classList.add('bg-blue-50');
+            element.style.borderLeft = '4px solid #3b82f6';
+            showNotification('📋 Claim Selected', `Viewing details for trip ${tripId}`);
+            
+            setTimeout(() => {
+                element.classList.remove('bg-blue-50');
+                element.style.borderLeft = '';
+            }, 3000);
+        }
+
+        function updateClaimStatus(tripId, status) {
+            const claims = document.querySelectorAll('#claims-list .table-row');
+            claims.forEach(claim => {
+                const tripElement = claim.querySelector('p[class*="text-sm text-gray-600"]');
+                if (tripElement && tripElement.textContent.includes(tripId)) {
+                    const statusElement = claim.querySelector('[class*="status-"]');
+                    if (statusElement) {
+                        statusElement.className = `status-${status}`;
+                        statusElement.textContent = status === 'approved' ? 'Approved' : status === 'rejected' ? 'Rejected' : 'Processing';
+                    }
+                }
+            });
+        }
+
+        function incrementMetric(metricId, amount) {
+            const element = document.getElementById(metricId);
+            const currentValue = parseInt(element.textContent);
+            element.textContent = currentValue + amount;
+        }
+
+        function updateRevenue(additionalAmount) {
+            const element = document.getElementById('revenue-amount');
+            const currentValue = parseFloat(element.textContent.replace('$', '').replace(',', ''));
+            const newValue = currentValue + additionalAmount;
+            element.textContent = `$${newValue.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
+        }
+
+        function addActivity(title, details, icon, color) {
+            const activityFeed = document.getElementById('activity-feed');
+            const newActivity = document.createElement('div');
+            newActivity.className = `flex items-center space-x-4 p-3 bg-${color}-50 rounded-lg`;
+            newActivity.innerHTML = `
+                <div class="w-10 h-10 bg-${color}-500 rounded-full flex items-center justify-center">
+                    <i data-lucide="${icon}" class="w-5 h-5 text-white"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="font-semibold text-gray-800">${title}</p>
+                    <p class="text-sm text-gray-600">${details} • Just now</p>
+                </div>
+            `;
+            activityFeed.insertBefore(newActivity, activityFeed.firstChild);
+            initializeIcons();
+        }
+
+        // Utility functions
+        function showNotification(title, message) {
+            const notification = document.createElement('div');
+            notification.className = 'demo-notification';
+            notification.innerHTML = `
+                <div class="flex items-start">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-lg mb-1">${title}</h4>
+                        <p class="text-blue-100">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-white opacity-70 hover:opacity-100 ml-4">
+                        ✕
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 500);
+                }
+            }, 5000);
+        }
+
+        // Additional interactive functions
+        function applyFilters() {
+            showNotification('🔍 Filters Applied', 'Filtering claims by selected criteria');
+        }
+
+        function viewAllClaims() {
+            showNotification('📋 All Claims', 'Viewing complete claims database');
+        }
+
+        function bulkProcessClaims() {
+            showNotification('⚡ Bulk Processing', 'Processing multiple claims simultaneously');
+        }
+
+        function managePartners() {
+            showNotification('🏢 Partner Management', 'Managing insurance partner integrations');
+        }
+
+        function addInsurancePartner() {
+            showNotification('➕ New Partner', 'Adding new insurance partner integration');
+        }
+
+        function configureAutoApproval() {
+            showNotification('⚙️ Auto-Approval Rules', 'Configuring smart approval parameters');
+        }
+
+        function generateInvoices() {
+            showNotification('📄 Invoice Generation', 'Creating weekly batch invoices');
+        }
+
+        function viewReports() {
+            showNotification('📊 Financial Reports', 'Accessing detailed financial analytics');
+        }
+
+        function viewActivityLog() {
+            showNotification('📋 Activity Log', 'Viewing complete system activity history');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeIcons();
+            console.log('🛡️ Insurance Administrator Dashboard loaded!');
+            
+            // Welcome notification
+            setTimeout(() => {
+                showNotification('👋 Welcome Sarah!', '23 claims pending review • 5 require immediate attention');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

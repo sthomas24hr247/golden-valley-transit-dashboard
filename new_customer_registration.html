@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Valley Transit - New Customer Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .form-input {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+        .premium-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .premium-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="text-center py-8">
+        <div class="floating-animation inline-block">
+            <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-3xl">🏥</span>
+            </div>
+        </div>
+        <h1 class="text-4xl font-bold text-white mb-2">Golden Valley Transit</h1>
+        <p class="text-xl text-blue-100">New Customer Registration</p>
+    </div>
+
+    <div class="max-w-2xl mx-auto px-6 pb-8">
+        <div class="glass-card p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Welcome! Let's Get Started</h2>
+            <p class="text-gray-600 text-center mb-8">Create your account for premium medical transportation</p>
+            
+            <form id="registrationForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">First Name *</label>
+                        <input type="text" class="form-input" placeholder="Enter your first name" id="firstName" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Last Name *</label>
+                        <input type="text" class="form-input" placeholder="Enter your last name" id="lastName" required>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Email Address *</label>
+                    <input type="email" class="form-input" placeholder="your.email@example.com" id="email" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
+                    <input type="tel" class="form-input" placeholder="(555) 123-4567" id="phone" required>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Date of Birth</label>
+                        <input type="date" class="form-input" id="dateOfBirth">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Gender</label>
+                        <select class="form-input" id="gender">
+                            <option value="">Select Gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="other">Other</option>
+                            <option value="prefer-not-to-say">Prefer not to say</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Home Address</label>
+                    <input type="text" class="form-input mb-4" placeholder="Street Address" id="address">
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        <input type="text" class="form-input" placeholder="City" id="city">
+                        <input type="text" class="form-input" placeholder="State" id="state" value="CA">
+                        <input type="text" class="form-input" placeholder="ZIP Code" id="zipCode">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">Mobility Requirements</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <label class="flex items-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 transition-colors">
+                            <input type="checkbox" class="mr-3" id="wheelchair">
+                            <span class="text-sm">Wheelchair Required</span>
+                        </label>
+                        <label class="flex items-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 transition-colors">
+                            <input type="checkbox" class="mr-3" id="walker">
+                            <span class="text-sm">Walker/Cane</span>
+                        </label>
+                        <label class="flex items-center p-3 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 transition-colors">
+                            <input type="checkbox" class="mr-3" id="assistance">
+                            <span class="text-sm">Assistance Needed</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Primary Insurance</label>
+                    <select class="form-input" id="insurance">
+                        <option value="">Select Insurance Provider</option>
+                        <option value="medicare">Medicare</option>
+                        <option value="medi-cal">Medi-Cal</option>
+                        <option value="kern-family-health">Kern Family Health Care</option>
+                        <option value="blue-cross">Blue Cross Blue Shield</option>
+                        <option value="aetna">Aetna</option>
+                        <option value="other">Other</option>
+                        <option value="self-pay">Self Pay</option>
+                    </select>
+                </div>
+                
+                <div class="text-center mt-8">
+                    <button type="button" class="premium-button px-8 py-3" onclick="submitRegistration()">
+                        Complete Registration & Book First Trip
+                    </button>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="/patient-portal" class="text-blue-600 hover:text-blue-800 font-semibold">
+                        Already have an account? Access Patient Portal
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Message (hidden initially) -->
+        <div id="successMessage" class="glass-card p-8 mt-6" style="display: none;">
+            <div class="text-center">
+                <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span class="text-white text-2xl">✓</span>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">Welcome to Golden Valley Transit!</h3>
+                <p class="text-gray-600 mb-6">Your account has been created successfully.</p>
+                
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+                    <h4 class="font-semibold text-green-800 mb-2">Next Steps:</h4>
+                    <div class="text-sm text-green-700">
+                        <p>✓ Account created</p>
+                        <p>✓ Welcome email sent</p>
+                        <p>✓ Ready to book your first trip</p>
+                    </div>
+                </div>
+                
+                <button class="premium-button px-8 py-3" onclick="goToPatientPortal()">
+                    Access Your Patient Portal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function submitRegistration() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            
+            if (!firstName || !lastName || !email || !phone) {
+                alert('Please fill in all required fields (marked with *)');
+                return;
+            }
+            
+            // Show loading state
+            const submitButton = document.querySelector('button[onclick="submitRegistration()"]');
+            if (submitButton) {
+                submitButton.textContent = '📧 Creating Account & Sending Welcome Email...';
+                submitButton.disabled = true;
+            }
+            
+            try {
+                // Send welcome email via API
+                const response = await fetch('/api/send-welcome-email-alt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        name: `${firstName} ${lastName}`,
+                        phone: phone
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Hide form and show success message
+                    document.getElementById('registrationForm').parentElement.style.display = 'none';
+                    document.getElementById('successMessage').style.display = 'block';
+                    
+                    // Update success message with email confirmation
+                    const successContent = document.querySelector('#successMessage .bg-green-50');
+                    if (successContent) {
+                        successContent.innerHTML = `
+                            <h4 class="font-semibold text-green-800 mb-2">Account Created Successfully!</h4>
+                            <div class="text-sm text-green-700">
+                                <p>✅ Account created for ${firstName} ${lastName}</p>
+                                <p>✅ Professional welcome email sent to ${email}</p>
+                                <p>✅ Check your email for login instructions</p>
+                                <p>✅ Ready to access your patient portal</p>
+                            </div>
+                        `;
+                    }
+                    
+                    // Scroll to success message
+                    document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    throw new Error(result.message || 'Failed to send welcome email');
+                }
+            } catch (error) {
+                console.error('Email Error:', error);
+                
+                // Still show success but mention email issue
+                document.getElementById('registrationForm').parentElement.style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                
+                // Update with email issue notice
+                const successContent = document.querySelector('#successMessage .bg-green-50');
+                if (successContent) {
+                    successContent.innerHTML = `
+                        <h4 class="font-semibold text-green-800 mb-2">Account Created!</h4>
+                        <div class="text-sm text-green-700">
+                            <p>✅ Account created for ${firstName} ${lastName}</p>
+                            <p>⚠️ Email delivery issue - please contact support</p>
+                            <p>📞 Call (661) 555-0100 for assistance</p>
+                            <p>✅ Ready to access your patient portal</p>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+            } finally {
+                // Reset button
+                if (submitButton) {
+                    submitButton.textContent = 'Complete Registration & Book First Trip';
+                    submitButton.disabled = false;
+                }
+            }
+        }
+
+        function goToPatientPortal() {
+            // In a real implementation, this would redirect to the patient portal
+            window.location.href = '/patient-portal';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Valley Transit - Driver Dashboard</title>
+    <script src="https://cdn.tailwindcss.com">        // Enhanced Call Patient Function
+        function callPatient() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <div style="text-align: center;">
+                            <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Call Patient</h3>
+                            <div style="width: 80px; height: 80px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                <span style="font-size: 2rem;">📞</span>
+                            </div>
+                            <h4 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">Elena Garcia</h4>
+                            <p style="color: #6b7280; margin-bottom: 1.5rem;">(661) 555-0103</p>
+                            <div style="display: flex; gap: 0.75rem;">
+                                <button onclick="window.location.href='tel:+16615550103'; closeModal(); showNotification('📞 Calling Elena Garcia...', 'Connecting call now');" style="flex: 1; background: #10b981; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                    📞 Call Now
+                                </button>
+                                <button onclick="window.location.href='sms:+16615550103?body=Hello Elena, this is Carlos from Golden Valley Transit. I am on my way to pick you up.'; closeModal(); showNotification('💬 Opening SMS...', 'Message app opened');" style="flex: 1; background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                    💬 SMS
+                                </button>
+                            </div>
+                            <button onclick="closeModal()" style="margin-top: 1rem; width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Enhanced Navigation Function
+        function openNavigation() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Navigation Options</h3>
+                        <p style="text-align: center; color: #6b7280; margin-bottom: 1.5rem;">📍 1234 Main St → 🏥 Dialysis Center</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                            <button onclick="window.open('https://maps.google.com/maps?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🗺️ Google Maps', 'Opening navigation');" style="background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🗺️ Google Maps
+                            </button>
+                            <button onclick="window.open('https://waze.com/ul?navigate=yes&q=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🚗 Waze', 'Opening Waze navigation');" style="background: #8b5cf6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🚗 Waze
+                            </button>
+                            <button onclick="window.open('http://maps.apple.com/?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🍎 Apple Maps', 'Opening Apple Maps');" style="background: #10b981; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🍎 Apple Maps
+                            </button>
+                            <button onclick="closeModal(); showNotification('📍 Directions', 'Getting turn-by-turn directions');" style="background: #f59e0b; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📍 Directions
+                            </button>
+                        </div>
+                        <button onclick="closeModal()" style="width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Enhanced Send Message Function
+        function sendMessage() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Send Message</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Quick Messages:</p>
+                            <button onclick="sendQuickMessage('On my way to pickup location'); closeModal();" style="width: 100%; text-align: left; padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; border: none; margin-bottom: 0.5rem; cursor: pointer;">
+                                🚗 "On my way to pickup location"
+                            </button>
+                            <button onclick="sendQuickMessage('Arrived at your location'); closeModal();" style="width: 100%; text-align: left; padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; border: none; margin-bottom: 0.5rem; cursor: pointer;">
+                                📍 "Arrived at your location"
+                            </button>
+                            <button onclick="sendQuickMessage('Running 5 minutes late due to traffic'); closeModal();" style="width: 100%; text-align: left; padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; border: none; margin-bottom: 1rem; cursor: pointer;">
+                                ⏰ "Running 5 minutes late"
+                            </button>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Custom Message:</p>
+                            <textarea id="customMessage" placeholder="Type your message here..." style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; resize: vertical;" rows="3"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button onclick="sendCustomMessage(); closeModal();" style="flex: 1; background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📤 Send Message
+                            </button>
+                            <button onclick="closeModal()" style="flex: 1; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Enhanced Report Issue Function
+        function reportIssue() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Report Issue</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Issue Type:</p>
+                            <select id="issueType" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                                <option value="">Select Issue Type</option>
+                                <option value="vehicle">Vehicle Problem</option>
+                                <option value="patient">Patient Issue</option>
+                                <option value="traffic">Traffic/Route Issue</option>
+                                <option value="medical">Medical Emergency</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Description:</p>
+                            <textarea id="issueDescription" placeholder="Describe the issue in detail..." style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; resize: vertical;" rows="4"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button onclick="submitIssue('urgent'); closeModal();" style="flex: 1; background: #ef4444; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🚨 Urgent
+                            </button>
+                            <button onclick="submitIssue('normal'); closeModal();" style="flex: 1; background: #f59e0b; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📝 Submit
+                            </button>
+                        </div>
+                        <button onclick="closeModal()" style="margin-top: 0.75rem; width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Helper Functions
+        function closeModal() {
+            if (window.currentModal) {
+                window.currentModal.remove();
+                window.currentModal = null;
+            }
+        }
+
+        function sendQuickMessage(message) {
+            showNotification('💬 Message Sent', `"${message}"`);
+        }
+
+        function sendCustomMessage() {
+            const message = document.getElementById('customMessage')?.value;
+            if (message && message.trim()) {
+                showNotification('📤 Custom Message Sent', `"${message}"`);
+            } else {
+                alert('Please enter a message');
+            }
+        }
+
+        function submitIssue(priority) {
+            const issueType = document.getElementById('issueType')?.value;
+            const description = document.getElementById('issueDescription')?.value;
+            
+            if (!issueType || !description?.trim()) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const priorityText = priority === 'urgent' ? '🚨 URGENT' : '📝 NORMAL';
+            showNotification(`${priorityText} Issue Reported`, `${issueType}: ${description.substring(0, 50)}...`);
+        }
+
+        // Original openNavigation function (keeping for compatibility)
+        function openNavigation() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Navigation Options</h3>
+                        <p style="text-align: center; color: #6b7280; margin-bottom: 1.5rem;">📍 1234 Main St → 🏥 Dialysis Center</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                            <button onclick="window.open('https://maps.google.com/maps?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🗺️ Google Maps', 'Opening navigation');" style="background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🗺️ Google Maps
+                            </button>
+                            <button onclick="window.open('https://waze.com/ul?navigate=yes&q=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🚗 Waze', 'Opening Waze navigation');" style="background: #8b5cf6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🚗 Waze
+                            </button>
+                            <button onclick="window.open('http://maps.apple.com/?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🍎 Apple Maps', 'Opening Apple Maps');" style="background: #10b981; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🍎 Apple Maps
+                            </button>
+                            <button onclick="closeModal(); showNotification('📍 Directions', 'Getting turn-by-turn directions');" style="background: #f59e0b; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📍 Directions
+                            </button>
+                        </div>
+                        <button onclick="closeModal()" style="width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+    </script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js">        // Enhanced Call Patient Function
+        function callPatient() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <div style="text-align: center;">
+                            <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Call Patient</h3>
+                            <div style="width: 80px; height: 80px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                <span style="font-size: 2rem;">📞</span>
+                            </div>
+                            <h4 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">Elena Garcia</h4>
+                            <p style="color: #6b7280; margin-bottom: 1.5rem;">(661) 555-0103</p>
+                            <div style="display: flex; gap: 0.75rem;">
+                                <button onclick="window.location.href='tel:+16615550103'; closeModal(); showNotification('📞 Calling Elena Garcia...', 'Connecting call now');" style="flex: 1; background: #10b981; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                    📞 Call Now
+                                </button>
+                                <button onclick="window.location.href='sms:+16615550103?body=Hello Elena, this is Carlos from Golden Valley Transit. I am on my way to pick you up.'; closeModal(); showNotification('💬 Opening SMS...', 'Message app opened');" style="flex: 1; background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                    💬 SMS
+                                </button>
+                            </div>
+                            <button onclick="closeModal()" style="margin-top: 1rem; width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Enhanced Navigation Function
+        function openNavigation() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Navigation Options</h3>
+                        <p style="text-align: center; color: #6b7280; margin-bottom: 1.5rem;">📍 1234 Main St → 🏥 Dialysis Center</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                            <button onclick="window.open('https://maps.google.com/maps?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🗺️ Google Maps', 'Opening navigation');" style="background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🗺️ Google Maps
+                            </button>
+                            <button onclick="window.open('https://waze.com/ul?navigate=yes&q=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🚗 Waze', 'Opening Waze navigation');" style="background: #8b5cf6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🚗 Waze
+                            </button>
+                            <button onclick="window.open('http://maps.apple.com/?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🍎 Apple Maps', 'Opening Apple Maps');" style="background: #10b981; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🍎 Apple Maps
+                            </button>
+                            <button onclick="closeModal(); showNotification('📍 Directions', 'Getting turn-by-turn directions');" style="background: #f59e0b; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📍 Directions
+                            </button>
+                        </div>
+                        <button onclick="closeModal()" style="width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Enhanced Send Message Function
+        function sendMessage() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Send Message</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Quick Messages:</p>
+                            <button onclick="sendQuickMessage('On my way to pickup location'); closeModal();" style="width: 100%; text-align: left; padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; border: none; margin-bottom: 0.5rem; cursor: pointer;">
+                                🚗 "On my way to pickup location"
+                            </button>
+                            <button onclick="sendQuickMessage('Arrived at your location'); closeModal();" style="width: 100%; text-align: left; padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; border: none; margin-bottom: 0.5rem; cursor: pointer;">
+                                📍 "Arrived at your location"
+                            </button>
+                            <button onclick="sendQuickMessage('Running 5 minutes late due to traffic'); closeModal();" style="width: 100%; text-align: left; padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; border: none; margin-bottom: 1rem; cursor: pointer;">
+                                ⏰ "Running 5 minutes late"
+                            </button>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Custom Message:</p>
+                            <textarea id="customMessage" placeholder="Type your message here..." style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; resize: vertical;" rows="3"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button onclick="sendCustomMessage(); closeModal();" style="flex: 1; background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📤 Send Message
+                            </button>
+                            <button onclick="closeModal()" style="flex: 1; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Enhanced Report Issue Function
+        function reportIssue() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Report Issue</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Issue Type:</p>
+                            <select id="issueType" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                                <option value="">Select Issue Type</option>
+                                <option value="vehicle">Vehicle Problem</option>
+                                <option value="patient">Patient Issue</option>
+                                <option value="traffic">Traffic/Route Issue</option>
+                                <option value="medical">Medical Emergency</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Description:</p>
+                            <textarea id="issueDescription" placeholder="Describe the issue in detail..." style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; resize: vertical;" rows="4"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button onclick="submitIssue('urgent'); closeModal();" style="flex: 1; background: #ef4444; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🚨 Urgent
+                            </button>
+                            <button onclick="submitIssue('normal'); closeModal();" style="flex: 1; background: #f59e0b; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📝 Submit
+                            </button>
+                        </div>
+                        <button onclick="closeModal()" style="margin-top: 0.75rem; width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Helper Functions
+        function closeModal() {
+            if (window.currentModal) {
+                window.currentModal.remove();
+                window.currentModal = null;
+            }
+        }
+
+        function sendQuickMessage(message) {
+            showNotification('💬 Message Sent', `"${message}"`);
+        }
+
+        function sendCustomMessage() {
+            const message = document.getElementById('customMessage')?.value;
+            if (message && message.trim()) {
+                showNotification('📤 Custom Message Sent', `"${message}"`);
+            } else {
+                alert('Please enter a message');
+            }
+        }
+
+        function submitIssue(priority) {
+            const issueType = document.getElementById('issueType')?.value;
+            const description = document.getElementById('issueDescription')?.value;
+            
+            if (!issueType || !description?.trim()) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const priorityText = priority === 'urgent' ? '🚨 URGENT' : '📝 NORMAL';
+            showNotification(`${priorityText} Issue Reported`, `${issueType}: ${description.substring(0, 50)}...`);
+        }
+
+        // Original openNavigation function (keeping for compatibility)
+        function openNavigation() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Navigation Options</h3>
+                        <p style="text-align: center; color: #6b7280; margin-bottom: 1.5rem;">📍 1234 Main St → 🏥 Dialysis Center</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                            <button onclick="window.open('https://maps.google.com/maps?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🗺️ Google Maps', 'Opening navigation');" style="background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🗺️ Google Maps
+                            </button>
+                            <button onclick="window.open('https://waze.com/ul?navigate=yes&q=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🚗 Waze', 'Opening Waze navigation');" style="background: #8b5cf6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🚗 Waze
+                            </button>
+                            <button onclick="window.open('http://maps.apple.com/?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🍎 Apple Maps', 'Opening Apple Maps');" style="background: #10b981; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🍎 Apple Maps
+                            </button>
+                            <button onclick="closeModal(); showNotification('📍 Directions', 'Getting turn-by-turn directions');" style="background: #f59e0b; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📍 Directions
+                            </button>
+                        </div>
+                        <button onclick="closeModal()" style="width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --gold-gradient: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
+            --dark-gradient: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .status-online {
+            background: var(--success-gradient);
+            color: white;
+            position: relative;
+        }
+        
+        .status-online::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-break {
+            background: var(--warning-gradient);
+            color: white;
+        }
+        
+        .status-busy {
+            background: var(--gold-gradient);
+            color: white;
+        }
+        
+        .status-offline {
+            background: #718096;
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .floating-animation {
+            animation: float 4s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .premium-button {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+        }
+        
+        .premium-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+        
+        .action-button {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 15px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .action-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        .emergency-button {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            animation: emergency-glow 2s infinite;
+        }
+        
+        @keyframes emergency-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(229, 62, 62, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(229, 62, 62, 0.6); }
+        }
+        
+        .trip-card-active {
+            background: var(--success-gradient);
+            border-radius: 20px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .trip-card-active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .earnings-card {
+            background: var(--gold-gradient);
+            color: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .earnings-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background: #e53e3e;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .mobile-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: rgba(255, 255, 255, 0.6);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .nav-item.active {
+            color: #667eea;
+        }
+        
+        .nav-item:hover {
+            color: white;
+        }
+        
+        .progress-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(#667eea 0%, #667eea 75%, rgba(255,255,255,0.2) 75%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .progress-ring::before {
+            content: '';
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #2d3748;
+            position: absolute;
+        }
+        
+        .progress-text {
+            position: relative;
+            z-index: 1;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .achievement-badge {
+            background: var(--gold-gradient);
+            border-radius: 15px;
+            padding: 0.75rem;
+            min-width: 120px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .achievement-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.8s;
+        }
+        
+        .achievement-badge:hover::before {
+            left: 100%;
+        }
+        
+        .vehicle-status {
+            position: relative;
+        }
+        
+        .vehicle-status::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .weather-icon {
+            font-size: 2rem;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .trip-preview {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .trip-preview:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(4px);
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .performance-bar {
+            height: 8px;
+            border-radius: 4px;
+            background: #374151;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .performance-fill {
+            height: 100%;
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .performance-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .demo-mode {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Mode Indicator -->
+    <div class="demo-mode">
+        🎬 Driver Demo Mode
+    </div>
+
+    <!-- Header -->
+    <header class="p-6 pb-2">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-3">
+                <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center floating-animation">
+                    <i data-lucide="truck" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">Carlos Martinez</h1>
+                    <p class="text-gray-300 text-sm">Driver ID: GVT-D001</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleNotifications()" class="relative">
+                    <i data-lucide="bell" class="w-6 h-6 text-gray-300"></i>
+                    <div class="notification-dot" id="notification-dot"></div>
+                </button>
+                <button onclick="showSettings()">
+                    <i data-lucide="settings" class="w-6 h-6 text-gray-300"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Status Controls -->
+        <div class="grid grid-cols-4 gap-2 mb-6">
+            <button class="status-online px-3 py-2 rounded-lg text-sm font-semibold" onclick="setStatus('online')" id="status-online">
+                <span class="ml-4">Available</span>
+            </button>
+            <button class="status-break px-3 py-2 rounded-lg text-sm font-semibold" onclick="setStatus('break')" id="status-break">
+                On Break
+            </button>
+            <button class="status-busy px-3 py-2 rounded-lg text-sm font-semibold" onclick="setStatus('busy')" id="status-busy">
+                On Trip
+            </button>
+            <button class="status-offline px-3 py-2 rounded-lg text-sm font-semibold" onclick="setStatus('offline')" id="status-offline">
+                Off Duty
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="px-6 pb-24">
+        <!-- Daily Stats -->
+        <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="glass-card p-4 text-center">
+                <i data-lucide="clock" class="w-6 h-6 mx-auto mb-2 text-blue-400"></i>
+                <p class="text-2xl font-bold" id="hours-today">8.5</p>
+                <p class="text-xs text-gray-400">Hours Today</p>
+            </div>
+            <div class="earnings-card">
+                <i data-lucide="dollar-sign" class="w-6 h-6 mx-auto mb-2"></i>
+                <p class="text-2xl font-bold" id="earnings-today">$247</p>
+                <p class="text-xs opacity-90">Earned Today</p>
+            </div>
+            <div class="glass-card p-4 text-center">
+                <i data-lucide="map-pin" class="w-6 h-6 mx-auto mb-2 text-green-400"></i>
+                <p class="text-2xl font-bold" id="trips-today">6</p>
+                <p class="text-xs text-gray-400">Trips Today</p>
+            </div>
+        </div>
+
+        <!-- Current Trip -->
+        <div class="trip-card-active mb-6 relative z-10" id="current-trip">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-bold flex items-center">
+                    <i data-lucide="navigation" class="w-5 h-5 mr-2"></i>
+                    Active Trip
+                </h3>
+                <div class="bg-white bg-opacity-20 rounded-full px-3 py-1">
+                    <span class="text-sm font-semibold" id="trip-timer">12:34</span>
+                </div>
+            </div>
+            
+            <div class="glass-card p-4 mb-4" style="background: rgba(255, 255, 255, 0.2);">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <h4 class="font-bold">Elena Garcia</h4>
+                        <p class="text-sm opacity-90">Trip #GVT-20250819-001</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-bold">$45.00</p>
+                        <p class="text-xs opacity-90">Dialysis Trip</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4 text-sm">
+                    <div class="flex items-center">
+                        <i data-lucide="map-pin" class="w-4 h-4 mr-1 text-blue-300"></i>
+                        <span>1234 Main St</span>
+                    </div>
+                    <div class="flex items-center">
+                        <i data-lucide="navigation" class="w-4 h-4 mr-1 text-red-300"></i>
+                        <span>Dialysis Center</span>
+                    </div>
+                </div>
+                
+                <div class="mt-3 p-2 bg-yellow-500 bg-opacity-20 rounded-lg border border-yellow-400">
+                    <div class="flex items-center">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 mr-2 text-yellow-300"></i>
+                        <span class="text-sm">Wheelchair assistance required</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <button class="action-button" onclick="arrivePickup()">
+                    <i data-lucide="map-pin" class="w-4 h-4 mr-2 inline"></i>
+                    Arrived at Pickup
+                </button>
+                <button class="action-button" onclick="startTrip()">
+                    <i data-lucide="play" class="w-4 h-4 mr-2 inline"></i>
+                    Start Trip
+                </button>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <button class="glass-card p-4 text-center" onclick="callPatient()">
+                <i data-lucide="phone" class="w-8 h-8 mx-auto mb-2 text-green-400"></i>
+                <p class="font-semibold">Call Patient</p>
+                <p class="text-xs text-gray-400">Elena Garcia</p>
+            </button>
+            <button class="glass-card p-4 text-center" onclick="openNavigation()">
+                <i data-lucide="navigation" class="w-8 h-8 mx-auto mb-2 text-blue-400"></i>
+                <p class="font-semibold">Navigation</p>
+                <p class="text-xs text-gray-400">GPS Directions</p>
+            </button>
+            <button class="glass-card p-4 text-center" onclick="sendMessage()">
+                <i data-lucide="message-square" class="w-8 h-8 mx-auto mb-2 text-purple-400"></i>
+                <p class="font-semibold">Send Message</p>
+                <p class="text-xs text-gray-400">Quick Updates</p>
+            </button>
+            <button class="glass-card p-4 text-center" onclick="reportIssue()">
+                <i data-lucide="alert-circle" class="w-8 h-8 mx-auto mb-2 text-orange-400"></i>
+                <p class="font-semibold">Report Issue</p>
+                <p class="text-xs text-gray-400">Support Needed</p>
+            </button>
+        </div>
+
+        <!-- Performance & Recognition -->
+        <div class="grid grid-cols-1 gap-4 mb-6">
+            <!-- Weekly Performance -->
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-bold mb-4 flex items-center">
+                    <i data-lucide="trending-up" class="w-5 h-5 mr-2 text-blue-400"></i>
+                    Weekly Performance
+                </h3>
+                
+                <div class="flex items-center justify-between">
+                    <div class="flex-1 space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Hours: 38.5 / 40</span>
+                                <span class="text-blue-400 font-semibold">96%</span>
+                            </div>
+                            <div class="performance-bar mb-1">
+                                <div class="performance-fill bg-gradient-to-r from-blue-500 to-purple-600" style="width: 96%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>On-Time Performance</span>
+                                <span class="text-green-400 font-semibold">98%</span>
+                            </div>
+                            <div class="performance-bar mb-1">
+                                <div class="performance-fill bg-gradient-to-r from-green-500 to-emerald-500" style="width: 98%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between text-sm mb-2">
+                                <span>Safety Score</span>
+                                <span class="text-yellow-400 font-semibold">100%</span>
+                            </div>
+                            <div class="performance-bar">
+                                <div class="performance-fill bg-gradient-to-r from-yellow-500 to-orange-500" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="ml-6">
+                        <div class="progress-ring">
+                            <div class="progress-text">4.9</div>
+                        </div>
+                        <p class="text-center text-xs mt-2 text-gray-400">Rating</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Achievements -->
+            <div class="glass-card p-4">
+                <h4 class="font-bold mb-3 flex items-center">
+                    <i data-lucide="award" class="w-5 h-5 mr-2 text-yellow-400"></i>
+                    Recent Achievements
+                </h4>
+                <div class="flex space-x-2 overflow-x-auto pb-2">
+                    <div class="achievement-badge">
+                        <i data-lucide="star" class="w-6 h-6 mx-auto mb-1"></i>
+                        <p class="text-xs font-semibold">Perfect Week</p>
+                        <p class="text-xs opacity-90">5-Star Rating</p>
+                    </div>
+                    <div class="achievement-badge" style="background: var(--success-gradient);">
+                        <i data-lucide="clock" class="w-6 h-6 mx-auto mb-1"></i>
+                        <p class="text-xs font-semibold">Punctual Pro</p>
+                        <p class="text-xs opacity-90">On-Time Master</p>
+                    </div>
+                    <div class="achievement-badge" style="background: var(--primary-gradient);">
+                        <i data-lucide="shield-check" class="w-6 h-6 mx-auto mb-1"></i>
+                        <p class="text-xs font-semibold">Safety Expert</p>
+                        <p class="text-xs opacity-90">Zero Incidents</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vehicle Status & Weather -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-bold flex items-center">
+                        <i data-lucide="car" class="w-4 h-4 mr-2 text-blue-400"></i>
+                        Vehicle MT-001
+                    </h4>
+                    <div class="w-3 h-3 bg-green-400 rounded-full"></div>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Fuel</span>
+                        <span class="text-green-400">85%</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Mileage</span>
+                        <span>23,456 mi</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Status</span>
+                        <span class="text-green-400">Operational</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <h4 class="font-bold flex items-center">
+                        <i data-lucide="cloud-sun" class="w-4 h-4 mr-2 text-yellow-400"></i>
+                        Weather
+                    </h4>
+                    <span class="text-xl">☀️</span>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Current</span>
+                        <span>78°F</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Condition</span>
+                        <span class="text-yellow-400">Sunny</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-400">Visibility</span>
+                        <span class="text-green-400">Excellent</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Trips -->
+        <div class="glass-card p-4 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-bold flex items-center">
+                    <i data-lucide="calendar-clock" class="w-5 h-5 mr-2 text-purple-400"></i>
+                    Next Trips
+                </h3>
+                <span class="text-xs text-gray-400">2 Scheduled</span>
+            </div>
+            
+            <div class="space-y-3">
+                <div class="trip-preview">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-semibold text-sm">Maria Santos</span>
+                        <span class="status-indicator bg-purple-500 text-white">2:30 PM</span>
+                    </div>
+                    <div class="flex items-center text-xs text-gray-400">
+                        <i data-lucide="map-pin" class="w-3 h-3 mr-1"></i>
+                        <span>Physical Therapy → Home</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-gray-400">15 min duration</span>
+                        <span class="text-xs text-green-400">♿ Accessible</span>
+                    </div>
+                </div>
+                
+                <div class="trip-preview">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-semibold text-sm">Robert Johnson</span>
+                        <span class="status-indicator bg-blue-500 text-white">4:00 PM</span>
+                    </div>
+                    <div class="flex items-center text-xs text-gray-400">
+                        <i data-lucide="map-pin" class="w-3 h-3 mr-1"></i>
+                        <span>Doctor Appointment</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs text-gray-400">25 min duration</span>
+                        <span class="text-xs text-blue-400">Standard Transport</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Section -->
+        <div class="glass-card p-6 text-center">
+            <h3 class="text-lg font-bold mb-4 text-red-400 flex items-center justify-center">
+                <i data-lucide="shield-alert" class="w-5 h-5 mr-2"></i>
+                Emergency Support
+            </h3>
+            <button class="emergency-button" onclick="emergencyCall()">
+                <i data-lucide="phone" class="w-5 h-5 mr-2 inline"></i>
+                Emergency Dispatch
+            </button>
+            <p class="text-xs text-gray-400 mt-2">24/7 Support Available</p>
+        </div>
+    </main>
+
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <div class="grid grid-cols-5 gap-1">
+            <div class="nav-item active" onclick="switchTab('dashboard')">
+                <i data-lucide="gauge" class="w-5 h-5 mb-1"></i>
+                <span class="text-xs">Dashboard</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('trips')">
+                <i data-lucide="map" class="w-5 h-5 mb-1"></i>
+                <span class="text-xs">Trips</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('earnings')">
+                <i data-lucide="dollar-sign" class="w-5 h-5 mb-1"></i>
+                <span class="text-xs">Earnings</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('messages')">
+                <i data-lucide="message-square" class="w-5 h-5 mb-1"></i>
+                <span class="text-xs">Messages</span>
+                <div class="notification-dot" style="top: -2px; right: 8px;"></div>
+            </div>
+            <div class="nav-item" onclick="switchTab('profile')">
+                <i data-lucide="user" class="w-5 h-5 mb-1"></i>
+                <span class="text-xs">Profile</span>
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        // Initialize Lucide icons with fallback
+        function initializeIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            } else {
+                const iconMap = {
+                'truck': '🚛', 'bell': '��', 'settings': '⚙️', 'clock': '🕐',
+                'dollar-sign': '💰', 'map-pin': '📍', 'navigation': '🧭', 'alert-triangle': '⚠️',
+                'play': '▶️', 'phone': '📞', 'message-square': '��', 'alert-circle': '⚠️',
+                'trending-up': '📈', 'shield-alert': '🚨', 'gauge': '⏲️', 'map': '🗺️',
+                'user': '👤', 'award': '🏆', 'star': '⭐', 'shield-check': '🛡️',
+                'car': '🚗', 'cloud-sun': '🌤️', 'calendar-clock': '📅', 'check': '✅',
+                'flag': '🏁'
+            };
+                
+                document.querySelectorAll('[data-lucide]').forEach(el => {
+                    const iconName = el.getAttribute('data-lucide');
+                    const emoji = iconMap[iconName] || '●';
+                    el.innerHTML = emoji;
+                    el.style.fontSize = '1em';
+                    el.style.display = 'inline-flex';
+                    el.style.alignItems = 'center';
+                    el.style.justifyContent = 'center';
+                });
+            }
+        }
+
+        // Driver status management
+        let currentStatus = 'online';
+        let tripTimer = 754; // seconds
+        let dailyEarnings = 247;
+        let dailyTrips = 6;
+        let dailyHours = 8.5;
+
+        function setStatus(status) {
+            // Remove active class from all status buttons
+            document.querySelectorAll('[id^="status-"]').forEach(btn => {
+                btn.style.opacity = '0.5';
+                btn.style.transform = 'scale(1)';
+            });
+            
+            // Activate selected status
+            const activeBtn = document.getElementById(`status-${status}`);
+            activeBtn.style.opacity = '1';
+            activeBtn.style.transform = 'scale(1.05)';
+            
+            currentStatus = status;
+            showNotification(`Status Updated`, `You are now ${status === 'online' ? 'Available' : status === 'break' ? 'On Break' : status === 'busy' ? 'On Trip' : 'Off Duty'}`);
+            
+            // Update UI based on status
+            updateStatusUI(status);
+        }
+
+        function updateStatusUI(status) {
+            const currentTrip = document.getElementById('current-trip');
+            if (status === 'offline') {
+                currentTrip.style.opacity = '0.5';
+                currentTrip.style.pointerEvents = 'none';
+            } else {
+                currentTrip.style.opacity = '1';
+                currentTrip.style.pointerEvents = 'auto';
+            }
+        }
+
+        // Trip management
+        function arrivePickup() {
+            showNotification('📍 Arrival Confirmed', 'Marked as arrived at pickup location');
+            updateTripButton('startTrip', 'Patient Onboard', 'check');
+        }
+
+        function startTrip() {
+            showNotification('🚗 Trip Started', 'En route to Bakersfield Dialysis Center');
+            updateTripButton('completeTrip', 'Complete Trip', 'flag');
+            setStatus('busy');
+            startTripTimer();
+        }
+
+        function completeTrip() {
+            showNotification('✅ Trip Completed', 'Elena Garcia delivered safely • $45.00 earned');
+            dailyEarnings += 45;
+            dailyTrips += 1;
+            dailyHours += 0.5;
+            
+            document.getElementById('earnings-today').textContent = `$${dailyEarnings}`;
+            document.getElementById('trips-today').textContent = dailyTrips;
+            document.getElementById('hours-today').textContent = dailyHours.toFixed(1);
+            
+            setStatus('online');
+            resetTrip();
+        }
+
+        function updateTripButton(newFunction, newText, newIcon) {
+            const buttons = document.querySelector('#current-trip .grid').children;
+            buttons[1].setAttribute('onclick', `${newFunction}()`);
+            buttons[1].innerHTML = `<i data-lucide="${newIcon}" class="w-4 h-4 mr-2 inline"></i>${newText}`;
+            initializeIcons();
+        }
+
+        function resetTrip() {
+            setTimeout(() => {
+                document.querySelector('#current-trip .grid').children[1].setAttribute('onclick', 'startTrip()');
+                document.querySelector('#current-trip .grid').children[1].innerHTML = '<i data-lucide="play" class="w-4 h-4 mr-2 inline"></i>Start Trip';
+                initializeIcons();
+            }, 3000);
+        }
+
+        // Trip timer
+        function startTripTimer() {
+            const timerElement = document.getElementById('trip-timer');
+            const interval = setInterval(() => {
+                tripTimer++;
+                const minutes = Math.floor(tripTimer / 60);
+                const seconds = tripTimer % 60;
+                timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+            
+            // Store interval for cleanup if needed
+            window.tripTimerInterval = interval;
+        }
+
+        // Communication functions
+        function callPatient() {
+            showNotification('📞 Calling Elena', 'Connecting to patient...');
+            setTimeout(() => {
+                showNotification('📞 Call Connected', 'Speaking with Elena Garcia');
+            }, 2000);
+        }
+
+        function sendMessage() {
+            showNotification('💬 Quick Message', 'Message sent: "I\'m 2 minutes away"');
+        }
+
+        function openNavigation() {
+            showNotification('��️ GPS Navigation', 'Opening route to Bakersfield Dialysis Center');
+        }
+
+        function reportIssue() {
+            showNotification('🚨 Support Request', 'Issue reported to dispatch team');
+        }
+
+        function emergencyCall() {
+            showNotification('🚨 EMERGENCY', 'Connecting to emergency dispatch immediately');
+        }
+
+        // Utility functions
+        function showNotification(title, message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-16 right-4 left-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform';
+            notification.innerHTML = `
+                <div class="flex items-start">
+                    <div class="flex-1">
+                        <h4 class="font-bold">${title}</h4>
+                        <p class="text-sm opacity-90">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-white opacity-70 hover:opacity-100 ml-4">
+                        ✕
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 300);
+                }
+            }, 4000);
+        }
+
+        function toggleNotifications() {
+            showNotification('🔔 Notifications', 'New trip assignment available');
+        }
+
+        function showSettings() {
+            showNotification('⚙️ Settings', 'Driver preferences and account settings');
+        }
+
+        function switchTab(tab) {
+            // Remove active class from all nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            event.currentTarget.classList.add('active');
+            
+            // Show different content based on tab
+            switch(tab) {
+                case 'trips':
+                    showNotification('🗺️ Trip History', 'Viewing completed and upcoming trips');
+                    break;
+                case 'earnings':
+                    showNotification('💰 Earnings Report', 'Weekly: $1,247 • Daily: $247 • Rating: 4.9⭐');
+                    break;
+                case 'messages':
+                    showNotification('💬 Messages', 'New message from dispatch about tomorrow\'s schedule');
+                    break;
+                case 'profile':
+                    showNotification('👤 Driver Profile', 'Carlos Martinez • ID: GVT-D001 • 4.9⭐ Rating');
+                    break;
+                default:
+                    showNotification('⏲️ Dashboard', 'Driver dashboard - monitoring active trips and performance');
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeIcons();
+            console.log('🚛 Carlos Martinez Driver Dashboard loaded!');
+            
+            // Set initial status
+            setStatus('online');
+            
+            // Start trip timer display
+            const timerElement = document.getElementById('trip-timer');
+            const minutes = Math.floor(tripTimer / 60);
+            const seconds = tripTimer % 60;
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Welcome notification
+            setTimeout(() => {
+                showNotification('👋 Welcome Carlos!', 'You have 1 active trip and 2 pending assignments');
+            }, 1000);
+        });
+            // Enhanced Call Patient Function
+        function callPatient() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <div style="text-align: center;">
+                            <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem;">Call Patient</h3>
+                            <div style="width: 80px; height: 80px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                                <span style="font-size: 2rem;">📞</span>
+                            </div>
+                            <h4 style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.5rem;">Elena Garcia</h4>
+                            <p style="color: #6b7280; margin-bottom: 1.5rem;">(661) 555-0103</p>
+                            <div style="display: flex; gap: 0.75rem;">
+                                <button onclick="window.location.href='tel:+16615550103'; closeModal(); showNotification('📞 Calling Elena Garcia...', 'Connecting call now');" style="flex: 1; background: #10b981; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                    📞 Call Now
+                                </button>
+                                <button onclick="window.location.href='sms:+16615550103?body=Hello Elena, this is Carlos from Golden Valley Transit. I am on my way to pick you up.'; closeModal(); showNotification('💬 Opening SMS...', 'Message app opened');" style="flex: 1; background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                    💬 SMS
+                                </button>
+                            </div>
+                            <button onclick="closeModal()" style="margin-top: 1rem; width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Enhanced Navigation Function
+        function openNavigation() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Navigation Options</h3>
+                        <p style="text-align: center; color: #6b7280; margin-bottom: 1.5rem;">📍 1234 Main St → 🏥 Dialysis Center</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                            <button onclick="window.open('https://maps.google.com/maps?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🗺️ Google Maps', 'Opening navigation');" style="background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🗺️ Google Maps
+                            </button>
+                            <button onclick="window.open('https://waze.com/ul?navigate=yes&q=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🚗 Waze', 'Opening Waze navigation');" style="background: #8b5cf6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🚗 Waze
+                            </button>
+                            <button onclick="window.open('http://maps.apple.com/?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🍎 Apple Maps', 'Opening Apple Maps');" style="background: #10b981; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🍎 Apple Maps
+                            </button>
+                            <button onclick="closeModal(); showNotification('📍 Directions', 'Getting turn-by-turn directions');" style="background: #f59e0b; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📍 Directions
+                            </button>
+                        </div>
+                        <button onclick="closeModal()" style="width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Enhanced Send Message Function
+        function sendMessage() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Send Message</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Quick Messages:</p>
+                            <button onclick="sendQuickMessage('On my way to pickup location'); closeModal();" style="width: 100%; text-align: left; padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; border: none; margin-bottom: 0.5rem; cursor: pointer;">
+                                🚗 "On my way to pickup location"
+                            </button>
+                            <button onclick="sendQuickMessage('Arrived at your location'); closeModal();" style="width: 100%; text-align: left; padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; border: none; margin-bottom: 0.5rem; cursor: pointer;">
+                                📍 "Arrived at your location"
+                            </button>
+                            <button onclick="sendQuickMessage('Running 5 minutes late due to traffic'); closeModal();" style="width: 100%; text-align: left; padding: 0.75rem; background: #f3f4f6; border-radius: 0.5rem; border: none; margin-bottom: 1rem; cursor: pointer;">
+                                ⏰ "Running 5 minutes late"
+                            </button>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Custom Message:</p>
+                            <textarea id="customMessage" placeholder="Type your message here..." style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; resize: vertical;" rows="3"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button onclick="sendCustomMessage(); closeModal();" style="flex: 1; background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📤 Send Message
+                            </button>
+                            <button onclick="closeModal()" style="flex: 1; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Enhanced Report Issue Function
+        function reportIssue() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Report Issue</h3>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Issue Type:</p>
+                            <select id="issueType" style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                                <option value="">Select Issue Type</option>
+                                <option value="vehicle">Vehicle Problem</option>
+                                <option value="patient">Patient Issue</option>
+                                <option value="traffic">Traffic/Route Issue</option>
+                                <option value="medical">Medical Emergency</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div style="margin-bottom: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem;">Description:</p>
+                            <textarea id="issueDescription" placeholder="Describe the issue in detail..." style="width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; resize: vertical;" rows="4"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 0.75rem;">
+                            <button onclick="submitIssue('urgent'); closeModal();" style="flex: 1; background: #ef4444; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🚨 Urgent
+                            </button>
+                            <button onclick="submitIssue('normal'); closeModal();" style="flex: 1; background: #f59e0b; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📝 Submit
+                            </button>
+                        </div>
+                        <button onclick="closeModal()" style="margin-top: 0.75rem; width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+
+        // Helper Functions
+        function closeModal() {
+            if (window.currentModal) {
+                window.currentModal.remove();
+                window.currentModal = null;
+            }
+        }
+
+        function sendQuickMessage(message) {
+            showNotification('💬 Message Sent', `"${message}"`);
+        }
+
+        function sendCustomMessage() {
+            const message = document.getElementById('customMessage')?.value;
+            if (message && message.trim()) {
+                showNotification('📤 Custom Message Sent', `"${message}"`);
+            } else {
+                alert('Please enter a message');
+            }
+        }
+
+        function submitIssue(priority) {
+            const issueType = document.getElementById('issueType')?.value;
+            const description = document.getElementById('issueDescription')?.value;
+            
+            if (!issueType || !description?.trim()) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const priorityText = priority === 'urgent' ? '🚨 URGENT' : '📝 NORMAL';
+            showNotification(`${priorityText} Issue Reported`, `${issueType}: ${description.substring(0, 50)}...`);
+        }
+
+        // Original openNavigation function (keeping for compatibility)
+        function openNavigation() {
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+                    <div style="background: white; border-radius: 20px; padding: 2rem; max-width: 400px; width: 90%; color: #1f2937;">
+                        <h3 style="font-size: 1.25rem; font-weight: bold; margin-bottom: 1rem; text-align: center;">Navigation Options</h3>
+                        <p style="text-align: center; color: #6b7280; margin-bottom: 1.5rem;">📍 1234 Main St → 🏥 Dialysis Center</p>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1rem;">
+                            <button onclick="window.open('https://maps.google.com/maps?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🗺️ Google Maps', 'Opening navigation');" style="background: #3b82f6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🗺️ Google Maps
+                            </button>
+                            <button onclick="window.open('https://waze.com/ul?navigate=yes&q=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🚗 Waze', 'Opening Waze navigation');" style="background: #8b5cf6; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🚗 Waze
+                            </button>
+                            <button onclick="window.open('http://maps.apple.com/?daddr=5678 Medical Blvd, Bakersfield, CA 93309', '_blank'); closeModal(); showNotification('🍎 Apple Maps', 'Opening Apple Maps');" style="background: #10b981; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                🍎 Apple Maps
+                            </button>
+                            <button onclick="closeModal(); showNotification('📍 Directions', 'Getting turn-by-turn directions');" style="background: #f59e0b; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; font-weight: 600; cursor: pointer;">
+                                📍 Directions
+                            </button>
+                        </div>
+                        <button onclick="closeModal()" style="width: 100%; background: #6b7280; color: white; padding: 0.75rem; border-radius: 0.5rem; border: none; cursor: pointer;">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            window.currentModal = modal;
+        }
+    </script>
+</body>
+</html>

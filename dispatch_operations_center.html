@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Valley Transit - Dispatch Operations Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --success-gradient: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --dark-gradient: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+        
+        .operations-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        
+        .operations-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .live-map {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            min-height: 400px;
+        }
+        
+        .live-map::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='7' cy='7' r='7'/%3E%3Ccircle cx='53' cy='53' r='7'/%3E%3Ccircle cx='30' cy='30' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.5;
+        }
+        
+        .vehicle-marker {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: var(--success-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4);
+            animation: pulse-marker 2s infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .vehicle-marker:hover {
+            transform: scale(1.2);
+            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
+        }
+        
+        .vehicle-marker.busy {
+            background: var(--warning-gradient);
+            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
+        }
+        
+        .vehicle-marker.maintenance {
+            background: var(--danger-gradient);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+        
+        @keyframes pulse-marker {
+            0%, 100% { 
+                box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4), 0 0 0 0 rgba(17, 153, 142, 0.7);
+            }
+            50% { 
+                box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4), 0 0 0 10px rgba(17, 153, 142, 0);
+            }
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            position: relative;
+        }
+        
+        .status-active {
+            background: var(--success-gradient);
+            color: white;
+        }
+        
+        .status-active::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-scheduled {
+            background: var(--info-gradient);
+            color: white;
+        }
+        
+        .status-emergency {
+            background: var(--danger-gradient);
+            color: white;
+            animation: emergency-flash 1s infinite;
+        }
+        
+        @keyframes emergency-flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .priority-high {
+            border-left: 4px solid #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .priority-medium {
+            border-left: 4px solid #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .priority-low {
+            border-left: 4px solid #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .real-time-update {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .real-time-update::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: data-flow 3s infinite;
+        }
+        
+        @keyframes data-flow {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .metric-display {
+            background: var(--info-gradient);
+            color: white;
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .metric-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+        }
+        
+        .metric-display:hover {
+            transform: scale(1.05);
+        }
+        
+        .emergency-alert {
+            background: var(--danger-gradient);
+            border-radius: 15px;
+            padding: 1rem;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            animation: emergency-pulse 2s infinite;
+        }
+        
+        @keyframes emergency-pulse {
+            0%, 100% { 
+                box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+            }
+            50% { 
+                box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+            }
+        }
+        
+        .trip-queue-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .trip-queue-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateX(4px);
+        }
+        
+        .communication-panel {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 20px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .communication-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .demo-notification {
+            position: fixed;
+            top: 4rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: 1000;
+            max-width: 350px;
+        }
+        
+        .demo-notification.show {
+            transform: translateX(0);
+        }
+        
+        .weather-widget {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .driver-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        
+        .driver-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .driver-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .alert-banner {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            animation: alert-slide 0.5s ease;
+        }
+        
+        @keyframes alert-slide {
+            0% { transform: translateY(-100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        .performance-chart {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 1.5rem;
+            position: relative;
+        }
+        
+        .chart-bar {
+            background: var(--success-gradient);
+            height: 100px;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .chart-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: chart-shimmer 2s infinite;
+        }
+        
+        @keyframes chart-shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Demo Controls -->
+    <div class="fixed top-4 left-4 z-50 space-y-2">
+        <button onclick="startDispatchDemo()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-green-700">
+            🎬 Dispatch Demo
+        </button>
+        <button onclick="simulateEmergency()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-red-700">
+            🚨 Emergency Alert
+        </button>
+        <button onclick="simulateOptimization()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-purple-700">
+            🤖 AI Optimize
+        </button>
+    </div>
+
+    <!-- Alert Banner -->
+    <div class="alert-banner" id="alert-banner" style="display: none;">
+        <i data-lucide="alert-triangle" class="w-5 h-5 mr-3"></i>
+        <span id="alert-message">System Alert</span>
+        <button onclick="dismissAlert()" class="ml-auto text-white opacity-80 hover:opacity-100">
+            <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+    </div>
+
+    <!-- Header -->
+    <header class="operations-card mx-6 mt-6 p-6">
+        <div class="flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center floating-animation">
+                    <i data-lucide="radio" class="w-8 h-8 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold">Dispatch Operations Center</h1>
+                    <p class="text-gray-300 font-medium">Golden Valley Transit • Live Control Room</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-6">
+                <div class="weather-widget">
+                    <div class="text-2xl mb-1">☀️</div>
+                    <div class="text-sm font-semibold">78°F</div>
+                    <div class="text-xs text-gray-300">Clear</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-400" id="active-trips">12</div>
+                    <div class="text-xs text-gray-300">Active Trips</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-blue-400" id="available-drivers">8</div>
+                    <div class="text-xs text-gray-300">Available Drivers</div>
+                </div>
+                <div class="relative">
+                    <i data-lucide="bell" class="w-6 h-6 text-gray-300"></i>
+                    <div class="notification-dot" id="notification-dot"></div>
+                </div>
+                <div class="text-right">
+                    <p class="font-semibold">Michael Rodriguez</p>
+                    <p class="text-sm text-gray-300">Dispatch Manager</p>
+                </div>
+                <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center">
+                    <i data-lucide="user" class="w-5 h-5 text-white"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="px-6 py-6">
+        <!-- Top Metrics Row -->
+        <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
+            <div class="metric-display" onclick="showFleetStatus()">
+                <i data-lucide="truck" class="w-6 h-6 mx-auto mb-2"></i>
+                <p class="text-lg font-bold" id="fleet-count">15</p>
+                <p class="text-xs opacity-90">Fleet Vehicles</p>
+            </div>
+            <div class="metric-display" style="background: var(--success-gradient);" onclick="showTripMetrics()">
+                <i data-lucide="map-pin" class="w-6 h-6 mx-auto mb-2"></i>
+                <p class="text-lg font-bold" id="completed-trips">47</p>
+                <p class="text-xs opacity-90">Trips Today</p>
+            </div>
+            <div class="metric-display" style="background: var(--warning-gradient);" onclick="showResponseTime()">
+                <i data-lucide="clock" class="w-6 h-6 mx-auto mb-2"></i>
+                <p class="text-lg font-bold" id="response-time">3.2</p>
+                <p class="text-xs opacity-90">Avg Response (min)</p>
+            </div>
+            <div class="metric-display" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);" onclick="showEfficiency()">
+                <i data-lucide="zap" class="w-6 h-6 mx-auto mb-2"></i>
+                <p class="text-lg font-bold" id="efficiency">94%</p>
+                <p class="text-xs opacity-90">Efficiency Rate</p>
+            </div>
+            <div class="metric-display" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" onclick="showSatisfaction()">
+                <i data-lucide="star" class="w-6 h-6 mx-auto mb-2"></i>
+                <p class="text-lg font-bold" id="satisfaction">4.8</p>
+                <p class="text-xs opacity-90">Customer Rating</p>
+            </div>
+            <div class="metric-display" style="background: var(--danger-gradient);" onclick="showEmergencies()">
+                <i data-lucide="alert-triangle" class="w-6 h-6 mx-auto mb-2"></i>
+                <p class="text-lg font-bold" id="emergency-count">0</p>
+                <p class="text-xs opacity-90">Emergencies</p>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <!-- Live Fleet Map -->
+            <div class="lg:col-span-2 operations-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i data-lucide="map" class="w-6 h-6 mr-3 text-blue-400"></i>
+                        Live Fleet Tracking
+                    </h3>
+                    <div class="flex space-x-2">
+                        <button class="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-semibold" onclick="centerMap()">Center</button>
+                        <button class="bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-semibold" onclick="showRoutes()">Routes</button>
+                        <button class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-semibold" onclick="optimizeRoutes()">Optimize</button>
+                    </div>
+                </div>
+                
+                <div class="live-map relative">
+                    <div class="absolute inset-4 z-10">
+                        <!-- Vehicle Markers -->
+                        <div class="vehicle-marker" style="top: 20%; left: 15%;" onclick="selectVehicle('MT-001', 'Carlos Martinez')" data-vehicle="MT-001">
+                            <span class="text-xs">01</span>
+                        </div>
+                        <div class="vehicle-marker busy" style="top: 45%; left: 60%;" onclick="selectVehicle('MT-002', 'Angela Foster')" data-vehicle="MT-002">
+                            <span class="text-xs">02</span>
+                        </div>
+                        <div class="vehicle-marker" style="top: 70%; left: 30%;" onclick="selectVehicle('MT-003', 'David Chen')" data-vehicle="MT-003">
+                            <span class="text-xs">03</span>
+                        </div>
+                        <div class="vehicle-marker busy" style="top: 25%; left: 75%;" onclick="selectVehicle('MT-004', 'Maria Lopez')" data-vehicle="MT-004">
+                            <span class="text-xs">04</span>
+                        </div>
+                        <div class="vehicle-marker maintenance" style="top: 80%; left: 70%;" onclick="selectVehicle('MT-005', 'Robert Kim')" data-vehicle="MT-005">
+                            <span class="text-xs">05</span>
+                        </div>
+                        <div class="vehicle-marker" style="top: 35%; left: 45%;" onclick="selectVehicle('MT-006', 'Sarah Williams')" data-vehicle="MT-006">
+                            <span class="text-xs">06</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Map Legend -->
+                    <div class="absolute bottom-4 left-4 bg-black bg-opacity-50 backdrop-blur-lg rounded-lg p-3 z-20">
+                        <div class="text-xs font-semibold mb-2">Vehicle Status</div>
+                        <div class="space-y-1 text-xs">
+                            <div class="flex items-center"><div class="w-3 h-3 bg-green-500 rounded-full mr-2"></div>Available</div>
+                            <div class="flex items-center"><div class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>On Trip</div>
+                            <div class="flex items-center"><div class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>Maintenance</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Selected Vehicle Info -->
+                    <div class="absolute top-4 right-4 bg-black bg-opacity-50 backdrop-blur-lg rounded-lg p-3 z-20" id="vehicle-info" style="display: none;">
+                        <div class="text-sm font-semibold" id="vehicle-name">Vehicle Info</div>
+                        <div class="text-xs text-gray-300" id="vehicle-details">Click a vehicle for details</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Trips Queue -->
+            <div class="operations-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i data-lucide="list" class="w-6 h-6 mr-3 text-green-400"></i>
+                        Active Trips
+                    </h3>
+                    <div class="status-active">12 Active</div>
+                </div>
+                
+                <div class="space-y-3 max-h-96 overflow-y-auto" id="active-trips-list">
+                    <div class="trip-queue-item priority-high" onclick="selectTrip('GVT-001')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Elena Garcia</span>
+                            <div class="status-active">In Transit</div>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-1">Dialysis • Trip #GVT-20250819-001</div>
+                        <div class="text-xs text-gray-400">Driver: Carlos Martinez</div>
+                        <div class="text-xs text-blue-400">ETA: 15 min</div>
+                    </div>
+                    
+                    <div class="trip-queue-item priority-medium" onclick="selectTrip('GVT-002')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Maria Santos</span>
+                            <div class="status-scheduled">En Route</div>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-1">Physical Therapy • Trip #GVT-20250819-002</div>
+                        <div class="text-xs text-gray-400">Driver: Angela Foster</div>
+                        <div class="text-xs text-blue-400">ETA: 8 min</div>
+                    </div>
+                    
+                    <div class="trip-queue-item priority-low" onclick="selectTrip('GVT-003')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Robert Johnson</span>
+                            <div class="status-scheduled">Pickup</div>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-1">Doctor Visit • Trip #GVT-20250819-003</div>
+                        <div class="text-xs text-gray-400">Driver: David Chen</div>
+                        <div class="text-xs text-blue-400">ETA: 22 min</div>
+                    </div>
+                    
+                    <div class="trip-queue-item priority-high" onclick="selectTrip('GVT-004')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Carmen Rodriguez</span>
+                            <div class="status-active">In Transit</div>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-1">Chemotherapy • Trip #GVT-20250819-004</div>
+                        <div class="text-xs text-gray-400">Driver: Maria Lopez</div>
+                        <div class="text-xs text-blue-400">ETA: 12 min</div>
+                    </div>
+                    
+                    <div class="trip-queue-item priority-medium" onclick="selectTrip('GVT-005')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">James Wilson</span>
+                            <div class="status-scheduled">Scheduled</div>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-1">Surgery Consultation • Trip #GVT-20250819-005</div>
+                        <div class="text-xs text-gray-400">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400">In 45 min</div>
+                    </div>
+                </div>
+                
+                <button class="w-full mt-4 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors" onclick="assignOptimalDrivers()">
+                    <i data-lucide="zap" class="w-4 h-4 mr-2 inline"></i>
+                    Auto-Assign Drivers
+                </button>
+            </div>
+        </div>
+
+        <!-- Secondary Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+            <!-- Driver Status -->
+            <div class="lg:col-span-2 operations-card p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i data-lucide="users" class="w-6 h-6 mr-3 text-purple-400"></i>
+                        Driver Status
+                    </h3>
+                    <button class="text-blue-400 hover:text-blue-300 font-semibold text-sm" onclick="manageDrivers()">Manage All</button>
+                </div>
+                
+                <div class="driver-status-grid" id="driver-grid">
+                    <div class="driver-card" onclick="contactDriver('Carlos Martinez')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Carlos Martinez</span>
+                            <div class="status-active">On Trip</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Vehicle: MT-001 • Rating: 4.9⭐</div>
+                        <div class="text-xs text-green-400">Elena Garcia • ETA 15min</div>
+                    </div>
+                    
+                    <div class="driver-card" onclick="contactDriver('Angela Foster')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Angela Foster</span>
+                            <div class="status-active">On Trip</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Vehicle: MT-002 • Rating: 4.8⭐</div>
+                        <div class="text-xs text-green-400">Maria Santos • ETA 8min</div>
+                    </div>
+                    
+                    <div class="driver-card" onclick="contactDriver('David Chen')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">David Chen</span>
+                            <div class="status-scheduled">Available</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Vehicle: MT-003 • Rating: 4.9⭐</div>
+                        <div class="text-xs text-blue-400">Next: Robert Johnson in 22min</div>
+                    </div>
+                    
+                    <div class="driver-card" onclick="contactDriver('Maria Lopez')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Maria Lopez</span>
+                            <div class="status-active">On Trip</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Vehicle: MT-004 • Rating: 4.7⭐</div>
+                        <div class="text-xs text-green-400">Carmen Rodriguez • ETA 12min</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Communication Panel -->
+            <div class="communication-panel relative">
+                <div class="relative z-10">
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i data-lucide="message-square" class="w-6 h-6 mr-3"></i>
+                        Communications
+                    </h3>
+                    
+                    <div class="space-y-3 mb-4">
+                        <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-semibold">Carlos Martinez</span>
+                                <span class="text-xs text-gray-300">2 min ago</span>
+                            </div>
+                            <div class="text-xs text-gray-300">"Arrived at pickup location"</div>
+                        </div>
+                        
+                        <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-semibold">System Alert</span>
+                                <span class="text-xs text-gray-300">5 min ago</span>
+                            </div>
+                            <div class="text-xs text-yellow-300">"Traffic delay on Route 99"</div>
+                        </div>
+                        
+                        <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-sm font-semibold">Angela Foster</span>
+                                <span class="text-xs text-gray-300">8 min ago</span>
+                            </div>
+                            <div class="text-xs text-gray-300">"Patient onboard, en route"</div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-2">
+                        <button class="bg-white bg-opacity-20 text-white py-2 px-3 rounded-lg text-sm font-semibold" onclick="broadcastMessage()">
+                            <i data-lucide="radio" class="w-4 h-4 mr-1 inline"></i>
+                            Broadcast
+                        </button>
+                        <button class="bg-white bg-opacity-20 text-white py-2 px-3 rounded-lg text-sm font-semibold" onclick="emergencyComms()">
+                            <i data-lucide="alert-triangle" class="w-4 h-4 mr-1 inline"></i>
+                            Emergency
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Analytics -->
+            <div class="operations-card p-6">
+                <h3 class="text-xl font-bold mb-4 flex items-center">
+                    <i data-lucide="trending-up" class="w-6 h-6 mr-3 text-green-400"></i>
+                    Today's Performance
+                </h3>
+                
+                <div class="space-y-4">
+                    <div class="real-time-update">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>On-Time Performance</span>
+                            <span class="text-green-400 font-semibold">96%</span>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 96%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="real-time-update">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>Fleet Utilization</span>
+                            <span class="text-blue-400 font-semibold">78%</span>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-2">
+                            <div class="bg-blue-500 h-2 rounded-full" style="width: 78%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="real-time-update">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>Customer Satisfaction</span>
+                            <span class="text-purple-400 font-semibold">4.8⭐</span>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-2">
+                            <div class="bg-purple-500 h-2 rounded-full" style="width: 96%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="real-time-update">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>Revenue Target</span>
+                            <span class="text-yellow-400 font-semibold">$2,115</span>
+                        </div>
+                        <div class="bg-gray-700 rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 82%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="w-full mt-4 bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors" onclick="viewDetailedAnalytics()">
+                    <i data-lucide="bar-chart" class="w-4 h-4 mr-2 inline"></i>
+                    Detailed Analytics
+                </button>
+            </div>
+        </div>
+
+        <!-- Emergency Protocols -->
+        <div class="operations-card p-6" id="emergency-panel" style="display: none;">
+            <div class="emergency-alert">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-bold flex items-center">
+                        <i data-lucide="alert-triangle" class="w-6 h-6 mr-3"></i>
+                        Emergency Protocol Activated
+                    </h3>
+                    <button onclick="clearEmergency()" class="text-white opacity-80 hover:opacity-100">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button class="bg-white bg-opacity-20 text-white py-3 px-4 rounded-lg font-semibold" onclick="dispatchEmergency()">
+                        <i data-lucide="truck" class="w-5 h-5 mr-2 inline"></i>
+                        Dispatch Nearest Vehicle
+                    </button>
+                    <button class="bg-white bg-opacity-20 text-white py-3 px-4 rounded-lg font-semibold" onclick="notifyEMS()">
+                        <i data-lucide="phone" class="w-5 h-5 mr-2 inline"></i>
+                        Contact EMS
+                    </button>
+                    <button class="bg-white bg-opacity-20 text-white py-3 px-4 rounded-lg font-semibold" onclick="alertSupervisor()">
+                        <i data-lucide="user-check" class="w-5 h-5 mr-2 inline"></i>
+                        Alert Supervisor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Initialize Lucide icons with fallback
+        function initializeIcons() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            } else {
+                const iconMap = {
+                    'radio': '📡', 'bell': '🔔', 'user': '👤', 'truck': '🚛',
+                    'map-pin': '📍', 'clock': '🕐', 'zap': '⚡', 'star': '⭐',
+                    'alert-triangle': '⚠️', 'map': '🗺️', 'list': '📋', 'users': '👥',
+                    'message-square': '💬', 'trending-up': '📈', 'bar-chart': '📊',
+                    'phone': '📞', 'user-check': '✅', 'x': '✕'
+                };
+                
+                document.querySelectorAll('[data-lucide]').forEach(el => {
+                    const iconName = el.getAttribute('data-lucide');
+                    const emoji = iconMap[iconName] || '●';
+                    el.innerHTML = emoji;
+                    el.style.fontSize = '1em';
+                    el.style.display = 'inline-flex';
+                    el.style.alignItems = 'center';
+                    el.style.justifyContent = 'center';
+                });
+            }
+        }
+
+        // Demo functions
+        function startDispatchDemo() {
+            showNotification('🎬 Dispatch Demo Started', 'Live operations center with real-time fleet management');
+            
+            setTimeout(() => {
+                showNotification('🚛 Fleet Management', '15 vehicles tracked in real-time • 94% efficiency rate');
+            }, 3000);
+            
+            setTimeout(() => {
+                showNotification('📊 AI Optimization', 'Smart routing reduces response time by 35% • 96% on-time performance');
+            }, 6000);
+            
+            setTimeout(() => {
+                showNotification('💼 Operations Excellence', '47 trips today • 4.8⭐ customer rating • $2,115 revenue');
+            }, 9000);
+        }
+
+        function simulateEmergency() {
+            showNotification('🚨 Emergency Alert', 'Medical emergency reported • Activating emergency protocols');
+            document.getElementById('emergency-panel').style.display = 'block';
+            document.getElementById('emergency-count').textContent = '1';
+            
+            // Show alert banner
+            const alertBanner = document.getElementById('alert-banner');
+            const alertMessage = document.getElementById('alert-message');
+            alertMessage.textContent = 'Medical Emergency: Patient requires immediate assistance';
+            alertBanner.style.display = 'flex';
+            
+            setTimeout(() => {
+                showNotification('🚑 Emergency Response', 'Nearest vehicle dispatched • EMS contacted • Supervisor notified');
+            }, 3000);
+        }
+
+        function simulateOptimization() {
+            showNotification('🤖 AI Optimization Active', 'Analyzing routes and reassigning vehicles for maximum efficiency');
+            
+            let optimizationStep = 0;
+            const interval = setInterval(() => {
+                optimizationStep++;
+                
+                switch(optimizationStep) {
+                    case 1:
+                        showNotification('📍 Route Analysis', 'Scanning traffic patterns and patient locations');
+                        break;
+                    case 2:
+                        showNotification('🚛 Vehicle Reassignment', 'Optimizing driver assignments for faster response times');
+                        updateResponseTime('2.8');
+                        break;
+                    case 3:
+                        showNotification('✅ Optimization Complete', 'Efficiency improved to 97% • Response time reduced by 12%');
+                        updateEfficiency('97%');
+                        clearInterval(interval);
+                        break;
+                }
+            }, 4000);
+        }
+
+        // Interactive functions
+        function selectVehicle(vehicleId, driverName) {
+            const vehicleInfo = document.getElementById('vehicle-info');
+            const vehicleName = document.getElementById('vehicle-name');
+            const vehicleDetails = document.getElementById('vehicle-details');
+            
+            vehicleName.textContent = `${vehicleId} - ${driverName}`;
+            vehicleDetails.textContent = 'Speed: 35 mph • Fuel: 78% • Status: Active';
+            vehicleInfo.style.display = 'block';
+            
+            showNotification('🚛 Vehicle Selected', `${vehicleId} - ${driverName} • Live tracking active`);
+        }
+
+        function selectTrip(tripId) {
+            showNotification('📋 Trip Selected', `Viewing details for ${tripId} • Real-time tracking enabled`);
+        }
+
+        function contactDriver(driverName) {
+            showNotification('📞 Contacting Driver', `Connecting to ${driverName} via in-vehicle communication`);
+        }
+
+        function showFleetStatus() {
+            showNotification('🚛 Fleet Status', '15 vehicles • 12 active • 2 available • 1 maintenance');
+        }
+
+        function showTripMetrics() {
+            showNotification('📊 Trip Metrics', '47 completed trips today • 96% on-time • 4.8⭐ average rating');
+        }
+
+        function showResponseTime() {
+            showNotification('⏱️ Response Time', '3.2 minute average • 15% improvement vs last week');
+        }
+
+        function showEfficiency() {
+            showNotification('⚡ Efficiency Rate', '94% fleet utilization • AI optimization active');
+        }
+
+        function showSatisfaction() {
+            showNotification('⭐ Customer Rating', '4.8/5 average • 98% satisfaction rate • Zero complaints');
+        }
+
+        function showEmergencies() {
+            showNotification('🚨 Emergency Status', 'Zero active emergencies • Emergency protocols ready');
+        }
+
+        function centerMap() {
+            showNotification('🗺️ Map Centered', 'View centered on Bakersfield service area');
+        }
+
+        function showRoutes() {
+            showNotification('🛣️ Routes Displayed', 'Showing optimal routes and traffic conditions');
+        }
+
+        function optimizeRoutes() {
+            showNotification('🤖 Route Optimization', 'AI calculating most efficient routes');
+        }
+
+        function assignOptimalDrivers() {
+            showNotification('⚡ Auto-Assignment', 'AI assigning optimal drivers based on location and availability');
+        }
+
+        function broadcastMessage() {
+            showNotification('�� Broadcasting', 'Message sent to all active drivers');
+        }
+
+        function emergencyComms() {
+            showNotification('🚨 Emergency Comms', 'Emergency communication channel activated');
+        }
+
+        function manageDrivers() {
+            showNotification('👥 Driver Management', 'Accessing driver scheduling and performance dashboard');
+        }
+
+        function viewDetailedAnalytics() {
+            showNotification('📊 Analytics Dashboard', 'Opening comprehensive performance analytics');
+        }
+
+        function dispatchEmergency() {
+            showNotification('🚛 Emergency Dispatch', 'Nearest vehicle dispatched • ETA: 4 minutes');
+        }
+
+        function notifyEMS() {
+            showNotification('🚑 EMS Contacted', 'Emergency Medical Services notified and en route');
+        }
+
+        function alertSupervisor() {
+            showNotification('👨‍💼 Supervisor Alerted', 'Shift supervisor and management team notified');
+        }
+
+        function clearEmergency() {
+            document.getElementById('emergency-panel').style.display = 'none';
+            document.getElementById('emergency-count').textContent = '0';
+            showNotification('✅ Emergency Cleared', 'Emergency protocols deactivated • Normal operations resumed');
+        }
+
+        function dismissAlert() {
+            document.getElementById('alert-banner').style.display = 'none';
+        }
+
+        // Utility functions
+        function updateResponseTime(newTime) {
+            document.getElementById('response-time').textContent = newTime;
+        }
+
+        function updateEfficiency(newRate) {
+            document.getElementById('efficiency').textContent = newRate;
+        }
+
+        function showNotification(title, message) {
+            const notification = document.createElement('div');
+            notification.className = 'demo-notification';
+            notification.innerHTML = `
+                <div class="flex items-start">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-lg mb-1">${title}</h4>
+                        <p class="text-blue-100">${message}</p>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-white opacity-70 hover:opacity-100 ml-4">
+                        ✕
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.classList.remove('show');
+                    setTimeout(() => {
+                        if (notification.parentElement) {
+                            notification.remove();
+                        }
+                    }, 500);
+                }
+            }, 5000);
+        }
+
+        // Auto-update simulation
+        function startRealTimeUpdates() {
+            setInterval(() => {
+                // Simulate real-time data updates
+                const trips = document.getElementById('completed-trips');
+                const currentTrips = parseInt(trips.textContent);
+                if (Math.random() > 0.8) { // 20% chance to update
+                    trips.textContent = currentTrips + 1;
+                }
+                
+                // Update response time slightly
+                const responseTime = document.getElementById('response-time');
+                const currentTime = parseFloat(responseTime.textContent);
+                const variation = (Math.random() - 0.5) * 0.2; // ±0.1 variation
+                responseTime.textContent = Math.max(2.0, currentTime + variation).toFixed(1);
+            }, 10000); // Update every 10 seconds
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeIcons();
+            console.log('📡 Dispatch Operations Center loaded!');
+            
+            // Start real-time updates
+            startRealTimeUpdates();
+            
+            // Welcome notification
+            setTimeout(() => {
+                showNotification('👋 Welcome Michael!', '12 active trips • 8 available drivers • All systems operational');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

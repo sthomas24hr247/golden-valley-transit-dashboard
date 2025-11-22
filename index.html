@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Valley Transit - Medical Transportation Services | Bakersfield, CA</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        /* Navigation */
+        nav {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        .nav-links a:hover {
+            color: #667eea;
+        }
+        .nav-cta {
+            background: #667eea;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+        .nav-cta:hover {
+            background: #5568d3;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+        }
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .hero p {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            opacity: 0.95;
+        }
+        .hero-cta {
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: 600;
+            display: inline-block;
+            transition: transform 0.3s;
+        }
+        .hero-cta:hover {
+            transform: scale(1.05);
+        }
+
+        /* Services Section */
+        .services {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #333;
+        }
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        .service-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .service-card:hover {
+            transform: translateY(-10px);
+        }
+        .service-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .service-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        /* Why Choose Us */
+        .why-us {
+            padding: 80px 20px;
+            background: white;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        .feature {
+            text-align: center;
+        }
+        .feature-icon {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+        }
+        .feature h3 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        /* Booking Section */
+        .booking-section {
+            padding: 80px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .booking-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .booking-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .booking-header h2 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .booking-header p {
+            font-size: 1.1em;
+            color: #666;
+        }
+        
+        /* Form Styles */
+        .form-section {
+            margin-bottom: 40px;
+        }
+        .form-section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .appointment-types {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .type-option {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .type-option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .type-option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        .type-option input[type="radio"] {
+            display: none;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .submit-btn:hover {
+            background: #5568d3;
+        }
+        .success-message {
+            display: none;
+            background: #43e97b;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .required { color: #e74c3c; }
+
+        /* Contact Section */
+        .contact {
+            padding: 80px 20px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        .contact-item {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .contact-item-icon {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        /* Footer */
+        footer {
+            background: #2d3561;
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        footer p {
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2em; }
+            .form-row { grid-template-columns: 1fr; }
+            .appointment-types { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🚐 Golden Valley Transit</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#why-us">Why Us</a></li>
+                <li><a href="#book">Book Now</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <a href="#book" class="nav-cta">Schedule Ride</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <h1>Safe, Reliable Medical Transportation</h1>
+        <p>Serving Bakersfield and Kern County with professional NEMT services</p>
+        <a href="#book" class="hero-cta">Book Your Ride Today</a>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">Our Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">💉</div>
+                    <h3>Dialysis Transportation</h3>
+                    <p>Regular, reliable transportation for your ongoing dialysis treatments with experienced drivers who understand your needs.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">👨‍⚕️</div>
+                    <h3>Doctor Appointments</h3>
+                    <p>On-time transportation to and from doctor visits, specialist appointments, and medical consultations.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🏃</div>
+                    <h3>Physical Therapy</h3>
+                    <p>Comfortable rides to your physical therapy sessions with wheelchair-accessible vehicles available.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🔬</div>
+                    <h3>Lab Work & Testing</h3>
+                    <p>Prompt transportation for blood work, imaging, and other medical testing appointments.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">♿</div>
+                    <h3>Wheelchair Accessible</h3>
+                    <p>Fully equipped vehicles with wheelchair lifts and trained staff to ensure safe, comfortable transport.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🏥</div>
+                    <h3>Hospital Discharge</h3>
+                    <p>Safe transportation home after hospital stays with door-to-door service and assistance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section id="why-us" class="why-us">
+        <div class="container">
+            <h2 class="section-title">Why Choose Golden Valley Transit?</h2>
+            <div class="features-grid">
+                <div class="feature">
+                    <div class="feature-icon">✅</div>
+                    <h3>Professional Drivers</h3>
+                    <p>Experienced, licensed, and background-checked drivers</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⏰</div>
+                    <h3>On-Time Service</h3>
+                    <p>We understand medical appointments can't be missed</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💳</div>
+                    <h3>Insurance Accepted</h3>
+                    <p>Medi-Cal, Medicare, and most major insurance plans</p>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📱</div>
+                    <h3>Easy Booking</h3>
+                    <p>Online booking and confirmation in minutes</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="book" class="booking-section">
+        <div class="booking-container">
+            <div class="booking-header">
+                <h2>Schedule Your Ride</h2>
+                <p>Complete the form below and we'll contact you within 1 hour to confirm</p>
+            </div>
+
+            <form id="bookingForm">
+                <!-- Patient Information -->
+                <div class="form-section">
+                    <div class="form-section-title">Patient Information</div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name <span class="required">*</span></label>
+                            <input type="text" id="firstName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name <span class="required">*</span></label>
+                            <input type="text" id="lastName" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="phone" placeholder="(661) 555-1234" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="email" placeholder="your.email@example.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Date of Birth <span class="required">*</span></label>
+                        <input type="date" id="dob" required>
+                    </div>
+                </div>
+
+                <!-- Pickup Information -->
+                <div class="form-section">
+                    <div class="form-section-title">Pickup Information</div>
+                    
+                    <div class="form-group">
+                        <label>Pickup Address <span class="required">*</span></label>
+                        <input type="text" id="pickupAddress" placeholder="123 Main St, Bakersfield, CA 93301" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Pickup Date <span class="required">*</span></label>
+                            <input type="date" id="pickupDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Pickup Time <span class="required">*</span></label>
+                            <input type="time" id="pickupTime" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Appointment Details -->
+                <div class="form-section">
+                    <div class="form-section-title">Appointment Details</div>
+
+                    <div class="form-group">
+                        <label>Appointment Type <span class="required">*</span></label>
+                        <div class="appointment-types">
+                            <label class="type-option">
+                                <input type="radio" name="appointmentType" value="Dialysis" required>
+                                <div>💉 Dialysis</div>
+                            </label>
+                            <label class="type-option">
+                                <input type="radio" name="appointmentType" value="Physical Therapy">
+                                <div>🏃 Physical Therapy</div>
+                            </label>
+                            <label class="type-option">
+                                <input type="radio" name="appointmentType" value="Doctor Appointment">
+                                <div>👨‍⚕️ Doctor Visit</div>
+                            </label>
+                            <label class="type-option">
+                                <input type="radio" name="appointmentType" value="Lab Work">
+                                <div>🔬 Lab Work</div>
+                            </label>
+                            <label class="type-option">
+                                <input type="radio" name="appointmentType" value="X-Ray/Imaging">
+                                <div>📷 Imaging</div>
+                            </label>
+                            <label class="type-option">
+                                <input type="radio" name="appointmentType" value="Other">
+                                <div>📋 Other</div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Appointment Location <span class="required">*</span></label>
+                        <input type="text" id="appointmentLocation" placeholder="Bakersfield Dialysis Center" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Appointment Time</label>
+                        <input type="time" id="appointmentTime">
+                    </div>
+                </div>
+
+                <!-- Insurance -->
+                <div class="form-section">
+                    <div class="form-section-title">Insurance Information</div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Insurance Provider</label>
+                            <select id="insuranceProvider">
+                                <option value="">Select Insurance</option>
+                                <option value="Medi-Cal">Medi-Cal</option>
+                                <option value="Medicare">Medicare</option>
+                                <option value="Blue Cross">Blue Cross</option>
+                                <option value="Kaiser">Kaiser Permanente</option>
+                                <option value="Other">Other</option>
+                                <option value="Self-Pay">Self-Pay</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Insurance ID</label>
+                            <input type="text" id="insuranceId" placeholder="ABC123456789">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Options -->
+                <div class="form-section">
+                    <div class="form-section-title">Additional Options</div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="needsReturn" style="width: auto; margin-right: 10px;">
+                            I need a return trip after my appointment
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="wheelchair" style="width: auto; margin-right: 10px;">
+                            Wheelchair accessible vehicle required
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Additional Notes</label>
+                        <textarea id="notes" rows="4" placeholder="Any special instructions or requirements..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn">📅 Request Transportation</button>
+
+                <div class="success-message" id="successMessage">
+                    <h2>✅ Booking Request Submitted!</h2>
+                    <p>Thank you! We've received your transportation request.</p>
+                    <p style="margin-top: 15px;">Our team will contact you within 1 hour to confirm your appointment.</p>
+                    <p style="margin-top: 15px;"><strong>Confirmation Number: <span id="confirmationNumber"></span></strong></p>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Contact Us</h2>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <div class="contact-item-icon">📞</div>
+                    <h3>Phone</h3>
+                    <p>(661) 555-RIDE</p>
+                    <p>24/7 Dispatch</p>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-icon">📧</div>
+                    <h3>Email</h3>
+                    <p>info@goldenvalleytransit.com</p>
+                    <p>We respond within 1 hour</p>
+                </div>
+                <div class="contact-item">
+                    <div class="contact-item-icon">📍</div>
+                    <h3>Service Area</h3>
+                    <p>Bakersfield & Kern County</p>
+                    <p>California</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Golden Valley Transit. All rights reserved.</p>
+            <p>Licensed Medical Transportation Provider | Partners: Dr. Justin DeGuzman & Dr. Neal Johnson</p>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5001';
+
+        // Appointment type selection
+        document.querySelectorAll('.type-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.type-option').forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+                this.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('pickupDate').min = today;
+        document.getElementById('dob').max = today;
+
+        // Phone number formatting
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 3) {
+                    value = `(${value}`;
+                } else if (value.length <= 6) {
+                    value = `(${value.slice(0, 3)}) ${value.slice(3)}`;
+                } else {
+                    value = `(${value.slice(0, 3)}) ${value.slice(3, 6)}-${value.slice(6, 10)}`;
+                }
+            }
+            e.target.value = value;
+        });
+
+        // Form submission
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = {
+                patient: {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
+                    dateOfBirth: document.getElementById('dob').value
+                },
+                trip: {
+                    pickupAddress: document.getElementById('pickupAddress').value,
+                    pickupDate: document.getElementById('pickupDate').value,
+                    pickupTime: document.getElementById('pickupTime').value,
+                    appointmentType: document.querySelector('input[name="appointmentType"]:checked').value,
+                    appointmentLocation: document.getElementById('appointmentLocation').value,
+                    appointmentTime: document.getElementById('appointmentTime').value,
+                    needsReturn: document.getElementById('needsReturn').checked,
+                    wheelchair: document.getElementById('wheelchair').checked,
+                    notes: document.getElementById('notes').value
+                },
+                insurance: {
+                    provider: document.getElementById('insuranceProvider').value,
+                    insuranceId: document.getElementById('insuranceId').value
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/booking/create`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    const confirmationNumber = 'GVT-' + Date.now().toString().slice(-8);
+                    document.getElementById('confirmationNumber').textContent = confirmationNumber;
+                    document.getElementById('successMessage').style.display = 'block';
+                    this.style.display = 'none';
+                    document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert('Error submitting request. Please call (661) 555-RIDE');
+                }
+            } catch (error) {
+                console.error('Booking error:', error);
+                alert('Unable to submit booking. Please call (661) 555-RIDE');
+            }
+        });
+
+        // Smooth scrolling for navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
