@@ -3,8 +3,14 @@ from flask import Flask, send_file, jsonify
 from flask_cors import CORS
 import os
 
+# Import booking routes
+from booking_routes import booking_bp
+
 app = Flask(__name__)
 CORS(app)
+
+# Register booking blueprint
+app.register_blueprint(booking_bp)
 
 # Route mapping
 @app.route('/')
