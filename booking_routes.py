@@ -10,7 +10,7 @@ def get_db_connection():
     """Get database connection"""
     connection_string = (
         "DRIVER={ODBC Driver 18 for SQL Server};"
-        "SERVER=partnership-sql-server.database.windows.net;"
+        "SERVER=partnership-sql-server-v2.database.windows.net;"
         "DATABASE=golden-valley-transit-dev;"
         "UID=info;"
         "PWD=SaQu12022!;"
