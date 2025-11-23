@@ -100,14 +100,15 @@ def create_booking():
             # Create Patient record
             cursor.execute("""
                 INSERT INTO medical.patients (
-                    user_id, mrn, first_name, last_name, phone, email,
+                    user_id, mrn, first_name, last_name, date_of_birth, phone, email,
                     status, created_at
                 ) OUTPUT INSERTED.patient_id
-                VALUES (?, ?, ?, ?, ?, ?, 'active', GETDATE())
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'active', GETDATE())
             """, (
                 user_id, mrn,
                 data['patient_name'].split()[0],
                 ' '.join(data['patient_name'].split()[1:]) if len(data['patient_name'].split()) > 1 else '',
+                data.get('date_of_birth', '1900-01-01'),
                 data['phone'], data.get('email', '')
             ))
             
