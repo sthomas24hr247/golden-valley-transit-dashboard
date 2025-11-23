@@ -51,6 +51,10 @@ def insurance():
 def analytics_dashboard():
     return send_file('analytics_dashboard.html')
 
+@app.route('/billing-dashboard')
+def billing_dashboard():
+    return send_file('billing_dashboard.html')
+
 @app.route('/health')
 def health():
     return jsonify({"status": "healthy", "service": "Golden Valley Transit Dashboard"})
