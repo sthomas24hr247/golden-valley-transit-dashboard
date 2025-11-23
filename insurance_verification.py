@@ -126,7 +126,7 @@ def verify_insurance():
                 verification['prior_auth_required'],
                 verification.get('copay', 0),
                 verification.get('deductible', 0),
-                'verified' if verification['active'] else 'inactive',
+                'active' if verification['active'] else 'inactive',
                 existing[0]
             ))
         else:
@@ -147,7 +147,7 @@ def verify_insurance():
                 verification['prior_auth_required'],
                 verification.get('copay', 0),
                 verification.get('deductible', 0),
-                'verified' if verification['active'] else 'inactive'
+                'active' if verification['active'] else 'inactive'
             ))
         
         conn.commit()
