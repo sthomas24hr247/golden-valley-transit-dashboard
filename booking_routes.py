@@ -137,7 +137,7 @@ def create_booking():
                 scheduled_pickup_time, trip_type, status, 
                 booking_source, created_at
             ) OUTPUT INSERTED.trip_id
-            VALUES (?, ?, ?, ?, ?, 'Medical Appointment', 'scheduled', 'web', GETDATE())
+            VALUES (?, ?, ?, ?, ?, 'routine', 'scheduled', 'web', GETDATE())
         """, (
             trip_number, patient_id, data['pickup_address'], data['dropoff_address'],
             appointment_datetime
