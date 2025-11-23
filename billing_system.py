@@ -176,7 +176,7 @@ def generate_claim():
             VALUES (?, ?, ?, ?, ?, 'draft', ?, ?, GETDATE())
         """, (
             claim_number, trip_id, trip[1], trip[7],
-            service_date, total_amount, trip[9] or 0.00
+            service_date, float(total_amount), float(trip[9]) if trip[9] else 0.00
         ))
         
         claim_id = cursor.fetchone()[0]
@@ -188,7 +188,7 @@ def generate_claim():
                 claim_id, line_number, service_code, service_description,
                 quantity, unit_price, line_total
             ) VALUES (?, 1, 'A0130', 'Non-emergency wheelchair van transport', 1, ?, ?)
-        """, (claim_id, base_charge, base_charge))
+        """, (claim_id, float(base_charge), float(base_charge)))
         
         # Mileage charge
         cursor.execute("""
@@ -196,7 +196,7 @@ def generate_claim():
                 claim_id, line_number, service_code, service_description,
                 quantity, unit_price, line_total
             ) VALUES (?, 2, 'S0215', 'Mileage', ?, ?, ?)
-        """, (claim_id, mileage, rates['per_mile_rate'], mileage_charge))
+        """, (claim_id, float(mileage), float(rates['per_mile_rate']), float(mileage_charge)))
         
         # Create status history
         cursor.execute("""
