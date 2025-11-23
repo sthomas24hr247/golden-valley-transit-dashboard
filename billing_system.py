@@ -218,7 +218,7 @@ def generate_claim():
                 'base_charge': float(base_charge),
                 'mileage': float(mileage),
                 'mileage_charge': float(mileage_charge),
-                'patient_copay': float(trip[11]) if trip[11] else 0.0
+                'patient_copay': float(trip[10]) if trip[10] else 0.0
             },
             'payer_type': payer_type,
             'insurance_company': trip[8]
