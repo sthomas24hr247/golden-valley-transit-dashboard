@@ -41,6 +41,14 @@ def generate_password():
     """Generate temporary password"""
     return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
 
+
+def generate_trip_number():
+    """Generate unique trip number"""
+    from datetime import datetime
+    date_str = datetime.now().strftime('%Y%m%d')
+    random_num = random.randint(1000, 9999)
+    return f"GVT-{date_str}-{random_num}"
+
 def check_existing_patient(cursor, phone):
     """Check if patient already exists"""
     cursor.execute("""
@@ -119,15 +127,17 @@ def create_booking():
         appointment_datetime = f"{data['appointment_date']} {data['appointment_time']}"
         
         # Create the trip
+        trip_number = generate_trip_number()
+        
         cursor.execute("""
             INSERT INTO operations.trips (
-                patient_id, pickup_address, destination_address,
+                trip_number, patient_id, pickup_address, destination_address,
                 scheduled_pickup_time, trip_type, status, 
                 booking_source, created_at
             ) OUTPUT INSERTED.trip_id
-            VALUES (?, ?, ?, ?, 'Medical Appointment', 'scheduled', 'web', GETDATE())
+            VALUES (?, ?, ?, ?, ?, 'Medical Appointment', 'scheduled', 'web', GETDATE())
         """, (
-            patient_id, data['pickup_address'], data['dropoff_address'],
+            trip_number, patient_id, data['pickup_address'], data['dropoff_address'],
             appointment_datetime
         ))
         
