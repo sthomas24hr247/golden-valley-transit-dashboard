@@ -114,8 +114,7 @@ def verify_insurance():
                     prior_authorization_required = ?,
                     copay_amount = ?,
                     deductible_amount = ?,
-                    status = ?,
-                    updated_at = GETDATE()
+                    status = ?
                 WHERE insurance_id = ?
             """, (
                 data['insurance_company'],
