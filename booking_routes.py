@@ -12,7 +12,7 @@ def get_db_connection():
     server = os.environ.get('DB_SERVER', 'partnership-sql-server-v2.database.windows.net')
     database = os.environ.get('DB_DATABASE', 'golden-valley-transit-prod')
     username = os.environ.get('DB_USERNAME', 'sqladmin')
-    password = os.environ.get('DB_PASSWORD', 'SaQu12022!')
+    password = os.environ.get('DB_PASSWORD', 'GoldenValley2025')
     
     connection_string = (
         f"DRIVER={{ODBC Driver 18 for SQL Server}};"
@@ -25,21 +25,11 @@ def get_db_connection():
         f"Connection Timeout=30;"
     )
     
-    print(f"Attempting connection to: {server}/{database}")  # Debug log
     return pyodbc.connect(connection_string)
 
-def generate_patient_id(cursor):
-    """Generate unique patient ID (GVT-XXX format)"""
-    cursor.execute("SELECT MAX(PatientID) FROM medical.patients WHERE PatientID LIKE 'GVT-%'")
-    result = cursor.fetchone()
-    
-    if result and result[0]:
-        last_id = result[0]
-        number = int(last_id.split('-')[1]) + 1
-    else:
-        number = 2
-    
-    return f"GVT-{number:03d}"
+def generate_mrn():
+    """Generate MRN (Medical Record Number)"""
+    return f"GVT{random.randint(100000, 999999)}"
 
 def generate_username(name):
     """Generate username from name"""
@@ -51,19 +41,12 @@ def generate_password():
     """Generate temporary password"""
     return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
 
-def check_existing_patient(cursor, phone, email=None):
+def check_existing_patient(cursor, phone):
     """Check if patient already exists"""
-    if email:
-        cursor.execute("""
-            SELECT PatientID, UserID FROM medical.patients 
-            WHERE PhoneNumber = ? OR Email = ?
-        """, (phone, email))
-    else:
-        cursor.execute("""
-            SELECT PatientID, UserID FROM medical.patients 
-            WHERE PhoneNumber = ?
-        """, (phone,))
-    
+    cursor.execute("""
+        SELECT patient_id, user_id FROM medical.patients 
+        WHERE phone = ?
+    """, (phone,))
     return cursor.fetchone()
 
 @booking_bp.route('/api/booking/create', methods=['POST'])
@@ -82,60 +65,71 @@ def create_booking():
                     'error': f'Missing required field: {field}'
                 }), 400
         
-        print(f"Creating booking for: {data['patient_name']}")  # Debug log
-        
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        existing = check_existing_patient(cursor, data['phone'], data.get('email'))
+        existing = check_existing_patient(cursor, data['phone'])
         
         if existing:
             patient_id = existing[0]
             user_id = existing[1]
             is_new_patient = False
-            print(f"Existing patient found: {patient_id}")  # Debug log
         else:
-            patient_id = generate_patient_id(cursor)
+            # Generate IDs
+            user_id = None  # Will be auto-generated as uniqueidentifier
+            patient_id = None  # Will be auto-generated as uniqueidentifier
+            mrn = generate_mrn()
             username = generate_username(data['patient_name'])
             temp_password = generate_password()
             
-            print(f"Creating new patient: {patient_id}")  # Debug log
-            
+            # Create User account
             cursor.execute("""
                 INSERT INTO security.users (
-                    Username, PasswordHash, Email, PhoneNumber, 
-                    UserType, IsActive, CreatedDate
-                ) VALUES (?, ?, ?, ?, 'Patient', 1, GETDATE())
-            """, (username, temp_password, data.get('email', ''), data['phone']))
-            
-            cursor.execute("SELECT @@IDENTITY")
-            user_id = cursor.fetchone()[0]
-            
-            cursor.execute("""
-                INSERT INTO medical.patients (
-                    PatientID, UserID, FirstName, LastName, 
-                    PhoneNumber, Email, Address, IsActive, CreatedDate
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, 1, GETDATE())
+                    username, password_hash, email, phone, 
+                    first_name, last_name, user_type, status, created_at
+                ) OUTPUT INSERTED.user_id
+                VALUES (?, ?, ?, ?, ?, ?, 'patient', 'active', GETDATE())
             """, (
-                patient_id, user_id,
+                username, temp_password, data.get('email', ''), data['phone'],
                 data['patient_name'].split()[0],
                 ' '.join(data['patient_name'].split()[1:]) if len(data['patient_name'].split()) > 1 else '',
-                data['phone'], data.get('email', ''), data['pickup_address']
             ))
             
+            user_id = cursor.fetchone()[0]
+            
+            # Create Patient record
+            cursor.execute("""
+                INSERT INTO medical.patients (
+                    user_id, mrn, first_name, last_name, phone, email,
+                    status, created_at
+                ) OUTPUT INSERTED.patient_id
+                VALUES (?, ?, ?, ?, ?, ?, 'active', GETDATE())
+            """, (
+                user_id, mrn,
+                data['patient_name'].split()[0],
+                ' '.join(data['patient_name'].split()[1:]) if len(data['patient_name'].split()) > 1 else '',
+                data['phone'], data.get('email', '')
+            ))
+            
+            patient_id = cursor.fetchone()[0]
             is_new_patient = True
         
+        # Combine appointment date and time
+        appointment_datetime = f"{data['appointment_date']} {data['appointment_time']}"
+        
+        # Create the trip
         cursor.execute("""
             INSERT INTO operations.trips (
-                PatientID, PickupAddress, DropoffAddress,
-                AppointmentDate, AppointmentTime, Status, CreatedDate
-            ) VALUES (?, ?, ?, ?, ?, 'Pending', GETDATE())
+                patient_id, pickup_address, destination_address,
+                scheduled_pickup_time, trip_type, status, 
+                booking_source, created_at
+            ) OUTPUT INSERTED.trip_id
+            VALUES (?, ?, ?, ?, 'Medical Appointment', 'scheduled', 'web', GETDATE())
         """, (
             patient_id, data['pickup_address'], data['dropoff_address'],
-            data['appointment_date'], data['appointment_time']
+            appointment_datetime
         ))
         
-        cursor.execute("SELECT @@IDENTITY")
         trip_id = cursor.fetchone()[0]
         
         conn.commit()
@@ -145,8 +139,8 @@ def create_booking():
         response_data = {
             'success': True,
             'message': 'Booking created successfully',
-            'trip_id': trip_id,
-            'patient_id': patient_id
+            'trip_id': str(trip_id),
+            'patient_id': str(patient_id)
         }
         
         if is_new_patient:
@@ -158,7 +152,6 @@ def create_booking():
         return jsonify(response_data), 201
         
     except Exception as e:
-        print(f"Error: {str(e)}")  # Debug log
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @booking_bp.route('/api/booking/test', methods=['GET'])
