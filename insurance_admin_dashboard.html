@@ -272,6 +272,31 @@
     </style>
 </head>
 <body>
+    <style>
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: inline-block;
+            color: #667eea;
+            text-decoration: none;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            z-index: 9999;
+            font-weight: 600;
+        }
+        .back-link:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+    <a href="/" class="back-link">← Back to Dashboard</a>
+
     <!-- Demo Controls -->
     <div class="fixed top-4 left-4 z-50 space-y-2">
         <button onclick="startInsuranceDemo()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-green-700">
