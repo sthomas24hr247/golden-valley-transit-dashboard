@@ -47,6 +47,10 @@ def dispatcher():
 def insurance():
     return send_file('insurance_admin_dashboard.html')
 
+@app.route('/analytics-dashboard')
+def analytics_dashboard():
+    return send_file('analytics_dashboard.html')
+
 @app.route('/health')
 def health():
     return jsonify({"status": "healthy", "service": "Golden Valley Transit Dashboard"})
