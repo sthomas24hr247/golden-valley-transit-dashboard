@@ -83,7 +83,7 @@ def generate_claim():
         cursor.execute("""
             SELECT 
                 t.trip_id, t.patient_id, t.pickup_address, t.destination_address,
-                t.scheduled_pickup_time, t.actual_pickup_time, t.actual_dropoff_time,
+                t.scheduled_pickup_time,
                 p.first_name, p.last_name,
                 pi.insurance_id, pi.insurance_company, pi.policy_number,
                 pi.copay_amount
@@ -104,7 +104,7 @@ def generate_claim():
                 'error': 'Trip not found'
             }), 404
         
-        if not trip[9]:  # insurance_id
+        if not trip[7]:  # insurance_id
             cursor.close()
             conn.close()
             return jsonify({
@@ -128,7 +128,7 @@ def generate_claim():
             }), 400
         
         # Determine payer type from insurance company
-        insurance_company = trip[10].lower()
+        insurance_company = trip[8].lower()
         if 'medi-cal' in insurance_company or 'medicaid' in insurance_company:
             payer_type = 'medi-cal'
         elif 'medicare' in insurance_company:
@@ -175,8 +175,8 @@ def generate_claim():
             ) OUTPUT INSERTED.claim_id
             VALUES (?, ?, ?, ?, ?, 'draft', ?, ?, GETDATE())
         """, (
-            claim_number, trip_id, trip[1], trip[9],
-            service_date, total_amount, trip[11] or 0.00
+            claim_number, trip_id, trip[1], trip[7],
+            service_date, total_amount, trip[9] or 0.00
         ))
         
         claim_id = cursor.fetchone()[0]
@@ -221,7 +221,7 @@ def generate_claim():
                 'patient_copay': float(trip[11]) if trip[11] else 0.0
             },
             'payer_type': payer_type,
-            'insurance_company': trip[10]
+            'insurance_company': trip[8]
         })
         
     except Exception as e:
