@@ -129,6 +129,8 @@ def create_booking():
         # Create the trip
         trip_number = generate_trip_number()
         
+        trip_number = generate_trip_number()
+        
         cursor.execute("""
             INSERT INTO operations.trips (
                 trip_number, patient_id, pickup_address, destination_address,
