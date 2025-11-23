@@ -176,7 +176,7 @@ def generate_claim():
             VALUES (?, ?, ?, ?, ?, 'draft', ?, ?, GETDATE())
         """, (
             claim_number, trip_id, trip[1], trip[7],
-            service_date, float(total_amount), float(trip[9]) if trip[9] else 0.00
+            service_date, float(total_amount), float(trip[10]) if trip[10] else 0.00
         ))
         
         claim_id = cursor.fetchone()[0]
