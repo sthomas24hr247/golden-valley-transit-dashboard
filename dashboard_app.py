@@ -7,6 +7,7 @@ import os
 from booking_routes import booking_bp
 from insurance_verification import insurance_bp
 from billing_system import billing_bp
+from analytics_system import analytics_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -15,6 +16,7 @@ CORS(app)
 app.register_blueprint(booking_bp)
 app.register_blueprint(insurance_bp)
 app.register_blueprint(billing_bp)
+app.register_blueprint(analytics_bp)
 
 # Route mapping
 @app.route('/')
