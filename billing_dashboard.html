@@ -402,7 +402,7 @@
                 if (data.claims && data.claims.length > 0) {
                     let html = '<table style="width:100%;border-collapse:collapse;"><tr style="background:#f5f5f5;"><th style="padding:10px;text-align:left;">Claim #</th><th style="padding:10px;">Amount</th><th style="padding:10px;">Insurance</th><th style="padding:10px;">Action</th></tr>';
                     data.claims.forEach(claim => {
-                        html += '<tr style="border-bottom:1px solid #eee;"><td style="padding:10px;">' + claim.claim_number + '</td><td style="padding:10px;">$' + claim.total_amount.toFixed(2) + '</td><td style="padding:10px;">' + claim.insurance_company + '</td><td style="padding:10px;"><button onclick="submitClaimToClearinghouse(\''+claim.claim_id+'\')" style="padding:6px 12px;background:#5b6be8;color:white;border:none;border-radius:4px;cursor:pointer;">Submit</button></td></tr>';
+                        html += '<tr style="border-bottom:1px solid #eee;"><td style="padding:10px;">' + claim.claim_number + '</td><td style="padding:10px;">$' + claim.amount.toFixed(2) + '</td><td style="padding:10px;">' + claim.insurance + '</td><td style="padding:10px;"><button onclick="submitClaimToClearinghouse(\''+claim.claim_id+'\')" style="padding:6px 12px;background:#5b6be8;color:white;border:none;border-radius:4px;cursor:pointer;">Submit</button></td></tr>';
                     });
                     html += '</table>';
                     document.getElementById('pendingClaimsList').innerHTML = html;
