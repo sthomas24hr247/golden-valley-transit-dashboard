@@ -178,6 +178,38 @@ def create_booking():
             patient_id = cursor.fetchone()[0]
             is_new_patient = True
         
+
+        # Insurance Verification (if provided)
+        if data.get('insurance_company') and data.get('policy_number'):
+            from datetime import timedelta
+            effective_date = datetime.now().date()
+            expiration_date = effective_date + timedelta(days=365)
+            
+            # Determine verification based on insurance type
+            insurance_company_lower = data['insurance_company'].lower()
+            if 'medi-cal' in insurance_company_lower or 'medicaid' in insurance_company_lower:
+                prior_auth = False
+                copay = 0.00
+            elif 'medicare' in insurance_company_lower:
+                prior_auth = False
+                copay = 0.00
+            else:
+                prior_auth = True
+                copay = 15.00
+            
+            # Save insurance record
+            cursor.execute("""
+                INSERT INTO medical.patient_insurance (
+                    patient_id, insurance_company, policy_number,
+                    effective_date, expiration_date,
+                    copay_amount, prior_authorization_required, 
+                    status, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 'active', GETDATE())
+            """, (
+                patient_id, data['insurance_company'], data['policy_number'],
+                effective_date, expiration_date, copay, prior_auth
+            ))
+
         # Combine appointment date and time
         appointment_datetime = f"{data['appointment_date']} {data['appointment_time']}"
         
