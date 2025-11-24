@@ -996,11 +996,77 @@
         }
 
         function editProfile() {
-            showNotification('👤 Profile Editor', 'Medical information, preferences, and emergency contacts');
+            updateMedicalInfo();
         }
 
         function updateMedicalInfo() {
-            showNotification('⚕️ Medical Update', 'HIPAA-compliant medical record management system');
+            const modal = document.createElement('div');
+            modal.id = 'medicalModal';
+            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:9999;';
+            modal.innerHTML = `
+                <div style="background:white;border-radius:16px;padding:30px;max-width:500px;width:90%;max-height:85vh;overflow-y:auto;">
+                    <h2 style="margin-bottom:20px;color:#1a1a2e;font-size:24px;">Update Medical Information</h2>
+                    
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#374151;">Mobility Equipment</label>
+                        <select id="mobilityEquipment" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">
+                            <option value="wheelchair" selected>Wheelchair required for all transfers</option>
+                            <option value="walker">Walker/Cane assistance</option>
+                            <option value="stretcher">Stretcher transport required</option>
+                            <option value="ambulatory">Ambulatory - no assistance needed</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#374151;">Treatment Schedule</label>
+                        <select id="treatmentSchedule" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">
+                            <option value="mwf" selected>Dialysis: Monday, Wednesday, Friday</option>
+                            <option value="tts">Dialysis: Tuesday, Thursday, Saturday</option>
+                            <option value="daily">Daily treatment</option>
+                            <option value="weekly">Weekly appointments</option>
+                            <option value="asneeded">As needed</option>
+                        </select>
+                    </div>
+                    
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#374151;">Emergency Contact Name</label>
+                        <input type="text" id="emergencyName" value="Roberto Garcia (Husband)" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">
+                    </div>
+                    
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#374151;">Emergency Contact Phone</label>
+                        <input type="tel" id="emergencyPhone" value="(661) 555-0104" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;">
+                    </div>
+                    
+                    <div style="margin-bottom:20px;">
+                        <label style="display:block;margin-bottom:8px;font-weight:600;color:#374151;">Special Medical Notes</label>
+                        <textarea id="medicalNotes" rows="3" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:16px;resize:vertical;" placeholder="Any allergies, medications, or special requirements..."></textarea>
+                    </div>
+                    
+                    <div style="display:flex;gap:12px;">
+                        <button onclick="saveMedicalInfo()" style="flex:1;padding:14px;background:linear-gradient(to right,#ec4899,#e11d48);color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;font-size:16px;">Save Changes</button>
+                        <button onclick="closeMedicalModal()" style="flex:1;padding:14px;background:#e5e7eb;color:#374151;border:none;border-radius:10px;cursor:pointer;font-weight:600;font-size:16px;">Cancel</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function saveMedicalInfo() {
+            const mobility = document.getElementById('mobilityEquipment').value;
+            const schedule = document.getElementById('treatmentSchedule').value;
+            const emergencyName = document.getElementById('emergencyName').value;
+            const emergencyPhone = document.getElementById('emergencyPhone').value;
+            const notes = document.getElementById('medicalNotes').value;
+            
+            // In production, this would save to the database
+            showNotification('✅ Saved!', 'Your medical information has been updated successfully.');
+            closeMedicalModal();
+        }
+
+        function closeMedicalModal() {
+            const modal = document.getElementById('medicalModal');
+            if (modal) modal.remove();
         }
 
         function emergencyCall() {
