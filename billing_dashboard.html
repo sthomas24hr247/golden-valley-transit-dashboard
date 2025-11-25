@@ -409,7 +409,6 @@
                 } else { document.getElementById('pendingClaimsList').innerHTML = '<p style="color:#666;">No pending claims. All claims have been submitted!</p>'; }
             } catch (error) { document.getElementById('pendingClaimsList').innerHTML = '<p style="color:#fc8181;">Error loading claims</p>'; }
         }
-        }
 
         async function submitClaimToClearinghouse(claimId) {
             try {
