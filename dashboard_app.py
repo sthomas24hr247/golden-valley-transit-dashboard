@@ -55,6 +55,10 @@ def analytics_dashboard():
 def billing_dashboard():
     return send_file('billing_dashboard.html')
 
+@app.route('/billing')
+def billing():
+    return send_file('billing_dashboard.html')
+
 @app.route('/health')
 def health():
     return jsonify({"status": "healthy", "service": "Golden Valley Transit Dashboard"})
