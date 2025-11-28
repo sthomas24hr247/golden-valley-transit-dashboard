@@ -350,3 +350,84 @@ def create_booking():
 def test_booking():
     """Test endpoint"""
     return jsonify({'success': True, 'message': 'Booking API is operational'})
+
+
+@booking_bp.route('/api/send-welcome-email-alt', methods=['POST'])
+def send_welcome_email_alt():
+    """Alternative endpoint for sending welcome email from registration form"""
+    try:
+        data = request.json
+        
+        first_name = data.get('firstName', '')
+        last_name = data.get('lastName', '')
+        email = data.get('email', '')
+        phone = data.get('phone', '')
+        
+        if not email:
+            return jsonify({'success': False, 'message': 'Email is required'}), 400
+        
+        # Generate credentials
+        username = generate_username(f"{first_name} {last_name}")
+        temp_password = generate_password()
+        mrn = generate_mrn()
+        
+        # Try to create user in database
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            
+            # Check if user already exists by email
+            cursor.execute("SELECT user_id FROM security.users WHERE email = ?", (email,))
+            existing = cursor.fetchone()
+            
+            if not existing:
+                # Create user
+                cursor.execute("""
+                    INSERT INTO security.users (
+                        username, password_hash, email, phone,
+                        first_name, last_name, user_type, status, created_at
+                    ) OUTPUT INSERTED.user_id
+                    VALUES (?, ?, ?, ?, ?, ?, 'patient', 'active', GETDATE())
+                """, (username, temp_password, email, phone, first_name, last_name))
+                
+                user_id = cursor.fetchone()[0]
+                
+                # Create patient record
+                cursor.execute("""
+                    INSERT INTO medical.patients (
+                        user_id, mrn, first_name, last_name, date_of_birth, phone, email,
+                        status, created_at
+                    ) VALUES (?, ?, ?, ?, '1900-01-01', ?, ?, 'active', GETDATE())
+                """, (user_id, mrn, first_name, last_name, phone, email))
+                
+                conn.commit()
+                print(f"Created new patient: {first_name} {last_name} ({email})")
+            else:
+                print(f"User already exists: {email}")
+            
+            cursor.close()
+            conn.close()
+        except Exception as db_error:
+            print(f"Database error (non-fatal): {str(db_error)}")
+        
+        # Send welcome email
+        patient_name = f"{first_name} {last_name}"
+        email_sent = send_welcome_email(email, patient_name, username, temp_password)
+        
+        if email_sent:
+            return jsonify({
+                'success': True,
+                'message': 'Welcome email sent successfully',
+                'username': username
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'message': 'Account created but email could not be sent',
+                'username': username,
+                'email_sent': False
+            })
+            
+    except Exception as e:
+        print(f"Send welcome email error: {str(e)}")
+        return jsonify({'success': False, 'message': str(e)}), 500
