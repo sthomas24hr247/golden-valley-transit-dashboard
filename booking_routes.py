@@ -42,7 +42,11 @@ def generate_mrn():
 
 def generate_username(name):
     """Generate username from name"""
-    first_name = name.split()[0].lower()
+    if not name or not name.strip():
+        first_name = "patient"
+    else:
+        parts = name.split()
+        first_name = parts[0].lower() if parts else "patient"
     random_num = ''.join(random.choices(string.digits, k=4))
     return f"{first_name}{random_num}"
 
@@ -133,6 +137,9 @@ def send_welcome_email(email, patient_name, username, temp_password):
             print("No email address provided")
             return False
         
+        # Use patient name or default
+        display_name = patient_name if patient_name and patient_name.strip() else "Valued Patient"
+        
         message = Mail(
             from_email=from_email,
             to_emails=email,
@@ -144,7 +151,7 @@ def send_welcome_email(email, patient_name, username, temp_password):
                         <p style="color: #718096;">Caring Medical Transportation for the Central Valley</p>
                     </div>
                     
-                    <h2 style="color: #2d3748;">Welcome, {patient_name}!</h2>
+                    <h2 style="color: #2d3748;">Welcome, {display_name}!</h2>
                     <p style="color: #4a5568;">Your patient account has been created successfully.</p>
                     
                     <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 25px; border-radius: 12px; margin: 25px 0; color: white;">
@@ -358,16 +365,17 @@ def send_welcome_email_alt():
     try:
         data = request.json
         
-        first_name = data.get('firstName', '')
-        last_name = data.get('lastName', '')
-        email = data.get('email', '')
-        phone = data.get('phone', '')
+        first_name = data.get('firstName', '').strip()
+        last_name = data.get('lastName', '').strip()
+        email = data.get('email', '').strip()
+        phone = data.get('phone', '').strip()
         
         if not email:
             return jsonify({'success': False, 'message': 'Email is required'}), 400
         
-        # Generate credentials
-        username = generate_username(f"{first_name} {last_name}")
+        # Generate credentials with safe defaults
+        full_name = f"{first_name} {last_name}".strip()
+        username = generate_username(full_name)
         temp_password = generate_password()
         mrn = generate_mrn()
         
@@ -411,7 +419,7 @@ def send_welcome_email_alt():
             print(f"Database error (non-fatal): {str(db_error)}")
         
         # Send welcome email
-        patient_name = f"{first_name} {last_name}"
+        patient_name = full_name if full_name else "Valued Patient"
         email_sent = send_welcome_email(email, patient_name, username, temp_password)
         
         if email_sent:
