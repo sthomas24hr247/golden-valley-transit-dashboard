@@ -496,9 +496,9 @@ def get_patient_trips(patient_id):
         cursor.execute("""
             SELECT t.trip_id, t.trip_number, t.pickup_address, t.destination_address,
                    t.scheduled_pickup_time, t.status,
-                   COALESCE(d.driver_name, 'Pending') as driver_name
+                   'Pending Assignment' as driver_name
             FROM operations.trips t
-            LEFT JOIN operations.drivers d ON t.driver_id = d.driver_id
+            
             WHERE t.patient_id = ? 
               AND t.scheduled_pickup_time >= GETDATE()
               AND t.status NOT IN ('completed', 'cancelled')
