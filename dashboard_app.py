@@ -32,8 +32,12 @@ def new_customer():
     return send_file('new_customer_registration.html')
 
 @app.route('/patient-portal')
+def patient_login():
+    return send_file('patient_login.html')
+
+@app.route('/patient-dashboard')
 def patient_portal():
-    return send_file('partnership_demo.html')
+    return send_file('patient_dashboard.html')
 
 @app.route('/driver-dashboard')
 def driver_dashboard():

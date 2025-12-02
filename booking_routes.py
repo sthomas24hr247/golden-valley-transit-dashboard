@@ -439,3 +439,114 @@ def send_welcome_email_alt():
     except Exception as e:
         print(f"Send welcome email error: {str(e)}")
         return jsonify({'success': False, 'message': str(e)}), 500
+# Patient Portal API Endpoints
+@booking_bp.route('/api/patient/login', methods=['POST'])
+def patient_login():
+    """Patient login endpoint"""
+    try:
+        data = request.json
+        username = data.get('username', '').strip()
+        password = data.get('password', '').strip()
+        
+        if not username or not password:
+            return jsonify({'success': False, 'error': 'Username and password required'}), 400
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Check credentials
+        cursor.execute("""
+            SELECT u.user_id, u.first_name, u.last_name, u.password_hash, p.patient_id
+            FROM security.users u
+            LEFT JOIN medical.patients p ON u.user_id = p.user_id
+            WHERE u.username = ? AND u.user_type = 'patient' AND u.status = 'active'
+        """, (username,))
+        
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        if not user:
+            return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
+        
+        # Simple password check (in production, use proper hashing)
+        if user[3] != password:
+            return jsonify({'success': False, 'error': 'Invalid username or password'}), 401
+        
+        return jsonify({
+            'success': True,
+            'token': f"patient_{user[4]}_{random.randint(1000,9999)}",
+            'patient_id': str(user[4]),
+            'patient_name': f"{user[1]} {user[2]}"
+        })
+        
+    except Exception as e:
+        print(f"Login error: {str(e)}")
+        return jsonify({'success': False, 'error': 'Login failed'}), 500
+
+
+@booking_bp.route('/api/patient/<patient_id>/trips', methods=['GET'])
+def get_patient_trips(patient_id):
+    """Get patient's upcoming and past trips"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Get upcoming trips
+        cursor.execute("""
+            SELECT t.trip_id, t.trip_number, t.pickup_address, t.destination_address,
+                   t.scheduled_pickup_time, t.status,
+                   d.first_name + ' ' + d.last_name as driver_name
+            FROM operations.trips t
+            LEFT JOIN operations.drivers d ON t.driver_id = d.driver_id
+            WHERE t.patient_id = ? 
+              AND t.scheduled_pickup_time >= GETDATE()
+              AND t.status NOT IN ('completed', 'cancelled')
+            ORDER BY t.scheduled_pickup_time ASC
+        """, (patient_id,))
+        
+        upcoming = []
+        for row in cursor.fetchall():
+            upcoming.append({
+                'trip_id': str(row[0]),
+                'trip_number': row[1],
+                'pickup_address': row[2],
+                'destination_address': row[3],
+                'scheduled_pickup_time': row[4].isoformat() if row[4] else None,
+                'status': row[5],
+                'driver_name': row[6]
+            })
+        
+        # Get trip history
+        cursor.execute("""
+            SELECT TOP 10 t.trip_id, t.trip_number, t.pickup_address, t.destination_address,
+                   t.scheduled_pickup_time, t.status
+            FROM operations.trips t
+            WHERE t.patient_id = ? 
+              AND (t.scheduled_pickup_time < GETDATE() OR t.status IN ('completed', 'cancelled'))
+            ORDER BY t.scheduled_pickup_time DESC
+        """, (patient_id,))
+        
+        history = []
+        for row in cursor.fetchall():
+            history.append({
+                'trip_id': str(row[0]),
+                'trip_number': row[1],
+                'pickup_address': row[2],
+                'destination_address': row[3],
+                'scheduled_pickup_time': row[4].isoformat() if row[4] else None,
+                'status': row[5]
+            })
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'upcoming': upcoming,
+            'history': history
+        })
+        
+    except Exception as e:
+        print(f"Get trips error: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
