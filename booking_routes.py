@@ -550,3 +550,100 @@ def get_patient_trips(patient_id):
     except Exception as e:
         print(f"Get trips error: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+# ============================================
+# ADMIN USER MANAGEMENT API ENDPOINTS
+# ============================================
+
+@booking_bp.route('/api/admin/users', methods=['GET'])
+def get_admin_users():
+    """Get all patient accounts with stats"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT 
+                p.patient_id, p.first_name, p.last_name, p.email, p.phone, p.created_at,
+                u.user_id, u.username, u.status,
+                (SELECT COUNT(*) FROM operations.trips t WHERE t.patient_id = p.patient_id) as trip_count
+            FROM medical.patients p
+            LEFT JOIN security.users u ON u.email = p.email AND u.user_type = 'patient'
+            ORDER BY p.created_at DESC
+        """)
+        
+        columns = [column[0] for column in cursor.description]
+        users = []
+        for row in cursor.fetchall():
+            user_dict = dict(zip(columns, row))
+            if user_dict.get('created_at'):
+                user_dict['created_at'] = user_dict['created_at'].isoformat() if hasattr(user_dict['created_at'], 'isoformat') else str(user_dict['created_at'])
+            users.append(user_dict)
+        
+        cursor.execute("SELECT COUNT(*) FROM medical.patients")
+        total_patients = cursor.fetchone()[0]
+        
+        cursor.execute("SELECT COUNT(*) FROM security.users WHERE user_type = 'patient' AND status = 'active'")
+        active_accounts = cursor.fetchone()[0]
+        
+        cursor.execute("SELECT COUNT(*) FROM medical.patients WHERE created_at >= DATEADD(month, -1, GETDATE())")
+        new_this_month = cursor.fetchone()[0]
+        
+        cursor.execute("SELECT COUNT(*) FROM operations.trips")
+        total_trips = cursor.fetchone()[0]
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'users': users,
+            'stats': {
+                'total_patients': total_patients,
+                'active_accounts': active_accounts,
+                'new_this_month': new_this_month,
+                'total_trips': total_trips
+            }
+        })
+    except Exception as e:
+        print(f"Error fetching admin users: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@booking_bp.route('/api/admin/users/<user_id>/reset-password', methods=['POST'])
+def reset_user_password(user_id):
+    """Reset user password"""
+    try:
+        new_password = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("UPDATE security.users SET password_hash = ? WHERE user_id = ?", (new_password, user_id))
+        conn.commit()
+        
+        cursor.execute("SELECT username FROM security.users WHERE user_id = ?", (user_id,))
+        user = cursor.fetchone()
+        conn.close()
+        
+        if user:
+            return jsonify({'success': True, 'new_password': new_password})
+        return jsonify({'success': False, 'error': 'User not found'}), 404
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+@booking_bp.route('/api/admin/users/<user_id>/status', methods=['POST'])
+def update_user_status(user_id):
+    """Toggle user status"""
+    try:
+        data = request.get_json()
+        new_status = data.get('status', 'active')
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE security.users SET status = ? WHERE user_id = ?", (new_status, user_id))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500

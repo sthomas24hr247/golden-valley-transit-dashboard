@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Golden Valley Transit Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f3f4f6; }
+        .gradient-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card { background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-inactive { background: #fee2e2; color: #991b1b; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-primary:hover { background: #5a67d8; }
+        .btn-secondary { background: #e5e7eb; color: #374151; }
+        .btn-secondary:hover { background: #d1d5db; }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .table-row:hover { background: #f9fafb; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .loading { display: none; }
+        .loading.active { display: flex; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="gradient-header text-white py-4 px-6 shadow-lg">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <a href="/admin" class="flex items-center space-x-2 hover:opacity-80">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back to Dashboard</span>
+                </a>
+                <span class="text-white/50">|</span>
+                <h1 class="text-xl font-bold">User Management</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="text-sm text-white/80">Golden Valley Transit</span>
+                <button onclick="refreshData()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm">
+                    <i class="fas fa-sync-alt mr-2"></i>Refresh
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-8 px-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Patients</p>
+                        <p class="text-3xl font-bold text-gray-900" id="totalPatients">-</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-users text-blue-600"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Active Accounts</p>
+                        <p class="text-3xl font-bold text-green-600" id="activeAccounts">-</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-check text-green-600"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">New This Month</p>
+                        <p class="text-3xl font-bold text-purple-600" id="newThisMonth">-</p>
+                    </div>
+                    <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-user-plus text-purple-600"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="card p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">Total Trips</p>
+                        <p class="text-3xl font-bold text-orange-600" id="totalTrips">-</p>
+                    </div>
+                    <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-route text-orange-600"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="card p-4 mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <div class="flex items-center space-x-4 w-full md:w-auto">
+                    <div class="relative flex-1 md:w-80">
+                        <input type="text" id="searchInput" placeholder="Search by name, email, or phone..." 
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                               onkeyup="filterUsers()">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <select id="statusFilter" class="border border-gray-300 rounded-lg px-4 py-2" onchange="filterUsers()">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="exportUsers()" class="btn-secondary px-4 py-2 rounded-lg text-sm">
+                        <i class="fas fa-download mr-2"></i>Export
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading active card p-12 text-center">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-spinner fa-spin text-4xl text-purple-600 mb-4"></i>
+                <p class="text-gray-600">Loading patient accounts...</p>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div id="usersTable" class="card overflow-hidden" style="display: none;">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Patient</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Username</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Trips</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Created</th>
+                            <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody" class="divide-y divide-gray-200">
+                        <!-- Rows populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="card p-12 text-center" style="display: none;">
+            <i class="fas fa-users text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-600">No patient accounts found</p>
+        </div>
+    </main>
+
+    <!-- Reset Password Modal -->
+    <div id="resetPasswordModal" class="modal">
+        <div class="card p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900">Reset Password</h3>
+                <button onclick="closeModal('resetPasswordModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <p class="text-gray-600 mb-4">Generate a new temporary password for <strong id="resetUserName"></strong>?</p>
+            <input type="hidden" id="resetUserId">
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeModal('resetPasswordModal')" class="btn-secondary px-4 py-2 rounded-lg">Cancel</button>
+                <button onclick="confirmResetPassword()" class="btn-primary px-4 py-2 rounded-lg">
+                    <i class="fas fa-key mr-2"></i>Reset Password
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Password Modal -->
+    <div id="newPasswordModal" class="modal">
+        <div class="card p-6 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900">New Password Generated</h3>
+                <button onclick="closeModal('newPasswordModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <p class="text-sm text-gray-600 mb-2">New temporary password:</p>
+                <div class="flex items-center justify-between bg-white border rounded p-3">
+                    <code id="newPasswordDisplay" class="text-lg font-mono font-bold text-green-700"></code>
+                    <button onclick="copyPassword()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 mb-4">Make sure to share this password with the patient securely.</p>
+            <div class="flex justify-end">
+                <button onclick="closeModal('newPasswordModal')" class="btn-primary px-4 py-2 rounded-lg">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Trips Modal -->
+    <div id="viewTripsModal" class="modal">
+        <div class="card p-6 w-full max-w-3xl mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-gray-900">Trips for <span id="tripsUserName"></span></h3>
+                <button onclick="closeModal('viewTripsModal')" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="tripsContent">
+                <!-- Trips loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allUsers = [];
+
+        // Load users on page load
+        document.addEventListener('DOMContentLoaded', loadUsers);
+
+        async function loadUsers() {
+            showLoading(true);
+            try {
+                const response = await fetch('/api/admin/users');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allUsers = data.users;
+                    updateStats(data.stats);
+                    renderUsers(allUsers);
+                } else {
+                    showError('Failed to load users');
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showError('Error connecting to server');
+            }
+            showLoading(false);
+        }
+
+        function updateStats(stats) {
+            document.getElementById('totalPatients').textContent = stats.total_patients || 0;
+            document.getElementById('activeAccounts').textContent = stats.active_accounts || 0;
+            document.getElementById('newThisMonth').textContent = stats.new_this_month || 0;
+            document.getElementById('totalTrips').textContent = stats.total_trips || 0;
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            const table = document.getElementById('usersTable');
+            const empty = document.getElementById('emptyState');
+
+            if (users.length === 0) {
+                table.style.display = 'none';
+                empty.style.display = 'block';
+                return;
+            }
+
+            table.style.display = 'block';
+            empty.style.display = 'none';
+
+            tbody.innerHTML = users.map(user => `
+                <tr class="table-row">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-purple-600 font-semibold">${(user.first_name || 'U')[0]}${(user.last_name || '')[0] || ''}</span>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900">${user.first_name || ''} ${user.last_name || ''}</p>
+                                <p class="text-sm text-gray-500">ID: ${user.patient_id ? user.patient_id.substring(0, 8) + '...' : 'N/A'}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-gray-900">${user.email || 'No email'}</p>
+                        <p class="text-sm text-gray-500">${user.phone || 'No phone'}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <code class="bg-gray-100 px-2 py-1 rounded text-sm">${user.username || 'N/A'}</code>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold ${user.status === 'active' ? 'status-active' : 'status-inactive'}">
+                            ${user.status || 'active'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <button onclick="viewTrips('${user.patient_id}', '${user.first_name} ${user.last_name}')" 
+                                class="text-purple-600 hover:text-purple-800 font-semibold">
+                            ${user.trip_count || 0} trips
+                        </button>
+                    </td>
+                    <td class="px-6 py-4 text-gray-500 text-sm">
+                        ${formatDate(user.created_at)}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex justify-end space-x-2">
+                            <button onclick="openResetPassword('${user.user_id}', '${user.first_name} ${user.last_name}')" 
+                                    class="text-gray-500 hover:text-purple-600 p-2" title="Reset Password">
+                                <i class="fas fa-key"></i>
+                            </button>
+                            <button onclick="toggleStatus('${user.user_id}', '${user.status}')" 
+                                    class="text-gray-500 hover:text-orange-600 p-2" title="Toggle Status">
+                                <i class="fas fa-user-${user.status === 'active' ? 'slash' : 'check'}"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterUsers() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value;
+
+            const filtered = allUsers.filter(user => {
+                const matchesSearch = !search || 
+                    (user.first_name && user.first_name.toLowerCase().includes(search)) ||
+                    (user.last_name && user.last_name.toLowerCase().includes(search)) ||
+                    (user.email && user.email.toLowerCase().includes(search)) ||
+                    (user.phone && user.phone.includes(search)) ||
+                    (user.username && user.username.toLowerCase().includes(search));
+                
+                const matchesStatus = !status || user.status === status;
+                
+                return matchesSearch && matchesStatus;
+            });
+
+            renderUsers(filtered);
+        }
+
+        function openResetPassword(userId, userName) {
+            document.getElementById('resetUserId').value = userId;
+            document.getElementById('resetUserName').textContent = userName;
+            document.getElementById('resetPasswordModal').classList.add('active');
+        }
+
+        async function confirmResetPassword() {
+            const userId = document.getElementById('resetUserId').value;
+            closeModal('resetPasswordModal');
+            
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/reset-password`, {
+                    method: 'POST'
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('newPasswordDisplay').textContent = data.new_password;
+                    document.getElementById('newPasswordModal').classList.add('active');
+                } else {
+                    alert('Failed to reset password: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error resetting password:', error);
+                alert('Error connecting to server');
+            }
+        }
+
+        function copyPassword() {
+            const password = document.getElementById('newPasswordDisplay').textContent;
+            navigator.clipboard.writeText(password);
+            alert('Password copied to clipboard!');
+        }
+
+        async function toggleStatus(userId, currentStatus) {
+            const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+            if (!confirm(`Are you sure you want to ${newStatus === 'active' ? 'activate' : 'deactivate'} this account?`)) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/api/admin/users/${userId}/status`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    loadUsers(); // Refresh the list
+                } else {
+                    alert('Failed to update status: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                alert('Error connecting to server');
+            }
+        }
+
+        async function viewTrips(patientId, userName) {
+            document.getElementById('tripsUserName').textContent = userName;
+            document.getElementById('tripsContent').innerHTML = '<div class="text-center py-8"><i class="fas fa-spinner fa-spin text-2xl text-purple-600"></i></div>';
+            document.getElementById('viewTripsModal').classList.add('active');
+            
+            try {
+                const response = await fetch(`/api/patient/${patientId}/trips`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const allTrips = [...(data.upcoming || []), ...(data.history || [])];
+                    if (allTrips.length === 0) {
+                        document.getElementById('tripsContent').innerHTML = '<p class="text-center text-gray-500 py-8">No trips found</p>';
+                    } else {
+                        document.getElementById('tripsContent').innerHTML = `
+                            <div class="space-y-3">
+                                ${allTrips.map(trip => `
+                                    <div class="border rounded-lg p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <span class="font-semibold">${trip.trip_number}</span>
+                                            <span class="px-2 py-1 rounded text-xs font-semibold ${getStatusClass(trip.status)}">${trip.status}</span>
+                                        </div>
+                                        <p class="text-sm text-gray-600"><i class="fas fa-map-marker-alt text-green-500 mr-2"></i>${trip.pickup_address}</p>
+                                        <p class="text-sm text-gray-600"><i class="fas fa-map-marker-alt text-red-500 mr-2"></i>${trip.destination_address}</p>
+                                        <p class="text-sm text-gray-500 mt-2"><i class="fas fa-clock mr-2"></i>${formatDateTime(trip.scheduled_pickup_time)}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    }
+                } else {
+                    document.getElementById('tripsContent').innerHTML = '<p class="text-center text-red-500 py-8">Failed to load trips</p>';
+                }
+            } catch (error) {
+                console.error('Error loading trips:', error);
+                document.getElementById('tripsContent').innerHTML = '<p class="text-center text-red-500 py-8">Error connecting to server</p>';
+            }
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'completed': return 'bg-green-100 text-green-800';
+                case 'scheduled': return 'bg-blue-100 text-blue-800';
+                case 'cancelled': return 'bg-red-100 text-red-800';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function exportUsers() {
+            const csv = [
+                ['Name', 'Email', 'Phone', 'Username', 'Status', 'Trips', 'Created'],
+                ...allUsers.map(u => [
+                    `${u.first_name || ''} ${u.last_name || ''}`,
+                    u.email || '',
+                    u.phone || '',
+                    u.username || '',
+                    u.status || 'active',
+                    u.trip_count || 0,
+                    u.created_at || ''
+                ])
+            ].map(row => row.join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'gvt_patients_export.csv';
+            a.click();
+        }
+
+        function refreshData() {
+            loadUsers();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function showLoading(show) {
+            document.getElementById('loadingState').classList.toggle('active', show);
+            if (show) {
+                document.getElementById('usersTable').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            document.getElementById('usersTableBody').innerHTML = `
+                <tr>
+                    <td colspan="7" class="px-6 py-12 text-center text-red-500">
+                        <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+                        <p>${message}</p>
+                        <button onclick="loadUsers()" class="mt-4 btn-primary px-4 py-2 rounded-lg text-sm">Retry</button>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('usersTable').style.display = 'block';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function formatDateTime(dateStr) {
+            if (!dateStr) return 'N/A';
+            return new Date(dateStr).toLocaleString('en-US', { 
+                month: 'short', day: 'numeric', year: 'numeric',
+                hour: 'numeric', minute: '2-digit', hour12: true
+            });
+        }
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

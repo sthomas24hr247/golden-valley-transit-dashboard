@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, send_file, jsonify
+from flask import Flask, send_file, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 
@@ -62,6 +62,10 @@ def billing_dashboard():
 @app.route('/billing')
 def billing():
     return send_file('billing_dashboard.html')
+
+@app.route('/user-management')
+def user_management():
+    return send_from_directory('.', 'user_management.html')
 
 @app.route('/health')
 def health():
