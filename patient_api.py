@@ -34,10 +34,10 @@ def get_patient_profile(patient_id=None):
                 return jsonify({"error": "No patients found"}), 404
         
         cursor.execute("""
-            SELECT p.patient_id, p.mrn, p.first_name, p.last_name, p.date_of_birth,
-                   p.gender, p.phone, p.email, p.emergency_contact_name,
-                   p.emergency_contact_phone, p.emergency_contact_relationship
-            FROM medical.patients p WHERE p.patient_id = ?
+            SELECT patient_id, mrn, first_name, last_name, date_of_birth,
+                   gender, phone, email, emergency_contact_name,
+                   emergency_contact_phone, emergency_contact_relationship
+            FROM medical.patients WHERE patient_id = ?
         """, (patient_id,))
         
         row = cursor.fetchone()
@@ -51,14 +51,14 @@ def get_patient_profile(patient_id=None):
             "emergency_contact": {"name": row[8], "phone": row[9], "relationship": row[10]}
         }
         
-        # Get address
+        # Get address (no apartment_unit column)
         cursor.execute("""
-            SELECT street_address, apartment_unit, city, state, zip_code
+            SELECT street_address, city, state, zip_code
             FROM medical.patient_addresses WHERE patient_id = ? AND is_primary = 1
         """, (patient_id,))
         addr = cursor.fetchone()
         if addr:
-            data["address"] = {"street": addr[0], "apartment": addr[1], "city": addr[2], "state": addr[3], "zip_code": addr[4]}
+            data["address"] = {"street": addr[0], "city": addr[1], "state": addr[2], "zip_code": addr[3]}
         
         # Get insurance
         cursor.execute("""
@@ -134,27 +134,33 @@ def get_patient_trips(patient_id=None):
                 return jsonify({"error": "No patients found"}), 404
         
         cursor.execute("""
-            SELECT trip_id, trip_number, trip_date, pickup_time, pickup_address, 
-                   dropoff_address, trip_status, trip_type, special_instructions
+            SELECT trip_id, trip_number, scheduled_pickup_time, pickup_address, 
+                   destination_address, status, trip_type, special_instructions
             FROM operations.trips WHERE patient_id = ?
-            ORDER BY trip_date DESC
+            ORDER BY scheduled_pickup_time DESC
         """, (patient_id,))
         
         trips = []
         for row in cursor.fetchall():
+            trip_date = None
+            pickup_time = None
+            if row[2]:
+                trip_date = str(row[2].date()) if hasattr(row[2], 'date') else str(row[2])[:10]
+                pickup_time = str(row[2].time()) if hasattr(row[2], 'time') else str(row[2])[11:19]
+            
             trips.append({
                 "trip_id": str(row[0]), "trip_number": row[1],
-                "trip_date": str(row[2]) if row[2] else None,
-                "pickup_time": str(row[3]) if row[3] else None,
-                "pickup_address": row[4], "dropoff_address": row[5],
-                "status": row[6], "trip_type": row[7], "special_instructions": row[8]
+                "trip_date": trip_date,
+                "pickup_time": pickup_time,
+                "pickup_address": row[3], "dropoff_address": row[4],
+                "status": row[5], "trip_type": row[6], "special_instructions": row[7]
             })
         
         conn.close()
         
         from datetime import date
         today = str(date.today())
-        upcoming = [t for t in trips if t['trip_date'] and t['trip_date'] >= today and t['status'] in ('scheduled', 'confirmed')]
+        upcoming = [t for t in trips if t['trip_date'] and t['trip_date'] >= today and t['status'] in ('scheduled', 'confirmed', 'Scheduled', 'Confirmed')]
         history = [t for t in trips if t not in upcoming]
         
         return jsonify({"status": "success", "data": {"upcoming": upcoming, "history": history}})
@@ -182,11 +188,16 @@ def book_patient_trip():
         import random
         trip_number = f"GVT-{datetime.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
         
+        # Combine date and time for scheduled_pickup_time
+        pickup_datetime = None
+        if data.get('trip_date') and data.get('pickup_time'):
+            pickup_datetime = f"{data.get('trip_date')} {data.get('pickup_time')}"
+        
         cursor.execute("""
             INSERT INTO operations.trips 
-            (patient_id, trip_number, trip_date, pickup_time, pickup_address, dropoff_address, trip_status, trip_type, special_instructions)
-            VALUES (?, ?, ?, ?, ?, ?, 'scheduled', ?, ?)
-        """, (patient_id, trip_number, data.get('trip_date'), data.get('pickup_time'),
+            (patient_id, trip_number, scheduled_pickup_time, pickup_address, destination_address, status, trip_type, special_instructions)
+            VALUES (?, ?, ?, ?, ?, 'Scheduled', ?, ?)
+        """, (patient_id, trip_number, pickup_datetime,
               data.get('pickup_address'), data.get('dropoff_address'),
               data.get('trip_type', 'one_way'), data.get('special_instructions')))
         
