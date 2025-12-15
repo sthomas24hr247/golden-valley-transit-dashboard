@@ -51,7 +51,7 @@ def get_patient_profile(patient_id=None):
             "emergency_contact": {"name": row[8], "phone": row[9], "relationship": row[10]}
         }
         
-        # Get address (no apartment_unit column)
+        # Get address
         cursor.execute("""
             SELECT street_address, city, state, zip_code
             FROM medical.patient_addresses WHERE patient_id = ? AND is_primary = 1
@@ -60,23 +60,30 @@ def get_patient_profile(patient_id=None):
         if addr:
             data["address"] = {"street": addr[0], "city": addr[1], "state": addr[2], "zip_code": addr[3]}
         
-        # Get insurance
+        # Get insurance (correct column names)
         cursor.execute("""
-            SELECT insurance_provider, member_id, group_number, coverage_status
+            SELECT insurance_company, policy_number, group_number, status
             FROM medical.patient_insurance WHERE patient_id = ? AND is_primary = 1
         """, (patient_id,))
         ins = cursor.fetchone()
         if ins:
             data["insurance"] = {"provider": ins[0], "member_id": ins[1], "group_number": ins[2], "coverage_status": ins[3]}
         
-        # Get medical info
+        # Get medical info (correct column names)
         cursor.execute("""
-            SELECT mobility_equipment, assistance_level, oxygen_required, medical_notes, requires_assistance
+            SELECT mobility_requirements, special_equipment_needed, oxygen_required, 
+                   behavioral_notes, wheelchair_required
             FROM medical.patient_medical_info WHERE patient_id = ?
         """, (patient_id,))
         med = cursor.fetchone()
         if med:
-            data["medical"] = {"mobility_equipment": med[0], "assistance_level": med[1], "oxygen_required": med[2], "medical_notes": med[3], "requires_assistance": bool(med[4]) if med[4] else False}
+            data["medical"] = {
+                "mobility_equipment": med[0], 
+                "assistance_level": med[1], 
+                "oxygen_required": med[2], 
+                "medical_notes": med[3], 
+                "requires_assistance": bool(med[4]) if med[4] else False
+            }
         
         conn.close()
         return jsonify({"status": "success", "data": data})
@@ -188,7 +195,6 @@ def book_patient_trip():
         import random
         trip_number = f"GVT-{datetime.now().strftime('%Y%m%d')}-{random.randint(1000, 9999)}"
         
-        # Combine date and time for scheduled_pickup_time
         pickup_datetime = None
         if data.get('trip_date') and data.get('pickup_time'):
             pickup_datetime = f"{data.get('trip_date')} {data.get('pickup_time')}"
