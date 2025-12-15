@@ -241,15 +241,16 @@
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
+                        firstName: firstName,
+                        lastName: lastName,
                         email: email,
-                        name: `${firstName} ${lastName}`,
                         phone: phone
                     })
                 });
                 
                 const result = await response.json();
                 
-                if (result.status === 'success') {
+                if (result.success === true) {
                     // Hide form and show success message
                     document.getElementById('registrationForm').parentElement.style.display = 'none';
                     document.getElementById('successMessage').style.display = 'block';

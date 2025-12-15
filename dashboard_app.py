@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, send_file, jsonify
+from flask import Flask, send_file, jsonify, send_from_directory
 from flask_cors import CORS
 import os
 
@@ -32,8 +32,12 @@ def new_customer():
     return send_file('new_customer_registration.html')
 
 @app.route('/patient-portal')
+def patient_login():
+    return send_file('patient_login.html')
+
+@app.route('/patient-dashboard')
 def patient_portal():
-    return send_file('partnership_demo.html')
+    return send_file('patient_dashboard.html')
 
 @app.route('/driver-dashboard')
 def driver_dashboard():
@@ -54,6 +58,14 @@ def analytics_dashboard():
 @app.route('/billing-dashboard')
 def billing_dashboard():
     return send_file('billing_dashboard.html')
+
+@app.route('/billing')
+def billing():
+    return send_file('billing_dashboard.html')
+
+@app.route('/user-management')
+def user_management():
+    return send_from_directory('.', 'user_management.html')
 
 @app.route('/health')
 def health():
