@@ -35,7 +35,7 @@ def get_patient_profile(patient_id=None):
         
         cursor.execute("""
             SELECT p.patient_id, p.mrn, p.first_name, p.last_name, p.date_of_birth,
-                   p.gender, p.phone_primary, p.email, p.emergency_contact_name,
+                   p.gender, p.phone, p.email, p.emergency_contact_name,
                    p.emergency_contact_phone, p.emergency_contact_relationship
             FROM medical.patients p WHERE p.patient_id = ?
         """, (patient_id,))
@@ -105,7 +105,7 @@ def update_patient_profile(patient_id=None):
                 UPDATE medical.patients SET 
                     first_name = COALESCE(?, first_name),
                     last_name = COALESCE(?, last_name),
-                    phone_primary = COALESCE(?, phone_primary),
+                    phone = COALESCE(?, phone),
                     email = COALESCE(?, email),
                     updated_at = GETUTCDATE()
                 WHERE patient_id = ?
