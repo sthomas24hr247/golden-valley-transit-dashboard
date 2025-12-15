@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Golden Valley Transit - Patient Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .tab-active { border-bottom: 3px solid #667eea; color: #667eea; font-weight: 600; }
+        .tab-inactive { border-bottom: 3px solid transparent; color: #6b7280; }
+        .tab-inactive:hover { color: #667eea; }
+        .card-shadow { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+        .info-label { font-size: 0.75rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; }
+        .info-value { font-size: 1rem; color: #1f2937; font-weight: 500; }
+        .edit-field { transition: all 0.2s ease; }
+        .edit-field:focus { border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Header -->
+    <header class="gradient-header text-white">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <span class="text-3xl">🚐</span>
+                    <div>
+                        <h1 class="text-xl font-bold">Golden Valley Transit</h1>
+                        <p class="text-sm text-purple-200">Patient Portal</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm" id="welcomeUser">Welcome, John Wick</span>
+                    <button onclick="logout()" class="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg text-sm font-medium transition">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-white border-b">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="flex space-x-8">
+                <button onclick="showTab('dashboard')" id="tab-dashboard" class="py-4 px-2 tab-active transition">
+                    <span class="mr-2">🏠</span> Dashboard
+                </button>
+                <button onclick="showTab('profile')" id="tab-profile" class="py-4 px-2 tab-inactive transition">
+                    <span class="mr-2">👤</span> My Profile
+                </button>
+                <button onclick="showTab('booking')" id="tab-booking" class="py-4 px-2 tab-inactive transition">
+                    <span class="mr-2">📅</span> Book a Ride
+                </button>
+                <button onclick="showTab('history')" id="tab-history" class="py-4 px-2 tab-inactive transition">
+                    <span class="mr-2">📋</span> Trip History
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-6 py-8">
+        
+        <!-- Dashboard Tab -->
+        <div id="content-dashboard" class="tab-content">
+            <!-- Quick Actions -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <div class="text-3xl mb-3">📅</div>
+                    <h3 class="font-semibold text-gray-800 mb-1">Book New Ride</h3>
+                    <p class="text-sm text-gray-600 mb-4">Schedule your next medical transportation</p>
+                    <button onclick="showTab('booking')" class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-medium transition">
+                        Book a Ride
+                    </button>
+                </div>
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <div class="text-3xl mb-3">📞</div>
+                    <h3 class="font-semibold text-gray-800 mb-1">Contact Us</h3>
+                    <p class="text-sm text-gray-600 mb-4">Speak with our dispatch team</p>
+                    <a href="tel:8773786368" class="block w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium transition text-center">
+                        (877) 378-NEMT
+                    </a>
+                </div>
+                <div class="bg-white rounded-xl p-6 card-shadow">
+                    <div class="text-3xl mb-3">⏰</div>
+                    <h3 class="font-semibold text-gray-800 mb-1">Hours</h3>
+                    <p class="text-sm text-gray-600 mb-4">We're here when you need us</p>
+                    <p class="text-gray-800 font-medium">6:00 AM - 10:00 PM Daily</p>
+                </div>
+            </div>
+
+            <!-- Upcoming Trips -->
+            <div class="bg-white rounded-xl card-shadow mb-8">
+                <div class="p-6 border-b flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800">Upcoming Trips</h2>
+                    <button onclick="refreshTrips()" class="text-purple-600 hover:text-purple-700 font-medium text-sm">Refresh</button>
+                </div>
+                <div class="p-6" id="upcomingTrips">
+                    <div class="text-center py-8">
+                        <div class="text-5xl mb-4">📅</div>
+                        <p class="text-gray-500">No upcoming trips scheduled</p>
+                        <button onclick="showTab('booking')" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded-lg font-medium transition">
+                            Book a Ride
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Trip History -->
+            <div class="bg-white rounded-xl card-shadow">
+                <div class="p-6 border-b flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800">Recent Trips</h2>
+                    <button onclick="showTab('history')" class="text-purple-600 hover:text-purple-700 font-medium text-sm">View All</button>
+                </div>
+                <div class="divide-y" id="recentTrips">
+                    <!-- Sample trip data -->
+                    <div class="p-4 hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded mb-2">scheduled</span>
+                                <span class="text-gray-500 text-sm ml-2">GVT-20251210-9729</span>
+                                <p class="font-medium text-gray-800">Thursday, Dec 11, 9:30 AM</p>
+                                <p class="text-sm text-gray-600">📍 123 Main St, Bakersfield CA</p>
+                                <p class="text-sm text-gray-600">🏥 456 Hospital Dr, Bakersfield CA</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded mb-2">scheduled</span>
+                                <span class="text-gray-500 text-sm ml-2">GVT-20251202-8080</span>
+                                <p class="font-medium text-gray-800">Tuesday, Dec 2, 9:30 AM</p>
+                                <p class="text-sm text-gray-600">📍 10207 Rancho Heights, Bakersfield CA</p>
+                                <p class="text-sm text-gray-600">🏥 Mercy Hospital, Bakersfield CA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Tab -->
+        <div id="content-profile" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">My Profile</h2>
+                <button onclick="toggleEditMode()" id="editButton" class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded-lg font-medium transition">
+                    <span id="editButtonText">Edit Profile</span>
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Personal Information -->
+                <div class="bg-white rounded-xl card-shadow">
+                    <div class="p-6 border-b bg-gray-50 rounded-t-xl">
+                        <h3 class="font-bold text-gray-800 flex items-center">
+                            <span class="mr-2">👤</span> Personal Information
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="info-label">First Name</p>
+                                <p class="info-value view-mode" id="view-firstName">John</p>
+                                <input type="text" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-firstName" value="John">
+                            </div>
+                            <div>
+                                <p class="info-label">Last Name</p>
+                                <p class="info-value view-mode" id="view-lastName">Wick</p>
+                                <input type="text" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-lastName" value="Wick">
+                            </div>
+                        </div>
+                        <div>
+                            <p class="info-label">Date of Birth</p>
+                            <p class="info-value view-mode" id="view-dob">March 15, 1965</p>
+                            <input type="date" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-dob" value="1965-03-15">
+                        </div>
+                        <div>
+                            <p class="info-label">Gender</p>
+                            <p class="info-value view-mode" id="view-gender">Male</p>
+                            <select class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-gender">
+                                <option value="male" selected>Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <p class="info-label">Phone Number</p>
+                            <p class="info-value view-mode" id="view-phone">(661) 555-0123</p>
+                            <input type="tel" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-phone" value="(661) 555-0123">
+                        </div>
+                        <div>
+                            <p class="info-label">Email Address</p>
+                            <p class="info-value view-mode" id="view-email">john.wick@email.com</p>
+                            <input type="email" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-email" value="john.wick@email.com">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Home Address -->
+                <div class="bg-white rounded-xl card-shadow">
+                    <div class="p-6 border-b bg-gray-50 rounded-t-xl">
+                        <h3 class="font-bold text-gray-800 flex items-center">
+                            <span class="mr-2">🏠</span> Home Address
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <p class="info-label">Street Address</p>
+                            <p class="info-value view-mode" id="view-street">123 Main Street</p>
+                            <input type="text" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-street" value="123 Main Street">
+                        </div>
+                        <div>
+                            <p class="info-label">Apartment/Unit</p>
+                            <p class="info-value view-mode" id="view-apt">-</p>
+                            <input type="text" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-apt" value="">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="info-label">City</p>
+                                <p class="info-value view-mode" id="view-city">Bakersfield</p>
+                                <input type="text" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-city" value="Bakersfield">
+                            </div>
+                            <div>
+                                <p class="info-label">State</p>
+                                <p class="info-value view-mode" id="view-state">CA</p>
+                                <input type="text" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-state" value="CA">
+                            </div>
+                        </div>
+                        <div>
+                            <p class="info-label">ZIP Code</p>
+                            <p class="info-value view-mode" id="view-zip">93301</p>
+                            <input type="text" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-zip" value="93301">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Contact -->
+                <div class="bg-white rounded-xl card-shadow">
+                    <div class="p-6 border-b bg-gray-50 rounded-t-xl">
+                        <h3 class="font-bold text-gray-800 flex items-center">
+                            <span class="mr-2">🚨</span> Emergency Contact
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <p class="info-label">Contact Name</p>
+                            <p class="info-value view-mode" id="view-emergencyName">Helen Wick</p>
+                            <input type="text" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-emergencyName" value="Helen Wick">
+                        </div>
+                        <div>
+                            <p class="info-label">Relationship</p>
+                            <p class="info-value view-mode" id="view-emergencyRelation">Spouse</p>
+                            <select class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-emergencyRelation">
+                                <option value="spouse" selected>Spouse</option>
+                                <option value="parent">Parent</option>
+                                <option value="child">Child</option>
+                                <option value="sibling">Sibling</option>
+                                <option value="friend">Friend</option>
+                                <option value="caregiver">Caregiver</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <p class="info-label">Phone Number</p>
+                            <p class="info-value view-mode" id="view-emergencyPhone">(661) 555-0124</p>
+                            <input type="tel" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-emergencyPhone" value="(661) 555-0124">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Insurance Information -->
+                <div class="bg-white rounded-xl card-shadow">
+                    <div class="p-6 border-b bg-gray-50 rounded-t-xl">
+                        <h3 class="font-bold text-gray-800 flex items-center">
+                            <span class="mr-2">🛡️</span> Insurance Information
+                        </h3>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div>
+                            <p class="info-label">Insurance Provider</p>
+                            <p class="info-value view-mode" id="view-insuranceProvider">Medi-Cal</p>
+                            <select class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-insuranceProvider">
+                                <option value="medi-cal" selected>Medi-Cal</option>
+                                <option value="medicare">Medicare</option>
+                                <option value="blue-cross">Blue Cross Blue Shield</option>
+                                <option value="kaiser">Kaiser Permanente</option>
+                                <option value="aetna">Aetna</option>
+                                <option value="cigna">Cigna</option>
+                                <option value="united">United Healthcare</option>
+                                <option value="other">Other</option>
+                                <option value="self-pay">Self Pay</option>
+                            </select>
+                        </div>
+                        <div>
+                            <p class="info-label">Member ID</p>
+                            <p class="info-value view-mode" id="view-memberId">MC-123456789</p>
+                            <input type="text" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-memberId" value="MC-123456789">
+                        </div>
+                        <div>
+                            <p class="info-label">Group Number</p>
+                            <p class="info-value view-mode" id="view-groupNumber">GRP-98765</p>
+                            <input type="text" class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-groupNumber" value="GRP-98765">
+                        </div>
+                        <div>
+                            <p class="info-label">Coverage Status</p>
+                            <p class="info-value text-green-600 view-mode" id="view-coverageStatus">Active - Verified</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medical/Mobility Requirements -->
+                <div class="bg-white rounded-xl card-shadow lg:col-span-2">
+                    <div class="p-6 border-b bg-gray-50 rounded-t-xl">
+                        <h3 class="font-bold text-gray-800 flex items-center">
+                            <span class="mr-2">🏥</span> Medical & Mobility Requirements
+                        </h3>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div>
+                                <p class="info-label">Mobility Equipment</p>
+                                <p class="info-value view-mode" id="view-mobility">Wheelchair</p>
+                                <select class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-mobility">
+                                    <option value="none">None - Ambulatory</option>
+                                    <option value="wheelchair" selected>Wheelchair</option>
+                                    <option value="walker">Walker</option>
+                                    <option value="cane">Cane</option>
+                                    <option value="stretcher">Stretcher</option>
+                                    <option value="bariatric">Bariatric Equipment</option>
+                                </select>
+                            </div>
+                            <div>
+                                <p class="info-label">Assistance Required</p>
+                                <p class="info-value view-mode" id="view-assistance">Yes - Door to Door</p>
+                                <select class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-assistance">
+                                    <option value="none">No Assistance Needed</option>
+                                    <option value="curb">Curb to Curb</option>
+                                    <option value="door" selected>Door to Door</option>
+                                    <option value="bed">Bed to Bed</option>
+                                </select>
+                            </div>
+                            <div>
+                                <p class="info-label">Oxygen Required</p>
+                                <p class="info-value view-mode" id="view-oxygen">No</p>
+                                <select class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field" id="edit-oxygen">
+                                    <option value="no" selected>No</option>
+                                    <option value="portable">Yes - Portable</option>
+                                    <option value="concentrator">Yes - Concentrator</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <p class="info-label">Special Instructions / Medical Notes</p>
+                            <p class="info-value view-mode" id="view-notes">Requires wheelchair assistance for all transfers. Patient prefers quiet ride. Has difficulty with stairs.</p>
+                            <textarea class="edit-mode hidden w-full border rounded-lg px-3 py-2 edit-field h-24" id="edit-notes">Requires wheelchair assistance for all transfers. Patient prefers quiet ride. Has difficulty with stairs.</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save/Cancel Buttons (shown in edit mode) -->
+            <div id="saveButtons" class="hidden mt-6 flex justify-end space-x-4">
+                <button onclick="cancelEdit()" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-6 rounded-lg font-medium transition">
+                    Cancel
+                </button>
+                <button onclick="saveProfile()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-6 rounded-lg font-medium transition">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+
+        <!-- Booking Tab -->
+        <div id="content-booking" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Book a New Ride</h2>
+            
+            <div class="bg-white rounded-xl card-shadow p-6">
+                <form id="bookingForm" class="space-y-6">
+                    <!-- Appointment Details -->
+                    <div class="border-b pb-6">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="mr-2">📅</span> Appointment Details
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Appointment Date</label>
+                                <input type="date" class="w-full border rounded-lg px-3 py-2" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Appointment Time</label>
+                                <input type="time" class="w-full border rounded-lg px-3 py-2" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pickup Location -->
+                    <div class="border-b pb-6">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="mr-2">📍</span> Pickup Location
+                        </h3>
+                        <div class="mb-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" id="useHomeAddress" checked class="mr-2" onchange="toggleHomeAddress()">
+                                <span class="text-sm text-gray-700">Use my home address</span>
+                            </label>
+                        </div>
+                        <div id="pickupFields" class="hidden space-y-4">
+                            <input type="text" placeholder="Street Address" class="w-full border rounded-lg px-3 py-2">
+                            <div class="grid grid-cols-3 gap-4">
+                                <input type="text" placeholder="City" class="border rounded-lg px-3 py-2">
+                                <input type="text" placeholder="State" class="border rounded-lg px-3 py-2" value="CA">
+                                <input type="text" placeholder="ZIP" class="border rounded-lg px-3 py-2">
+                            </div>
+                        </div>
+                        <div id="homeAddressDisplay" class="bg-gray-50 rounded-lg p-4">
+                            <p class="text-gray-800">123 Main Street</p>
+                            <p class="text-gray-600">Bakersfield, CA 93301</p>
+                        </div>
+                    </div>
+
+                    <!-- Destination -->
+                    <div class="border-b pb-6">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="mr-2">🏥</span> Destination (Medical Facility)
+                        </h3>
+                        <div class="space-y-4">
+                            <input type="text" placeholder="Facility Name" class="w-full border rounded-lg px-3 py-2" required>
+                            <input type="text" placeholder="Street Address" class="w-full border rounded-lg px-3 py-2" required>
+                            <div class="grid grid-cols-3 gap-4">
+                                <input type="text" placeholder="City" class="border rounded-lg px-3 py-2" value="Bakersfield">
+                                <input type="text" placeholder="State" class="border rounded-lg px-3 py-2" value="CA">
+                                <input type="text" placeholder="ZIP" class="border rounded-lg px-3 py-2">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trip Type -->
+                    <div class="border-b pb-6">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="mr-2">🔄</span> Trip Type
+                        </h3>
+                        <div class="flex space-x-4">
+                            <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="tripType" value="roundtrip" checked class="mr-3">
+                                <div>
+                                    <p class="font-medium">Round Trip</p>
+                                    <p class="text-sm text-gray-500">Includes return ride</p>
+                                </div>
+                            </label>
+                            <label class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                                <input type="radio" name="tripType" value="oneway" class="mr-3">
+                                <div>
+                                    <p class="font-medium">One Way</p>
+                                    <p class="text-sm text-gray-500">Single direction only</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Special Instructions -->
+                    <div>
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                            <span class="mr-2">📝</span> Special Instructions
+                        </h3>
+                        <textarea class="w-full border rounded-lg px-3 py-2 h-24" placeholder="Any special instructions for the driver..."></textarea>
+                    </div>
+
+                    <!-- Submit -->
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <button type="button" onclick="showTab('dashboard')" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-8 rounded-lg font-medium transition">
+                            Cancel
+                        </button>
+                        <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-3 px-8 rounded-lg font-medium transition">
+                            Request Ride
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="content-history" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">Trip History</h2>
+            
+            <div class="bg-white rounded-xl card-shadow">
+                <div class="p-4 border-b flex justify-between items-center">
+                    <div class="flex space-x-2">
+                        <button class="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg font-medium text-sm">All Trips</button>
+                        <button class="px-4 py-2 hover:bg-gray-100 text-gray-600 rounded-lg font-medium text-sm">Completed</button>
+                        <button class="px-4 py-2 hover:bg-gray-100 text-gray-600 rounded-lg font-medium text-sm">Scheduled</button>
+                        <button class="px-4 py-2 hover:bg-gray-100 text-gray-600 rounded-lg font-medium text-sm">Cancelled</button>
+                    </div>
+                </div>
+                <div class="divide-y">
+                    <!-- Trip 1 -->
+                    <div class="p-4 hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">scheduled</span>
+                                    <span class="text-gray-500 text-sm">GVT-20251210-9729</span>
+                                </div>
+                                <p class="font-medium text-gray-800">Thursday, December 11, 2025 at 9:30 AM</p>
+                                <div class="mt-2 text-sm">
+                                    <p class="text-gray-600"><span class="text-red-500">📍</span> 123 Main St, Bakersfield CA</p>
+                                    <p class="text-gray-600"><span class="text-blue-500">🏥</span> 456 Hospital Dr, Bakersfield CA</p>
+                                </div>
+                            </div>
+                            <button class="text-purple-600 hover:text-purple-700 font-medium text-sm">View Details</button>
+                        </div>
+                    </div>
+                    <!-- Trip 2 -->
+                    <div class="p-4 hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">scheduled</span>
+                                    <span class="text-gray-500 text-sm">GVT-20251202-8080</span>
+                                </div>
+                                <p class="font-medium text-gray-800">Tuesday, December 2, 2025 at 9:30 AM</p>
+                                <div class="mt-2 text-sm">
+                                    <p class="text-gray-600"><span class="text-red-500">📍</span> 10207 Rancho Heights, Bakersfield CA</p>
+                                    <p class="text-gray-600"><span class="text-blue-500">🏥</span> Mercy Hospital, Bakersfield CA</p>
+                                </div>
+                            </div>
+                            <button class="text-purple-600 hover:text-purple-700 font-medium text-sm">View Details</button>
+                        </div>
+                    </div>
+                    <!-- Trip 3 -->
+                    <div class="p-4 hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">completed</span>
+                                    <span class="text-gray-500 text-sm">GVT-20251115-4521</span>
+                                </div>
+                                <p class="font-medium text-gray-800">Friday, November 15, 2025 at 2:00 PM</p>
+                                <div class="mt-2 text-sm">
+                                    <p class="text-gray-600"><span class="text-red-500">📍</span> 123 Main St, Bakersfield CA</p>
+                                    <p class="text-gray-600"><span class="text-blue-500">🏥</span> Kaiser Permanente, Bakersfield CA</p>
+                                </div>
+                            </div>
+                            <button class="text-purple-600 hover:text-purple-700 font-medium text-sm">View Details</button>
+                        </div>
+                    </div>
+                    <!-- Trip 4 -->
+                    <div class="p-4 hover:bg-gray-50">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 mb-2">
+                                    <span class="inline-block px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">completed</span>
+                                    <span class="text-gray-500 text-sm">GVT-20251101-3312</span>
+                                </div>
+                                <p class="font-medium text-gray-800">Saturday, November 1, 2025 at 10:00 AM</p>
+                                <div class="mt-2 text-sm">
+                                    <p class="text-gray-600"><span class="text-red-500">📍</span> 123 Main St, Bakersfield CA</p>
+                                    <p class="text-gray-600"><span class="text-blue-500">🏥</span> Adventist Health, Bakersfield CA</p>
+                                </div>
+                            </div>
+                            <button class="text-purple-600 hover:text-purple-700 font-medium text-sm">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-12">
+        <div class="max-w-6xl mx-auto px-6 text-center">
+            <p class="text-gray-400">Golden Valley Transit - Professional Medical Transportation</p>
+            <p class="text-gray-500 text-sm mt-2">Serving Bakersfield and Kern County, California</p>
+            <p class="text-gray-500 text-sm mt-1">(877) 378-NEMT | info@goldenvalleytransit.com</p>
+        </div>
+    </footer>
+
+    <script>
+        let isEditMode = false;
+        let patientData = null;
+
+        // Load patient data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPatientProfile();
+            loadPatientTrips();
+        });
+
+        // Fetch patient profile from API
+        async function loadPatientProfile() {
+            try {
+                const response = await fetch('/api/patient/profile');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    patientData = result.data;
+                    populateProfileFields(patientData);
+                    document.getElementById('welcomeUser').textContent = 
+                        'Welcome, ' + patientData.first_name + ' ' + patientData.last_name;
+                } else {
+                    console.error('Failed to load profile:', result.error);
+                }
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+
+        // Populate profile fields with data
+        function populateProfileFields(data) {
+            // Personal info
+            setFieldValue('firstName', data.first_name);
+            setFieldValue('lastName', data.last_name);
+            setFieldValue('dob', formatDate(data.date_of_birth));
+            setFieldValue('gender', capitalizeFirst(data.gender));
+            setFieldValue('phone', data.phone);
+            setFieldValue('email', data.email);
+            
+            // Address
+            if (data.address) {
+                setFieldValue('street', data.address.street);
+                setFieldValue('apt', data.address.apartment || '-');
+                setFieldValue('city', data.address.city);
+                setFieldValue('state', data.address.state);
+                setFieldValue('zip', data.address.zip_code);
+            }
+            
+            // Emergency contact
+            if (data.emergency_contact) {
+                setFieldValue('emergencyName', data.emergency_contact.name);
+                setFieldValue('emergencyRelation', capitalizeFirst(data.emergency_contact.relationship));
+                setFieldValue('emergencyPhone', data.emergency_contact.phone);
+            }
+            
+            // Insurance
+            if (data.insurance) {
+                setFieldValue('insuranceProvider', data.insurance.provider);
+                setFieldValue('memberId', data.insurance.member_id);
+                setFieldValue('groupNumber', data.insurance.group_number);
+                setFieldValue('coverageStatus', data.insurance.coverage_status === 'active' ? 'Active - Verified' : data.insurance.coverage_status);
+            }
+            
+            // Medical info
+            if (data.medical) {
+                setFieldValue('mobility', capitalizeFirst(data.medical.mobility_equipment));
+                setFieldValue('assistance', data.medical.assistance_level ? capitalizeFirst(data.medical.assistance_level.replace('_', ' ')) : 'None');
+                setFieldValue('oxygen', data.medical.oxygen_required || 'No');
+                setFieldValue('notes', data.medical.medical_notes);
+            }
+        }
+
+        function setFieldValue(fieldName, value) {
+            const viewEl = document.getElementById('view-' + fieldName);
+            const editEl = document.getElementById('edit-' + fieldName);
+            if (viewEl) viewEl.textContent = value || '-';
+            if (editEl) {
+                if (editEl.tagName === 'SELECT') {
+                    // Try to match option value
+                    for (let opt of editEl.options) {
+                        if (opt.value.toLowerCase() === (value || '').toLowerCase() || 
+                            opt.text.toLowerCase() === (value || '').toLowerCase()) {
+                            editEl.value = opt.value;
+                            break;
+                        }
+                    }
+                } else {
+                    editEl.value = value || '';
+                }
+            }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        function capitalizeFirst(str) {
+            if (!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Load patient trips from API
+        async function loadPatientTrips() {
+            try {
+                const response = await fetch('/api/patient/trips');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    displayUpcomingTrips(result.data.upcoming);
+                    displayTripHistory(result.data.history);
+                }
+            } catch (error) {
+                console.error('Error loading trips:', error);
+            }
+        }
+
+        function displayUpcomingTrips(trips) {
+            const container = document.getElementById('upcomingTrips');
+            if (trips.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8">
+                        <div class="text-5xl mb-4">📅</div>
+                        <p class="text-gray-500">No upcoming trips scheduled</p>
+                        <button onclick="showTab('booking')" class="mt-4 bg-purple-600 hover:bg-purple-700 text-white py-2 px-6 rounded-lg font-medium transition">
+                            Book a Ride
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = trips.map(trip => `
+                <div class="p-4 border-b hover:bg-gray-50">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="inline-block px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded mb-2">${trip.status}</span>
+                            <span class="text-gray-500 text-sm ml-2">${trip.trip_number}</span>
+                            <p class="font-medium text-gray-800">${formatTripDate(trip.trip_date, trip.pickup_time)}</p>
+                            <p class="text-sm text-gray-600">📍 ${trip.pickup_address}</p>
+                            <p class="text-sm text-gray-600">🏥 ${trip.dropoff_address}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function displayTripHistory(trips) {
+            const recentContainer = document.getElementById('recentTrips');
+            const recent = trips.slice(0, 3);
+            
+            if (recent.length === 0) {
+                recentContainer.innerHTML = '<p class="p-4 text-gray-500">No trip history</p>';
+                return;
+            }
+            
+            recentContainer.innerHTML = recent.map(trip => `
+                <div class="p-4 hover:bg-gray-50">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="inline-block px-2 py-1 ${trip.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'} text-xs font-medium rounded mb-2">${trip.status}</span>
+                            <span class="text-gray-500 text-sm ml-2">${trip.trip_number}</span>
+                            <p class="font-medium text-gray-800">${formatTripDate(trip.trip_date, trip.pickup_time)}</p>
+                            <p class="text-sm text-gray-600">📍 ${trip.pickup_address}</p>
+                            <p class="text-sm text-gray-600">🏥 ${trip.dropoff_address}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatTripDate(dateStr, timeStr) {
+            if (!dateStr) return 'Date TBD';
+            const date = new Date(dateStr);
+            let formatted = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+            if (timeStr) {
+                formatted += ' at ' + timeStr;
+            }
+            return formatted;
+        }
+
+        function showTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            // Show selected content
+            document.getElementById('content-' + tabName).classList.remove('hidden');
+            
+            // Update tab styles
+            document.querySelectorAll('[id^="tab-"]').forEach(el => {
+                el.classList.remove('tab-active');
+                el.classList.add('tab-inactive');
+            });
+            document.getElementById('tab-' + tabName).classList.remove('tab-inactive');
+            document.getElementById('tab-' + tabName).classList.add('tab-active');
+        }
+
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            
+            if (isEditMode) {
+                // Show edit fields, hide view fields
+                document.querySelectorAll('.view-mode').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.edit-mode').forEach(el => el.classList.remove('hidden'));
+                document.getElementById('saveButtons').classList.remove('hidden');
+                document.getElementById('editButtonText').textContent = 'Cancel Edit';
+                document.getElementById('editButton').classList.remove('bg-purple-600', 'hover:bg-purple-700');
+                document.getElementById('editButton').classList.add('bg-gray-500', 'hover:bg-gray-600');
+            } else {
+                // Show view fields, hide edit fields
+                document.querySelectorAll('.view-mode').forEach(el => el.classList.remove('hidden'));
+                document.querySelectorAll('.edit-mode').forEach(el => el.classList.add('hidden'));
+                document.getElementById('saveButtons').classList.add('hidden');
+                document.getElementById('editButtonText').textContent = 'Edit Profile';
+                document.getElementById('editButton').classList.remove('bg-gray-500', 'hover:bg-gray-600');
+                document.getElementById('editButton').classList.add('bg-purple-600', 'hover:bg-purple-700');
+            }
+        }
+
+        function cancelEdit() {
+            toggleEditMode();
+        }
+
+        async function saveProfile() {
+            // Collect all edit field values
+            const profileData = {
+                first_name: document.getElementById('edit-firstName').value,
+                last_name: document.getElementById('edit-lastName').value,
+                date_of_birth: document.getElementById('edit-dob').value,
+                gender: document.getElementById('edit-gender').value,
+                phone: document.getElementById('edit-phone').value,
+                email: document.getElementById('edit-email').value,
+                emergency_contact: {
+                    name: document.getElementById('edit-emergencyName').value,
+                    phone: document.getElementById('edit-emergencyPhone').value,
+                    relationship: document.getElementById('edit-emergencyRelation').value
+                },
+                address: {
+                    street: document.getElementById('edit-street').value,
+                    apartment: document.getElementById('edit-apt').value,
+                    city: document.getElementById('edit-city').value,
+                    state: document.getElementById('edit-state').value,
+                    zip_code: document.getElementById('edit-zip').value
+                },
+                insurance: {
+                    provider: document.getElementById('edit-insuranceProvider').value,
+                    member_id: document.getElementById('edit-memberId').value,
+                    group_number: document.getElementById('edit-groupNumber').value
+                },
+                medical: {
+                    mobility_equipment: document.getElementById('edit-mobility').value,
+                    assistance_level: document.getElementById('edit-assistance').value,
+                    oxygen_required: document.getElementById('edit-oxygen').value,
+                    medical_notes: document.getElementById('edit-notes').value
+                }
+            };
+
+            try {
+                const response = await fetch('/api/patient/profile', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Update view fields with new values
+                    const fields = ['firstName', 'lastName', 'dob', 'gender', 'phone', 'email', 
+                                   'street', 'apt', 'city', 'state', 'zip',
+                                   'emergencyName', 'emergencyRelation', 'emergencyPhone',
+                                   'insuranceProvider', 'memberId', 'groupNumber',
+                                   'mobility', 'assistance', 'oxygen', 'notes'];
+                    
+                    fields.forEach(field => {
+                        const editEl = document.getElementById('edit-' + field);
+                        const viewEl = document.getElementById('view-' + field);
+                        if (editEl && viewEl) {
+                            let value = editEl.value;
+                            if (editEl.tagName === 'SELECT') {
+                                value = editEl.options[editEl.selectedIndex].text;
+                            }
+                            viewEl.textContent = value || '-';
+                        }
+                    });
+
+                    // Update welcome message
+                    document.getElementById('welcomeUser').textContent = 
+                        'Welcome, ' + profileData.first_name + ' ' + profileData.last_name;
+
+                    alert('Profile updated successfully!');
+                    toggleEditMode();
+                } else {
+                    alert('Error updating profile: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error saving profile:', error);
+                alert('Error saving profile. Please try again.');
+            }
+        }
+
+        function toggleHomeAddress() {
+            const useHome = document.getElementById('useHomeAddress').checked;
+            document.getElementById('pickupFields').classList.toggle('hidden', useHome);
+            document.getElementById('homeAddressDisplay').classList.toggle('hidden', !useHome);
+        }
+
+        function refreshTrips() {
+            loadPatientTrips();
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '/';
+            }
+        }
+
+        // Form submission - Book a ride
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const useHomeAddress = document.getElementById('useHomeAddress').checked;
+            
+            // Get pickup address
+            let pickupAddress;
+            if (useHomeAddress && patientData && patientData.address) {
+                pickupAddress = `${patientData.address.street}, ${patientData.address.city}, ${patientData.address.state} ${patientData.address.zip_code}`;
+            } else {
+                const street = e.target.querySelector('#pickupFields input[placeholder="Street Address"]')?.value || '';
+                const city = e.target.querySelector('#pickupFields input[placeholder="City"]')?.value || '';
+                const state = e.target.querySelector('#pickupFields input[placeholder="State"]')?.value || 'CA';
+                const zip = e.target.querySelector('#pickupFields input[placeholder="ZIP"]')?.value || '';
+                pickupAddress = `${street}, ${city}, ${state} ${zip}`;
+            }
+            
+            // Get destination
+            const facilityName = e.target.querySelector('input[placeholder="Facility Name"]')?.value || '';
+            const destStreet = e.target.querySelector('#content-booking input[placeholder="Street Address"]:last-of-type')?.value || '';
+            const destCity = e.target.querySelectorAll('input[placeholder="City"]')[1]?.value || 'Bakersfield';
+            const destState = e.target.querySelectorAll('input[placeholder="State"]')[1]?.value || 'CA';
+            const destZip = e.target.querySelectorAll('input[placeholder="ZIP"]')[1]?.value || '';
+            const dropoffAddress = `${facilityName}, ${destStreet}, ${destCity}, ${destState} ${destZip}`;
+            
+            const bookingData = {
+                trip_date: e.target.querySelector('input[type="date"]')?.value,
+                pickup_time: e.target.querySelector('input[type="time"]')?.value,
+                pickup_address: pickupAddress,
+                dropoff_address: dropoffAddress,
+                trip_type: formData.get('tripType') || 'roundtrip',
+                special_instructions: e.target.querySelector('textarea')?.value
+            };
+
+            try {
+                const response = await fetch('/api/patient/trips/book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bookingData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    alert('Ride request submitted! Your confirmation number is: ' + result.trip_number);
+                    e.target.reset();
+                    document.getElementById('useHomeAddress').checked = true;
+                    toggleHomeAddress();
+                    loadPatientTrips(); // Refresh trips
+                    showTab('dashboard');
+                } else {
+                    alert('Error booking ride: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error booking ride:', error);
+                alert('Error booking ride. Please try again or call (877) 378-NEMT.');
+            }
+        });
+    </script>
+</body>
+</html>
