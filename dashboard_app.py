@@ -8,6 +8,7 @@ from booking_routes import booking_bp
 from insurance_verification import insurance_bp
 from billing_system import billing_bp
 from analytics_system import analytics_bp
+from patient_api import patient_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -17,6 +18,7 @@ app.register_blueprint(booking_bp)
 app.register_blueprint(insurance_bp)
 app.register_blueprint(billing_bp)
 app.register_blueprint(analytics_bp)
+app.register_blueprint(patient_bp)
 
 # Route mapping
 @app.route('/')
@@ -37,7 +39,7 @@ def patient_login():
 
 @app.route('/patient-dashboard')
 def patient_portal():
-    return send_file('patient_dashboard.html')
+    return send_file('patient-dashboard.html')
 
 @app.route('/driver-dashboard')
 def driver_dashboard():
