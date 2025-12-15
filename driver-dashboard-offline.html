@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#22c55e">
+    <title>GVT Driver - Offline</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: white;
+        }
+        .offline-container { text-align: center; max-width: 400px; }
+        .offline-icon { font-size: 80px; margin-bottom: 20px; }
+        h1 { font-size: 24px; margin-bottom: 10px; color: #22c55e; }
+        p { font-size: 16px; color: #94a3b8; margin-bottom: 30px; line-height: 1.5; }
+        .retry-btn {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .cached-info {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        .cached-info h3 { font-size: 14px; color: #22c55e; margin-bottom: 10px; }
+        .cached-trip {
+            background: rgba(255,255,255,0.05);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        .cached-trip .time { color: #22c55e; font-weight: 600; }
+        .cached-trip .location { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 20px;
+            color: #f97316;
+        }
+        .status-dot {
+            width: 8px; height: 8px;
+            background: #f97316;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .emergency-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 20px;
+            right: 20px;
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            text-align: center;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-container">
+        <div class="offline-icon">📡</div>
+        <h1>You're Offline</h1>
+        <p>Your assigned trips are saved on your device. Connection will restore automatically.</p>
+        <button class="retry-btn" onclick="location.reload()">Try Again</button>
+        <div class="cached-info">
+            <h3>Cached Trips</h3>
+            <div id="cachedTrips"><p style="color:#94a3b8;font-size:14px;">Loading...</p></div>
+        </div>
+        <div class="status-indicator">
+            <span class="status-dot"></span>
+            <span>Waiting for connection...</span>
+        </div>
+    </div>
+    <a href="tel:911" class="emergency-btn">Emergency Call 911</a>
+    <script>
+        window.addEventListener('online', () => location.reload());
+        const cached = localStorage.getItem('gvt_driver_trips');
+        const el = document.getElementById('cachedTrips');
+        if (cached) {
+            try {
+                const trips = JSON.parse(cached);
+                el.innerHTML = trips.slice(0,3).map(t => 
+                    '<div class="cached-trip"><div class="time">'+(t.time||'TBD')+'</div><div class="location">'+(t.pickup||'Pickup')+'</div></div>'
+                ).join('') || '<p style="color:#94a3b8">No trips cached</p>';
+            } catch(e) { el.innerHTML = '<p style="color:#94a3b8">No trips cached</p>'; }
+        }
+    </script>
+</body>
+</html>

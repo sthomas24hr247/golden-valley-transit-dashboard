@@ -1,0 +1,26 @@
+{
+  "name": "Golden Valley Transit Driver",
+  "short_name": "GVT Driver",
+  "description": "Driver mobile app for Golden Valley Transit NEMT operations",
+  "start_url": "/driver-dashboard",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#22c55e",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/static/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/static/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "categories": ["business", "transportation", "medical"]
+}

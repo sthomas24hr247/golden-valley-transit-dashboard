@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#22c55e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GVT Driver">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
     <title>Golden Valley Transit - Driver Dashboard</title>
     <script src="https://cdn.tailwindcss.com">        // Enhanced Call Patient Function
         function callPatient() {
@@ -1590,5 +1598,27 @@
             window.currentModal = modal;
         }
     </script>
+<!-- PWA Install Prompt -->
+<div id="pwaPrompt" style="display:none;position:fixed;bottom:80px;left:15px;right:15px;background:linear-gradient(135deg,#1e3a5f,#0f2744);border-radius:16px;padding:20px;z-index:10000;box-shadow:0 10px 40px rgba(0,0,0,0.4);">
+    <div style="display:flex;align-items:center;gap:15px;">
+        <span style="font-size:40px;">🚛</span>
+        <div><h4 style="color:#22c55e;font-size:16px;margin:0 0 4px;">Install GVT Driver App</h4><p style="color:#94a3b8;font-size:13px;margin:0;">Add to home screen for offline access</p></div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:15px;">
+        <button onclick="installApp()" style="flex:1;background:#22c55e;color:white;border:none;padding:12px;border-radius:10px;font-weight:600;">Install</button>
+        <button onclick="dismissInstall()" style="background:transparent;color:#94a3b8;border:1px solid #334155;padding:12px 20px;border-radius:10px;">Later</button>
+    </div>
+</div>
+<div id="offlineBanner" style="display:none;position:fixed;top:0;left:0;right:0;background:#f97316;color:white;text-align:center;padding:8px;font-size:14px;z-index:10001;">📡 You are offline - showing cached data</div>
+<script>
+let deferredPrompt;
+if("serviceWorker"in navigator){window.addEventListener("load",async()=>{try{await navigator.serviceWorker.register("/sw.js");console.log("SW registered")}catch(e){console.error("SW failed",e)}})}
+window.addEventListener("beforeinstallprompt",(e)=>{e.preventDefault();deferredPrompt=e;if(!localStorage.getItem("pwa_dismissed")){setTimeout(()=>{document.getElementById("pwaPrompt").style.display="block"},3000)}});
+async function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.getElementById("pwaPrompt").style.display="none"}
+function dismissInstall(){document.getElementById("pwaPrompt").style.display="none";localStorage.setItem("pwa_dismissed","1")}
+window.addEventListener("online",()=>{document.getElementById("offlineBanner").style.display="none"});
+window.addEventListener("offline",()=>{document.getElementById("offlineBanner").style.display="block"});
+window.addEventListener("appinstalled",()=>{console.log("PWA installed");document.getElementById("pwaPrompt").style.display="none"});
+</script>
 </body>
 </html>
