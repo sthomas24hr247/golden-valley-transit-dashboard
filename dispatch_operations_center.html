@@ -394,8 +394,8 @@
                         </div>
                     </div>
                     
-                    <div class="absolute top-4 right-4 bg-black bg-opacity-50 backdrop-blur-lg rounded-lg p-3 z-20" id="vehicle-info" style="display: none;">
-                        <div class="text-sm font-semibold" id="vehicle-name">Vehicle Info</div>
+                    <div class="absolute top-4 right-4 bg-black bg-opacity-70 backdrop-blur-lg rounded-lg p-4 z-20 min-w-64" id="vehicle-info" style="display: none;">
+                        <div class="text-sm font-semibold mb-2" id="vehicle-name">Vehicle Info</div>
                         <div class="text-xs text-gray-300" id="vehicle-details">Click a vehicle for details</div>
                     </div>
                 </div>
@@ -820,13 +820,27 @@
             document.getElementById(`trips-${tab}`).classList.remove('hidden');
         }
 
-        // Vehicle selection
+        // Vehicle selection with location
         function selectVehicle(vehicleId, driverName) {
+            const locations = {
+                'MT-001': { address: '2100 Chester Ave, Bakersfield', status: 'En route to pickup', speed: 35, fuel: 78 },
+                'MT-002': { address: '3200 F St, Bakersfield', status: 'Patient onboard', speed: 28, fuel: 65 },
+                'MT-003': { address: '4500 California Ave, Bakersfield', status: 'Available - Parked', speed: 0, fuel: 92 },
+                'MT-004': { address: '1800 24th St, Bakersfield', status: 'En route to dropoff', speed: 42, fuel: 54 },
+                'MT-005': { address: 'GVT Maintenance Yard, Bakersfield', status: 'In Maintenance', speed: 0, fuel: 100 },
+                'MT-006': { address: '5200 Stockdale Hwy, Bakersfield', status: 'Available - Parked', speed: 0, fuel: 88 }
+            };
+            
+            const loc = locations[vehicleId] || { address: 'Location unavailable', status: 'Unknown', speed: 0, fuel: 0 };
             const vehicleInfo = document.getElementById('vehicle-info');
             document.getElementById('vehicle-name').textContent = `${vehicleId} - ${driverName}`;
-            document.getElementById('vehicle-details').textContent = 'Speed: 35 mph • Fuel: 78% • Status: Active';
+            document.getElementById('vehicle-details').innerHTML = `
+                <div style="margin-bottom:4px;">📍 ${loc.address}</div>
+                <div style="margin-bottom:4px;">Status: ${loc.status}</div>
+                <div>Speed: ${loc.speed} mph • Fuel: ${loc.fuel}%</div>
+            `;
             vehicleInfo.style.display = 'block';
-            showNotification('🚐 Vehicle Selected', `${vehicleId} - ${driverName}`);
+            showNotification('🚐 Vehicle Located', `${driverName} at ${loc.address}`);
         }
 
         // Open assignment modal
