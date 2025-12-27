@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Golden Valley Transit - Dispatch Operations Center</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,7 +13,6 @@
             --warning-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             --info-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --dark-gradient: linear-gradient(135deg, #1f2937 0%, #374151 100%);
         }
         
         body { 
@@ -31,13 +29,6 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        }
-        
-        .operations-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
-            border-color: rgba(255, 255, 255, 0.2);
         }
         
         .live-map {
@@ -46,17 +37,6 @@
             position: relative;
             overflow: hidden;
             min-height: 400px;
-        }
-        
-        .live-map::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='7' cy='7' r='7'/%3E%3Ccircle cx='53' cy='53' r='7'/%3E%3Ccircle cx='30' cy='30' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-            opacity: 0.5;
         }
         
         .vehicle-marker {
@@ -76,28 +56,13 @@
             transition: all 0.3s ease;
         }
         
-        .vehicle-marker:hover {
-            transform: scale(1.2);
-            box-shadow: 0 6px 20px rgba(17, 153, 142, 0.6);
-        }
-        
-        .vehicle-marker.busy {
-            background: var(--warning-gradient);
-            box-shadow: 0 4px 15px rgba(240, 147, 251, 0.4);
-        }
-        
-        .vehicle-marker.maintenance {
-            background: var(--danger-gradient);
-            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
-        }
+        .vehicle-marker:hover { transform: scale(1.2); }
+        .vehicle-marker.busy { background: var(--warning-gradient); }
+        .vehicle-marker.maintenance { background: var(--danger-gradient); }
         
         @keyframes pulse-marker {
-            0%, 100% { 
-                box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4), 0 0 0 0 rgba(17, 153, 142, 0.7);
-            }
-            50% { 
-                box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4), 0 0 0 10px rgba(17, 153, 142, 0);
-            }
+            0%, 100% { box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4), 0 0 0 0 rgba(17, 153, 142, 0.7); }
+            50% { box-shadow: 0 4px 15px rgba(17, 153, 142, 0.4), 0 0 0 10px rgba(17, 153, 142, 0); }
         }
         
         .status-indicator {
@@ -107,87 +72,12 @@
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 600;
-            position: relative;
         }
         
-        .status-active {
-            background: var(--success-gradient);
-            color: white;
-        }
-        
-        .status-active::before {
-            content: '';
-            position: absolute;
-            left: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 6px;
-            height: 6px;
-            background: white;
-            border-radius: 50%;
-            animation: pulse 1.5s infinite;
-        }
-        
-        .status-scheduled {
-            background: var(--info-gradient);
-            color: white;
-        }
-        
-        .status-emergency {
-            background: var(--danger-gradient);
-            color: white;
-            animation: emergency-flash 1s infinite;
-        }
-        
-        @keyframes emergency-flash {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        .priority-high {
-            border-left: 4px solid #ef4444;
-            background: rgba(239, 68, 68, 0.1);
-        }
-        
-        .priority-medium {
-            border-left: 4px solid #f59e0b;
-            background: rgba(245, 158, 11, 0.1);
-        }
-        
-        .priority-low {
-            border-left: 4px solid #10b981;
-            background: rgba(16, 185, 129, 0.1);
-        }
-        
-        .floating-animation {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        
-        .real-time-update {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .real-time-update::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: data-flow 3s infinite;
-        }
-        
-        @keyframes data-flow {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
+        .status-active { background: var(--success-gradient); color: white; }
+        .status-scheduled { background: var(--info-gradient); color: white; }
+        .status-pickup { background: #f59e0b; color: white; }
+        .status-completed { background: #6b7280; color: white; }
         
         .metric-display {
             background: var(--info-gradient);
@@ -195,44 +85,11 @@
             border-radius: 15px;
             padding: 1rem;
             text-align: center;
-            position: relative;
-            overflow: hidden;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         
-        .metric-display::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
-        }
-        
-        .metric-display:hover {
-            transform: scale(1.05);
-        }
-        
-        .emergency-alert {
-            background: var(--danger-gradient);
-            border-radius: 15px;
-            padding: 1rem;
-            color: white;
-            position: relative;
-            overflow: hidden;
-            animation: emergency-pulse 2s infinite;
-        }
-        
-        @keyframes emergency-pulse {
-            0%, 100% { 
-                box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
-            }
-            50% { 
-                box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
-            }
-        }
+        .metric-display:hover { transform: scale(1.05); }
         
         .trip-queue-item {
             background: rgba(255, 255, 255, 0.05);
@@ -250,60 +107,34 @@
             transform: translateX(4px);
         }
         
-        .communication-panel {
-            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-            border-radius: 20px;
-            padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
+        .trip-queue-item.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
         }
         
-        .communication-panel::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/svg%3E");
-        }
+        .priority-high { border-left: 4px solid #ef4444; }
+        .priority-medium { border-left: 4px solid #f59e0b; }
+        .priority-low { border-left: 4px solid #10b981; }
         
-        .notification-dot {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            width: 12px;
-            height: 12px;
-            background: #ef4444;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        
-        .demo-notification {
-            position: fixed;
-            top: 4rem;
-            right: 1rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            transform: translateX(100%);
-            transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
-            z-index: 1000;
-            max-width: 350px;
-        }
-        
-        .demo-notification.show {
-            transform: translateX(0);
-        }
-        
-        .weather-widget {
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 1rem;
-            text-align: center;
+            border: none;
+            color: #a0aec0;
+        }
+        
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
         }
         
         .driver-status-grid {
@@ -321,62 +152,101 @@
             cursor: pointer;
         }
         
-        .driver-card:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px);
-        }
+        .driver-card:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-2px); }
+        .driver-card.available { border-color: #22c55e; }
         
-        .alert-banner {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            animation: alert-slide 0.5s ease;
-        }
-        
-        @keyframes alert-slide {
-            0% { transform: translateY(-100%); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-        
-        .performance-chart {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 15px;
+        .communication-panel {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            border-radius: 20px;
             padding: 1.5rem;
-            position: relative;
         }
         
-        .chart-bar {
-            background: var(--success-gradient);
-            height: 100px;
-            border-radius: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .chart-bar::after {
-            content: '';
-            position: absolute;
+        .modal-overlay {
+            display: none;
+            position: fixed;
             top: 0;
-            left: -100%;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: chart-shimmer 2s infinite;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
         }
         
-        @keyframes chart-shimmer {
-            0% { left: -100%; }
-            100% { left: 100%; }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-content {
+            background: #1e1e2e;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            color: white;
         }
-    </style>
-</head>
-<body>
-    <style>
-        body { padding-top: 80px !important; }
+        
+        .driver-option {
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .driver-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: #667eea;
+        }
+        
+        .driver-option.selected {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+        
+        .weather-widget {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .notification-dot {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            width: 12px;
+            height: 12px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .demo-notification {
+            position: fixed;
+            top: 4rem;
+            right: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: 1000;
+            max-width: 350px;
+        }
+        
+        .demo-notification.show { transform: translateX(0); }
+        
         .back-link {
             position: fixed;
             top: 20px;
@@ -392,34 +262,23 @@
             z-index: 9999;
             font-weight: 600;
         }
+        
         .back-link:hover {
             background: #667eea;
             color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
     </style>
+</head>
+<body style="padding-top: 80px;">
     <a href="/" class="back-link">← Back to Dashboard</a>
 
     <!-- Demo Controls -->
-    <div class="fixed top-4 left-4 z-50 space-y-2">
-        <button onclick="startDispatchDemo()" class="bg-green-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-green-700">
-            🎬 Dispatch Demo
-        </button>
+    <div class="fixed top-4 left-52 z-50 space-x-2 flex">
         <button onclick="simulateEmergency()" class="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-red-700">
-            🚨 Emergency Alert
+            Emergency Alert
         </button>
-        <button onclick="simulateOptimization()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-purple-700">
-            🤖 AI Optimize
-        </button>
-    </div>
-
-    <!-- Alert Banner -->
-    <div class="alert-banner" id="alert-banner" style="display: none;">
-        <i data-lucide="alert-triangle" class="w-5 h-5 mr-3"></i>
-        <span id="alert-message">System Alert</span>
-        <button onclick="dismissAlert()" class="ml-auto text-white opacity-80 hover:opacity-100">
-            <i data-lucide="x" class="w-4 h-4"></i>
+        <button onclick="simulateOptimization()" class="bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold shadow-lg hover:bg-purple-700 flex items-center">
+            <span class="mr-2">🤖</span> AI Optimize
         </button>
     </div>
 
@@ -427,8 +286,8 @@
     <header class="operations-card mx-6 mt-6 p-6">
         <div class="flex justify-between items-center">
             <div class="flex items-center space-x-4">
-                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center floating-animation">
-                    <i data-lucide="radio" class="w-8 h-8 text-white"></i>
+                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-content-center" style="display:flex;align-items:center;justify-content:center;">
+                    <span style="font-size:2rem;">📡</span>
                 </div>
                 <div>
                     <h1 class="text-3xl font-bold">Dispatch Operations Center</h1>
@@ -450,15 +309,15 @@
                     <div class="text-xs text-gray-300">Available Drivers</div>
                 </div>
                 <div class="relative">
-                    <i data-lucide="bell" class="w-6 h-6 text-gray-300"></i>
-                    <div class="notification-dot" id="notification-dot"></div>
+                    <span style="font-size:1.5rem;">🔔</span>
+                    <div class="notification-dot"></div>
                 </div>
                 <div class="text-right">
                     <p class="font-semibold">Michael Rodriguez</p>
                     <p class="text-sm text-gray-300">Dispatch Manager</p>
                 </div>
                 <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center">
-                    <i data-lucide="user" class="w-5 h-5 text-white"></i>
+                    <span>👤</span>
                 </div>
             </div>
         </div>
@@ -468,33 +327,33 @@
     <main class="px-6 py-6">
         <!-- Top Metrics Row -->
         <div class="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
-            <div class="metric-display" onclick="showFleetStatus()">
-                <i data-lucide="truck" class="w-6 h-6 mx-auto mb-2"></i>
-                <p class="text-lg font-bold" id="fleet-count">15</p>
+            <div class="metric-display">
+                <span style="font-size:1.5rem;">🚐</span>
+                <p class="text-lg font-bold">15</p>
                 <p class="text-xs opacity-90">Fleet Vehicles</p>
             </div>
-            <div class="metric-display" style="background: var(--success-gradient);" onclick="showTripMetrics()">
-                <i data-lucide="map-pin" class="w-6 h-6 mx-auto mb-2"></i>
-                <p class="text-lg font-bold" id="completed-trips">47</p>
+            <div class="metric-display" style="background: var(--success-gradient);">
+                <span style="font-size:1.5rem;">📍</span>
+                <p class="text-lg font-bold" id="trips-today">53</p>
                 <p class="text-xs opacity-90">Trips Today</p>
             </div>
-            <div class="metric-display" style="background: var(--warning-gradient);" onclick="showResponseTime()">
-                <i data-lucide="clock" class="w-6 h-6 mx-auto mb-2"></i>
-                <p class="text-lg font-bold" id="response-time">3.2</p>
+            <div class="metric-display" style="background: var(--warning-gradient);">
+                <span style="font-size:1.5rem;">⏱️</span>
+                <p class="text-lg font-bold">3.5</p>
                 <p class="text-xs opacity-90">Avg Response (min)</p>
             </div>
-            <div class="metric-display" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);" onclick="showEfficiency()">
-                <i data-lucide="zap" class="w-6 h-6 mx-auto mb-2"></i>
-                <p class="text-lg font-bold" id="efficiency">94%</p>
+            <div class="metric-display" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
+                <span style="font-size:1.5rem;">⚡</span>
+                <p class="text-lg font-bold">94%</p>
                 <p class="text-xs opacity-90">Efficiency Rate</p>
             </div>
-            <div class="metric-display" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);" onclick="showSatisfaction()">
-                <i data-lucide="star" class="w-6 h-6 mx-auto mb-2"></i>
-                <p class="text-lg font-bold" id="satisfaction">4.8</p>
+            <div class="metric-display" style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);">
+                <span style="font-size:1.5rem;">⭐</span>
+                <p class="text-lg font-bold">4.8</p>
                 <p class="text-xs opacity-90">Customer Rating</p>
             </div>
-            <div class="metric-display" style="background: var(--danger-gradient);" onclick="showEmergencies()">
-                <i data-lucide="alert-triangle" class="w-6 h-6 mx-auto mb-2"></i>
+            <div class="metric-display" style="background: var(--danger-gradient);">
+                <span style="font-size:1.5rem;">⚠️</span>
                 <p class="text-lg font-bold" id="emergency-count">0</p>
                 <p class="text-xs opacity-90">Emergencies</p>
             </div>
@@ -506,40 +365,26 @@
             <div class="lg:col-span-2 operations-card p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xl font-bold flex items-center">
-                        <i data-lucide="map" class="w-6 h-6 mr-3 text-blue-400"></i>
+                        <span class="mr-3">🗺️</span>
                         Live Fleet Tracking
                     </h3>
                     <div class="flex space-x-2">
-                        <button class="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-semibold" onclick="centerMap()">Center</button>
-                        <button class="bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-semibold" onclick="showRoutes()">Routes</button>
-                        <button class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-semibold" onclick="optimizeRoutes()">Optimize</button>
+                        <button class="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-semibold">Center</button>
+                        <button class="bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-semibold">Routes</button>
+                        <button class="bg-purple-600 text-white px-3 py-1 rounded-lg text-sm font-semibold" onclick="simulateOptimization()">Optimize</button>
                     </div>
                 </div>
                 
                 <div class="live-map relative">
                     <div class="absolute inset-4 z-10">
-                        <!-- Vehicle Markers -->
-                        <div class="vehicle-marker" style="top: 20%; left: 15%;" onclick="selectVehicle('MT-001', 'Carlos Martinez')" data-vehicle="MT-001">
-                            <span class="text-xs">01</span>
-                        </div>
-                        <div class="vehicle-marker busy" style="top: 45%; left: 60%;" onclick="selectVehicle('MT-002', 'Angela Foster')" data-vehicle="MT-002">
-                            <span class="text-xs">02</span>
-                        </div>
-                        <div class="vehicle-marker" style="top: 70%; left: 30%;" onclick="selectVehicle('MT-003', 'David Chen')" data-vehicle="MT-003">
-                            <span class="text-xs">03</span>
-                        </div>
-                        <div class="vehicle-marker busy" style="top: 25%; left: 75%;" onclick="selectVehicle('MT-004', 'Maria Lopez')" data-vehicle="MT-004">
-                            <span class="text-xs">04</span>
-                        </div>
-                        <div class="vehicle-marker maintenance" style="top: 80%; left: 70%;" onclick="selectVehicle('MT-005', 'Robert Kim')" data-vehicle="MT-005">
-                            <span class="text-xs">05</span>
-                        </div>
-                        <div class="vehicle-marker" style="top: 35%; left: 45%;" onclick="selectVehicle('MT-006', 'Sarah Williams')" data-vehicle="MT-006">
-                            <span class="text-xs">06</span>
-                        </div>
+                        <div class="vehicle-marker" style="top: 20%; left: 15%;" onclick="selectVehicle('MT-001', 'Carlos Martinez')"><span class="text-xs">01</span></div>
+                        <div class="vehicle-marker busy" style="top: 45%; left: 60%;" onclick="selectVehicle('MT-002', 'Angela Foster')"><span class="text-xs">02</span></div>
+                        <div class="vehicle-marker" style="top: 70%; left: 30%;" onclick="selectVehicle('MT-003', 'David Chen')"><span class="text-xs">03</span></div>
+                        <div class="vehicle-marker busy" style="top: 25%; left: 75%;" onclick="selectVehicle('MT-004', 'Maria Lopez')"><span class="text-xs">04</span></div>
+                        <div class="vehicle-marker maintenance" style="top: 80%; left: 70%;" onclick="selectVehicle('MT-005', 'Robert Kim')"><span class="text-xs">05</span></div>
+                        <div class="vehicle-marker" style="top: 35%; left: 45%;" onclick="selectVehicle('MT-006', 'Sarah Williams')"><span class="text-xs">06</span></div>
                     </div>
                     
-                    <!-- Map Legend -->
                     <div class="absolute bottom-4 left-4 bg-black bg-opacity-50 backdrop-blur-lg rounded-lg p-3 z-20">
                         <div class="text-xs font-semibold mb-2">Vehicle Status</div>
                         <div class="space-y-1 text-xs">
@@ -549,7 +394,6 @@
                         </div>
                     </div>
                     
-                    <!-- Selected Vehicle Info -->
                     <div class="absolute top-4 right-4 bg-black bg-opacity-50 backdrop-blur-lg rounded-lg p-3 z-20" id="vehicle-info" style="display: none;">
                         <div class="text-sm font-semibold" id="vehicle-name">Vehicle Info</div>
                         <div class="text-xs text-gray-300" id="vehicle-details">Click a vehicle for details</div>
@@ -557,48 +401,36 @@
                 </div>
             </div>
 
-            <!-- Active Trips Queue -->
+            <!-- Trip Queue with Tabs -->
             <div class="operations-card p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xl font-bold flex items-center">
-                        <i data-lucide="list" class="w-6 h-6 mr-3 text-green-400"></i>
-                        Active Trips
+                        <span class="mr-3">📋</span>
+                        Trip Queue
                     </h3>
-                    <div class="status-active">12 Active</div>
+                    <div class="text-sm text-green-400 font-semibold">53 Today</div>
                 </div>
                 
-                <div class="space-y-3 max-h-96 overflow-y-auto" id="active-trips-list">
-                    <div class="trip-queue-item priority-high" onclick="selectTrip('GVT-001')">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="font-semibold text-sm">Elena Garcia</span>
-                            <div class="status-active">In Transit</div>
-                        </div>
-                        <div class="text-xs text-gray-400 mb-1">Dialysis • Trip #GVT-20250819-001</div>
-                        <div class="text-xs text-gray-400">Driver: Carlos Martinez</div>
-                        <div class="text-xs text-blue-400">ETA: 15 min</div>
-                    </div>
-                    
-                    <div class="trip-queue-item priority-medium" onclick="selectTrip('GVT-002')">
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="font-semibold text-sm">Maria Santos</span>
-                            <div class="status-scheduled">En Route</div>
-                        </div>
-                        <div class="text-xs text-gray-400 mb-1">Physical Therapy • Trip #GVT-20250819-002</div>
-                        <div class="text-xs text-gray-400">Driver: Angela Foster</div>
-                        <div class="text-xs text-blue-400">ETA: 8 min</div>
-                    </div>
-                    
-                    <div class="trip-queue-item priority-low" onclick="selectTrip('GVT-003')">
+                <!-- Tabs -->
+                <div class="flex space-x-2 mb-4">
+                    <button class="tab-btn active" onclick="showTripTab('active')" id="tab-active">Active (12)</button>
+                    <button class="tab-btn" onclick="showTripTab('scheduled')" id="tab-scheduled">Scheduled (18)</button>
+                    <button class="tab-btn" onclick="showTripTab('completed')" id="tab-completed">Done (23)</button>
+                </div>
+                
+                <!-- Active Trips -->
+                <div class="space-y-3 max-h-96 overflow-y-auto" id="trips-active">
+                    <div class="trip-queue-item priority-high" onclick="openAssignModal('GVT-20250819-001', 'Robert Johnson', 'Doctor Visit', 'Unassigned')">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Robert Johnson</span>
-                            <div class="status-scheduled">Pickup</div>
+                            <div class="status-pickup">Pickup</div>
                         </div>
                         <div class="text-xs text-gray-400 mb-1">Doctor Visit • Trip #GVT-20250819-003</div>
                         <div class="text-xs text-gray-400">Driver: David Chen</div>
                         <div class="text-xs text-blue-400">ETA: 22 min</div>
                     </div>
                     
-                    <div class="trip-queue-item priority-high" onclick="selectTrip('GVT-004')">
+                    <div class="trip-queue-item priority-high" onclick="openAssignModal('GVT-20250819-004', 'Carmen Rodriguez', 'Chemotherapy', 'Maria Lopez')">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Carmen Rodriguez</span>
                             <div class="status-active">In Transit</div>
@@ -608,20 +440,127 @@
                         <div class="text-xs text-blue-400">ETA: 12 min</div>
                     </div>
                     
-                    <div class="trip-queue-item priority-medium" onclick="selectTrip('GVT-005')">
+                    <div class="trip-queue-item priority-medium" onclick="openAssignModal('GVT-20250819-005', 'James Wilson', 'Surgery Consultation', 'Unassigned')">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">James Wilson</span>
                             <div class="status-scheduled">Scheduled</div>
                         </div>
                         <div class="text-xs text-gray-400 mb-1">Surgery Consultation • Trip #GVT-20250819-005</div>
-                        <div class="text-xs text-gray-400">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
                         <div class="text-xs text-yellow-400">In 45 min</div>
+                    </div>
+                    
+                    <div class="trip-queue-item priority-low" onclick="openAssignModal('GVT-20250819-006', 'Patricia Moore', 'Lab Work', 'Unassigned')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Patricia Moore</span>
+                            <div class="status-scheduled">Scheduled</div>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-1">Lab Work • Trip #GVT-20250819-006</div>
+                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400">In 1 hr 15 min</div>
+                    </div>
+                    
+                    <div class="trip-queue-item priority-medium" onclick="openAssignModal('GVT-20250819-007', 'Linda Chen', 'Physical Therapy', 'Unassigned')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Linda Chen</span>
+                            <div class="status-scheduled">Scheduled</div>
+                        </div>
+                        <div class="text-xs text-gray-400 mb-1">Physical Therapy • Trip #GVT-20250819-007</div>
+                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400">In 1 hr 30 min</div>
                     </div>
                 </div>
                 
-                <button class="w-full mt-4 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors" onclick="assignOptimalDrivers()">
-                    <i data-lucide="zap" class="w-4 h-4 mr-2 inline"></i>
-                    Auto-Assign Drivers
+                <!-- Scheduled Trips (hidden by default) -->
+                <div class="space-y-3 max-h-96 overflow-y-auto hidden" id="trips-scheduled">
+                    <div class="trip-queue-item priority-medium" onclick="openAssignModal('GVT-20250819-008', 'Michael Brown', 'Dialysis', 'Unassigned')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Michael Brown</span>
+                            <div class="status-scheduled">10:30 AM</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Dialysis • DaVita Bakersfield</div>
+                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                    </div>
+                    <div class="trip-queue-item priority-low" onclick="openAssignModal('GVT-20250819-009', 'Susan Williams', 'Doctor Visit', 'Unassigned')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Susan Williams</span>
+                            <div class="status-scheduled">11:00 AM</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Doctor Visit • Kaiser Permanente</div>
+                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                    </div>
+                    <div class="trip-queue-item priority-high" onclick="openAssignModal('GVT-20250819-010', 'Thomas Garcia', 'Chemotherapy', 'Unassigned')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Thomas Garcia</span>
+                            <div class="status-scheduled">11:30 AM</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Chemotherapy • Comprehensive Blood & Cancer</div>
+                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                    </div>
+                    <div class="trip-queue-item priority-medium" onclick="openAssignModal('GVT-20250819-011', 'Jennifer Lee', 'Physical Therapy', 'Unassigned')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Jennifer Lee</span>
+                            <div class="status-scheduled">12:00 PM</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Physical Therapy • PT Solutions</div>
+                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                    </div>
+                    <div class="trip-queue-item priority-low" onclick="openAssignModal('GVT-20250819-012', 'David Kim', 'Lab Work', 'Unassigned')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">David Kim</span>
+                            <div class="status-scheduled">12:30 PM</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Lab Work • Quest Diagnostics</div>
+                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                    </div>
+                    <div class="trip-queue-item priority-medium" onclick="openAssignModal('GVT-20250819-013', 'Nancy Wilson', 'Dialysis', 'Unassigned')">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Nancy Wilson</span>
+                            <div class="status-scheduled">1:00 PM</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Dialysis • Fresenius Kidney Care</div>
+                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                    </div>
+                </div>
+                
+                <!-- Completed Trips (hidden by default) -->
+                <div class="space-y-3 max-h-96 overflow-y-auto hidden" id="trips-completed">
+                    <div class="trip-queue-item" style="opacity: 0.7;">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Elena Garcia</span>
+                            <div class="status-completed">Completed</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Dialysis • 7:30 AM - 8:45 AM</div>
+                        <div class="text-xs text-gray-400">Driver: Carlos Martinez</div>
+                    </div>
+                    <div class="trip-queue-item" style="opacity: 0.7;">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Maria Santos</span>
+                            <div class="status-completed">Completed</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Physical Therapy • 8:00 AM - 9:15 AM</div>
+                        <div class="text-xs text-gray-400">Driver: Angela Foster</div>
+                    </div>
+                    <div class="trip-queue-item" style="opacity: 0.7;">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">John Wick</span>
+                            <div class="status-completed">Completed</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Doctor Visit • 8:30 AM - 9:30 AM</div>
+                        <div class="text-xs text-gray-400">Driver: David Chen</div>
+                    </div>
+                    <div class="trip-queue-item" style="opacity: 0.7;">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="font-semibold text-sm">Sarah Connor</span>
+                            <div class="status-completed">Completed</div>
+                        </div>
+                        <div class="text-xs text-gray-400">Lab Work • 9:00 AM - 9:45 AM</div>
+                        <div class="text-xs text-gray-400">Driver: Maria Lopez</div>
+                    </div>
+                </div>
+                
+                <button class="w-full mt-4 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors" onclick="autoAssignAll()">
+                    ⚡ Auto-Assign Drivers
                 </button>
             </div>
         </div>
@@ -632,10 +571,10 @@
             <div class="lg:col-span-2 operations-card p-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xl font-bold flex items-center">
-                        <i data-lucide="users" class="w-6 h-6 mr-3 text-purple-400"></i>
+                        <span class="mr-3">👥</span>
                         Driver Status
                     </h3>
-                    <button class="text-blue-400 hover:text-blue-300 font-semibold text-sm" onclick="manageDrivers()">Manage All</button>
+                    <button class="text-blue-400 hover:text-blue-300 font-semibold text-sm">Manage All</button>
                 </div>
                 
                 <div class="driver-status-grid" id="driver-grid">
@@ -657,7 +596,7 @@
                         <div class="text-xs text-green-400">Maria Santos • ETA 8min</div>
                     </div>
                     
-                    <div class="driver-card" onclick="contactDriver('David Chen')">
+                    <div class="driver-card available" onclick="contactDriver('David Chen')">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">David Chen</span>
                             <div class="status-scheduled">Available</div>
@@ -679,60 +618,56 @@
 
             <!-- Communication Panel -->
             <div class="communication-panel relative">
-                <div class="relative z-10">
-                    <h3 class="text-xl font-bold mb-4 flex items-center">
-                        <i data-lucide="message-square" class="w-6 h-6 mr-3"></i>
-                        Communications
-                    </h3>
-                    
-                    <div class="space-y-3 mb-4">
-                        <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-sm font-semibold">Carlos Martinez</span>
-                                <span class="text-xs text-gray-300">2 min ago</span>
-                            </div>
-                            <div class="text-xs text-gray-300">"Arrived at pickup location"</div>
+                <h3 class="text-xl font-bold mb-4 flex items-center">
+                    <span class="mr-3">💬</span>
+                    Communications
+                </h3>
+                
+                <div class="space-y-3 mb-4">
+                    <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-semibold">Carlos Martinez</span>
+                            <span class="text-xs text-gray-300">2 min ago</span>
                         </div>
-                        
-                        <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-sm font-semibold">System Alert</span>
-                                <span class="text-xs text-gray-300">5 min ago</span>
-                            </div>
-                            <div class="text-xs text-yellow-300">"Traffic delay on Route 99"</div>
-                        </div>
-                        
-                        <div class="bg-white bg-opacity-20 rounded-lg p-3">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="text-sm font-semibold">Angela Foster</span>
-                                <span class="text-xs text-gray-300">8 min ago</span>
-                            </div>
-                            <div class="text-xs text-gray-300">"Patient onboard, en route"</div>
-                        </div>
+                        <div class="text-xs text-gray-300">"Arrived at pickup location"</div>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-2">
-                        <button class="bg-white bg-opacity-20 text-white py-2 px-3 rounded-lg text-sm font-semibold" onclick="broadcastMessage()">
-                            <i data-lucide="radio" class="w-4 h-4 mr-1 inline"></i>
-                            Broadcast
-                        </button>
-                        <button class="bg-white bg-opacity-20 text-white py-2 px-3 rounded-lg text-sm font-semibold" onclick="emergencyComms()">
-                            <i data-lucide="alert-triangle" class="w-4 h-4 mr-1 inline"></i>
-                            Emergency
-                        </button>
+                    <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-semibold">System Alert</span>
+                            <span class="text-xs text-gray-300">5 min ago</span>
+                        </div>
+                        <div class="text-xs text-yellow-300">"Traffic delay on Route 99"</div>
                     </div>
+                    
+                    <div class="bg-white bg-opacity-20 rounded-lg p-3">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-semibold">Angela Foster</span>
+                            <span class="text-xs text-gray-300">8 min ago</span>
+                        </div>
+                        <div class="text-xs text-gray-300">"Patient onboard, en route"</div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <button class="bg-white bg-opacity-20 text-white py-2 px-3 rounded-lg text-sm font-semibold" onclick="showNotification('📡 Broadcast', 'Message sent to all drivers')">
+                        📡 Broadcast
+                    </button>
+                    <button class="bg-white bg-opacity-20 text-white py-2 px-3 rounded-lg text-sm font-semibold" onclick="simulateEmergency()">
+                        ⚠️ Emergency
+                    </button>
                 </div>
             </div>
 
             <!-- Performance Analytics -->
             <div class="operations-card p-6">
                 <h3 class="text-xl font-bold mb-4 flex items-center">
-                    <i data-lucide="trending-up" class="w-6 h-6 mr-3 text-green-400"></i>
+                    <span class="mr-3">📈</span>
                     Today's Performance
                 </h3>
                 
                 <div class="space-y-4">
-                    <div class="real-time-update">
+                    <div>
                         <div class="flex justify-between text-sm mb-2">
                             <span>On-Time Performance</span>
                             <span class="text-green-400 font-semibold">96%</span>
@@ -742,7 +677,7 @@
                         </div>
                     </div>
                     
-                    <div class="real-time-update">
+                    <div>
                         <div class="flex justify-between text-sm mb-2">
                             <span>Fleet Utilization</span>
                             <span class="text-blue-400 font-semibold">78%</span>
@@ -752,7 +687,7 @@
                         </div>
                     </div>
                     
-                    <div class="real-time-update">
+                    <div>
                         <div class="flex justify-between text-sm mb-2">
                             <span>Customer Satisfaction</span>
                             <span class="text-purple-400 font-semibold">4.8⭐</span>
@@ -762,7 +697,7 @@
                         </div>
                     </div>
                     
-                    <div class="real-time-update">
+                    <div>
                         <div class="flex justify-between text-sm mb-2">
                             <span>Revenue Target</span>
                             <span class="text-yellow-400 font-semibold">$2,115</span>
@@ -773,307 +708,203 @@
                     </div>
                 </div>
                 
-                <button class="w-full mt-4 bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors" onclick="viewDetailedAnalytics()">
-                    <i data-lucide="bar-chart" class="w-4 h-4 mr-2 inline"></i>
-                    Detailed Analytics
+                <button class="w-full mt-4 bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+                    📊 Detailed Analytics
                 </button>
-            </div>
-        </div>
-
-        <!-- Emergency Protocols -->
-        <div class="operations-card p-6" id="emergency-panel" style="display: none;">
-            <div class="emergency-alert">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="text-xl font-bold flex items-center">
-                        <i data-lucide="alert-triangle" class="w-6 h-6 mr-3"></i>
-                        Emergency Protocol Activated
-                    </h3>
-                    <button onclick="clearEmergency()" class="text-white opacity-80 hover:opacity-100">
-                        <i data-lucide="x" class="w-6 h-6"></i>
-                    </button>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button class="bg-white bg-opacity-20 text-white py-3 px-4 rounded-lg font-semibold" onclick="dispatchEmergency()">
-                        <i data-lucide="truck" class="w-5 h-5 mr-2 inline"></i>
-                        Dispatch Nearest Vehicle
-                    </button>
-                    <button class="bg-white bg-opacity-20 text-white py-3 px-4 rounded-lg font-semibold" onclick="notifyEMS()">
-                        <i data-lucide="phone" class="w-5 h-5 mr-2 inline"></i>
-                        Contact EMS
-                    </button>
-                    <button class="bg-white bg-opacity-20 text-white py-3 px-4 rounded-lg font-semibold" onclick="alertSupervisor()">
-                        <i data-lucide="user-check" class="w-5 h-5 mr-2 inline"></i>
-                        Alert Supervisor
-                    </button>
-                </div>
             </div>
         </div>
     </main>
 
+    <!-- Manual Assignment Modal -->
+    <div class="modal-overlay" id="assignModal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">📋 Trip Assignment</h2>
+                <button onclick="closeAssignModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            
+            <div class="bg-gray-800 rounded-lg p-4 mb-6">
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <div class="font-semibold text-lg" id="modal-patient">Patient Name</div>
+                        <div class="text-sm text-gray-400" id="modal-trip-type">Trip Type</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-gray-400" id="modal-trip-id">Trip ID</div>
+                    </div>
+                </div>
+                <div class="text-sm text-gray-400 mt-2">
+                    <div>📍 Pickup: 1234 Oak St, Bakersfield</div>
+                    <div>🏥 Dropoff: Mercy Hospital</div>
+                    <div>⏰ Pickup Time: 10:30 AM</div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <div class="text-sm font-semibold mb-3">Select Driver:</div>
+                <div id="driver-options">
+                    <div class="driver-option" onclick="selectDriver(this, 'Carlos Martinez', 'MT-001')">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">Carlos Martinez</div>
+                                <div class="text-xs text-gray-400">MT-001 • Rating: 4.9⭐</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-yellow-400">On Trip</div>
+                                <div class="text-xs text-gray-400">Available in 15 min</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="driver-option" onclick="selectDriver(this, 'David Chen', 'MT-003')">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">David Chen</div>
+                                <div class="text-xs text-gray-400">MT-003 • Rating: 4.9⭐</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-green-400">Available Now</div>
+                                <div class="text-xs text-gray-400">2.3 mi away</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="driver-option" onclick="selectDriver(this, 'Sarah Williams', 'MT-006')">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">Sarah Williams</div>
+                                <div class="text-xs text-gray-400">MT-006 • Rating: 4.7⭐</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-green-400">Available Now</div>
+                                <div class="text-xs text-gray-400">4.1 mi away</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="driver-option" onclick="selectDriver(this, 'Angela Foster', 'MT-002')">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <div class="font-semibold">Angela Foster</div>
+                                <div class="text-xs text-gray-400">MT-002 • Rating: 4.8⭐</div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-xs text-yellow-400">On Trip</div>
+                                <div class="text-xs text-gray-400">Available in 8 min</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="confirmAssignment()" class="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700">
+                    ✓ Assign Driver
+                </button>
+                <button onclick="closeAssignModal()" class="flex-1 bg-gray-700 text-white py-3 rounded-lg font-semibold hover:bg-gray-600">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Initialize Lucide icons with fallback
-        function initializeIcons() {
-            if (typeof lucide !== 'undefined') {
-                lucide.createIcons();
-            } else {
-                const iconMap = {
-                    'radio': '📡', 'bell': '🔔', 'user': '👤', 'truck': '🚛',
-                    'map-pin': '📍', 'clock': '🕐', 'zap': '⚡', 'star': '⭐',
-                    'alert-triangle': '⚠️', 'map': '🗺️', 'list': '📋', 'users': '👥',
-                    'message-square': '💬', 'trending-up': '📈', 'bar-chart': '📊',
-                    'phone': '📞', 'user-check': '✅', 'x': '✕'
-                };
-                
-                document.querySelectorAll('[data-lucide]').forEach(el => {
-                    const iconName = el.getAttribute('data-lucide');
-                    const emoji = iconMap[iconName] || '●';
-                    el.innerHTML = emoji;
-                    el.style.fontSize = '1em';
-                    el.style.display = 'inline-flex';
-                    el.style.alignItems = 'center';
-                    el.style.justifyContent = 'center';
-                });
-            }
+        let selectedDriver = null;
+        let currentTrip = null;
+
+        // Tab switching
+        function showTripTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            
+            document.getElementById('trips-active').classList.add('hidden');
+            document.getElementById('trips-scheduled').classList.add('hidden');
+            document.getElementById('trips-completed').classList.add('hidden');
+            document.getElementById(`trips-${tab}`).classList.remove('hidden');
         }
 
-        // Demo functions
-        function startDispatchDemo() {
-            showNotification('🎬 Dispatch Demo Started', 'Live operations center with real-time fleet management');
-            
+        // Vehicle selection
+        function selectVehicle(vehicleId, driverName) {
+            const vehicleInfo = document.getElementById('vehicle-info');
+            document.getElementById('vehicle-name').textContent = `${vehicleId} - ${driverName}`;
+            document.getElementById('vehicle-details').textContent = 'Speed: 35 mph • Fuel: 78% • Status: Active';
+            vehicleInfo.style.display = 'block';
+            showNotification('🚐 Vehicle Selected', `${vehicleId} - ${driverName}`);
+        }
+
+        // Open assignment modal
+        function openAssignModal(tripId, patientName, tripType, currentDriver) {
+            currentTrip = { tripId, patientName, tripType, currentDriver };
+            document.getElementById('modal-patient').textContent = patientName;
+            document.getElementById('modal-trip-type').textContent = tripType;
+            document.getElementById('modal-trip-id').textContent = tripId;
+            document.getElementById('assignModal').classList.add('active');
+            selectedDriver = null;
+            document.querySelectorAll('.driver-option').forEach(opt => opt.classList.remove('selected'));
+        }
+
+        function closeAssignModal() {
+            document.getElementById('assignModal').classList.remove('active');
+            selectedDriver = null;
+        }
+
+        function selectDriver(element, driverName, vehicleId) {
+            document.querySelectorAll('.driver-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedDriver = { name: driverName, vehicle: vehicleId };
+        }
+
+        function confirmAssignment() {
+            if (!selectedDriver) {
+                showNotification('⚠️ Select Driver', 'Please select a driver to assign');
+                return;
+            }
+            closeAssignModal();
+            showNotification('✅ Driver Assigned', `${selectedDriver.name} assigned to ${currentTrip.patientName}`);
+        }
+
+        function autoAssignAll() {
+            showNotification('⚡ Auto-Assigning', 'AI analyzing optimal driver assignments...');
             setTimeout(() => {
-                showNotification('🚛 Fleet Management', '15 vehicles tracked in real-time • 94% efficiency rate');
-            }, 3000);
-            
-            setTimeout(() => {
-                showNotification('📊 AI Optimization', 'Smart routing reduces response time by 35% • 96% on-time performance');
-            }, 6000);
-            
-            setTimeout(() => {
-                showNotification('💼 Operations Excellence', '47 trips today • 4.8⭐ customer rating • $2,115 revenue');
-            }, 9000);
+                showNotification('✅ Complete', '5 drivers assigned • Avg wait time reduced 23%');
+            }, 2000);
+        }
+
+        function contactDriver(name) {
+            showNotification('📞 Contacting', `Connecting to ${name}...`);
         }
 
         function simulateEmergency() {
-            showNotification('🚨 Emergency Alert', 'Medical emergency reported • Activating emergency protocols');
-            document.getElementById('emergency-panel').style.display = 'block';
             document.getElementById('emergency-count').textContent = '1';
-            
-            // Show alert banner
-            const alertBanner = document.getElementById('alert-banner');
-            const alertMessage = document.getElementById('alert-message');
-            alertMessage.textContent = 'Medical Emergency: Patient requires immediate assistance';
-            alertBanner.style.display = 'flex';
-            
-            setTimeout(() => {
-                showNotification('🚑 Emergency Response', 'Nearest vehicle dispatched • EMS contacted • Supervisor notified');
-            }, 3000);
+            showNotification('🚨 Emergency Alert', 'Medical emergency reported - Activating protocols');
         }
 
         function simulateOptimization() {
-            showNotification('🤖 AI Optimization Active', 'Analyzing routes and reassigning vehicles for maximum efficiency');
-            
-            let optimizationStep = 0;
-            const interval = setInterval(() => {
-                optimizationStep++;
-                
-                switch(optimizationStep) {
-                    case 1:
-                        showNotification('📍 Route Analysis', 'Scanning traffic patterns and patient locations');
-                        break;
-                    case 2:
-                        showNotification('🚛 Vehicle Reassignment', 'Optimizing driver assignments for faster response times');
-                        updateResponseTime('2.8');
-                        break;
-                    case 3:
-                        showNotification('✅ Optimization Complete', 'Efficiency improved to 97% • Response time reduced by 12%');
-                        updateEfficiency('97%');
-                        clearInterval(interval);
-                        break;
-                }
-            }, 4000);
-        }
-
-        // Interactive functions
-        function selectVehicle(vehicleId, driverName) {
-            const vehicleInfo = document.getElementById('vehicle-info');
-            const vehicleName = document.getElementById('vehicle-name');
-            const vehicleDetails = document.getElementById('vehicle-details');
-            
-            vehicleName.textContent = `${vehicleId} - ${driverName}`;
-            vehicleDetails.textContent = 'Speed: 35 mph • Fuel: 78% • Status: Active';
-            vehicleInfo.style.display = 'block';
-            
-            showNotification('🚛 Vehicle Selected', `${vehicleId} - ${driverName} • Live tracking active`);
-        }
-
-        function selectTrip(tripId) {
-            showNotification('📋 Trip Selected', `Viewing details for ${tripId} • Real-time tracking enabled`);
-        }
-
-        function contactDriver(driverName) {
-            showNotification('📞 Contacting Driver', `Connecting to ${driverName} via in-vehicle communication`);
-        }
-
-        function showFleetStatus() {
-            showNotification('🚛 Fleet Status', '15 vehicles • 12 active • 2 available • 1 maintenance');
-        }
-
-        function showTripMetrics() {
-            showNotification('📊 Trip Metrics', '47 completed trips today • 96% on-time • 4.8⭐ average rating');
-        }
-
-        function showResponseTime() {
-            showNotification('⏱️ Response Time', '3.2 minute average • 15% improvement vs last week');
-        }
-
-        function showEfficiency() {
-            showNotification('⚡ Efficiency Rate', '94% fleet utilization • AI optimization active');
-        }
-
-        function showSatisfaction() {
-            showNotification('⭐ Customer Rating', '4.8/5 average • 98% satisfaction rate • Zero complaints');
-        }
-
-        function showEmergencies() {
-            showNotification('🚨 Emergency Status', 'Zero active emergencies • Emergency protocols ready');
-        }
-
-        function centerMap() {
-            showNotification('🗺️ Map Centered', 'View centered on Bakersfield service area');
-        }
-
-        function showRoutes() {
-            showNotification('🛣️ Routes Displayed', 'Showing optimal routes and traffic conditions');
-        }
-
-        function optimizeRoutes() {
-            showNotification('🤖 Route Optimization', 'AI calculating most efficient routes');
-        }
-
-        function assignOptimalDrivers() {
-            const modal = document.createElement('div');
-            modal.id = 'assignModal';
-            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
-            modal.innerHTML = '<div style="background:#1e1e2e;border-radius:16px;padding:30px;max-width:600px;width:90%;color:white;"><h2 style="margin-bottom:20px;">⚡ AI Auto-Assignment</h2><p style="margin-bottom:20px;color:#a0a0a0;">Analyzing pending trips and available drivers...</p><div style="background:#2a2a3e;border-radius:10px;padding:15px;margin-bottom:15px;"><div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span>Elena Garcia - Dialysis</span><span style="color:#22c55e;">Carlos Martinez ✓</span></div><div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span>Maria Santos - Physical Therapy</span><span style="color:#22c55e;">Angela Foster ✓</span></div><div style="display:flex;justify-content:space-between;"><span>Robert Johnson - Doctor Visit</span><span style="color:#22c55e;">David Chen ✓</span></div></div><div style="background:#22c55e20;border:1px solid #22c55e;border-radius:10px;padding:15px;margin-bottom:20px;"><p style="color:#22c55e;font-weight:600;">✓ Optimization Complete</p><p style="color:#a0a0a0;font-size:14px;">3 drivers assigned - Avg wait time reduced 23%</p></div><div style="display:flex;gap:12px;"><button onclick="showNotification(\'✅ Confirmed\',\'Drivers assigned\');document.getElementById(\'assignModal\').remove();" style="flex:1;padding:14px;background:#22c55e;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;">Confirm All</button><button onclick="document.getElementById(\'assignModal\').remove();" style="flex:1;padding:14px;background:#374151;color:white;border:none;border-radius:10px;cursor:pointer;">Cancel</button></div></div>';
-            document.body.appendChild(modal);
-        }
-
-        function broadcastMessage() {
-            showNotification('�� Broadcasting', 'Message sent to all active drivers');
-        }
-
-        function emergencyComms() {
-            const modal = document.createElement('div');
-            modal.id = 'emergencyModal';
-            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
-            modal.innerHTML = '<div style="background:#1e1e2e;border-radius:16px;padding:30px;max-width:500px;width:90%;color:white;border:2px solid #ef4444;"><h2 style="margin-bottom:20px;color:#ef4444;">🚨 Emergency Communications</h2><div style="display:grid;gap:12px;margin-bottom:20px;"><button onclick="showNotification(\'🚑 EMS Contacted\',\'Emergency services dispatched\');document.getElementById(\'emergencyModal\').remove();" style="padding:16px;background:#ef4444;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;">🚑 Call EMS (911)</button><button onclick="showNotification(\'👨‍💼 Supervisor Alerted\',\'Management notified\');document.getElementById(\'emergencyModal\').remove();" style="padding:16px;background:#f97316;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;">👨‍💼 Alert Supervisor</button><button onclick="showNotification(\'🔒 Fleet Locked\',\'All vehicles holding\');document.getElementById(\'emergencyModal\').remove();" style="padding:16px;background:#eab308;color:black;border:none;border-radius:10px;cursor:pointer;font-weight:600;">🔒 Fleet Lockdown</button></div><button onclick="document.getElementById(\'emergencyModal\').remove();" style="width:100%;padding:14px;background:#374151;color:white;border:none;border-radius:10px;cursor:pointer;">Close</button></div>';
-            document.body.appendChild(modal);
-        }
-
-        function manageDrivers() {
-            const modal = document.createElement('div');
-            modal.id = 'driversModal';
-            modal.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
-            modal.innerHTML = '<div style="background:#1e1e2e;border-radius:16px;padding:30px;max-width:700px;width:90%;color:white;"><h2 style="margin-bottom:20px;">👥 Driver Management</h2><table style="width:100%;border-collapse:collapse;"><tr style="background:#2a2a3e;"><th style="padding:12px;text-align:left;">Driver</th><th style="padding:12px;">Status</th><th style="padding:12px;">Rating</th><th style="padding:12px;">Action</th></tr><tr style="border-bottom:1px solid #374151;"><td style="padding:12px;">Carlos Martinez</td><td style="padding:12px;text-align:center;"><span style="background:#22c55e;padding:4px 12px;border-radius:20px;font-size:12px;">On Trip</span></td><td style="padding:12px;text-align:center;">⭐ 4.9</td><td style="padding:12px;text-align:center;"><button onclick="showNotification(\'📞 Calling\',\'Connecting to Carlos...\');" style="padding:6px 12px;background:#5b6be8;color:white;border:none;border-radius:6px;cursor:pointer;">Contact</button></td></tr><tr style="border-bottom:1px solid #374151;"><td style="padding:12px;">Angela Foster</td><td style="padding:12px;text-align:center;"><span style="background:#22c55e;padding:4px 12px;border-radius:20px;font-size:12px;">On Trip</span></td><td style="padding:12px;text-align:center;">⭐ 4.8</td><td style="padding:12px;text-align:center;"><button onclick="showNotification(\'📞 Calling\',\'Connecting to Angela...\');" style="padding:6px 12px;background:#5b6be8;color:white;border:none;border-radius:6px;cursor:pointer;">Contact</button></td></tr><tr style="border-bottom:1px solid #374151;"><td style="padding:12px;">David Chen</td><td style="padding:12px;text-align:center;"><span style="background:#3b82f6;padding:4px 12px;border-radius:20px;font-size:12px;">Available</span></td><td style="padding:12px;text-align:center;">⭐ 4.9</td><td style="padding:12px;text-align:center;"><button onclick="showNotification(\'📞 Calling\',\'Connecting to David...\');" style="padding:6px 12px;background:#5b6be8;color:white;border:none;border-radius:6px;cursor:pointer;">Contact</button></td></tr></table><div style="margin-top:20px;display:flex;gap:12px;"><button onclick="window.location.href=\'/driver-dashboard\'" style="flex:1;padding:14px;background:#5b6be8;color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;">Full Dashboard</button><button onclick="document.getElementById(\'driversModal\').remove();" style="flex:1;padding:14px;background:#374151;color:white;border:none;border-radius:10px;cursor:pointer;">Close</button></div></div>';
-            document.body.appendChild(modal);
-        }
-
-        function viewDetailedAnalytics() {
-            showNotification('📊 Analytics Dashboard', 'Opening comprehensive performance analytics');
-        }
-
-        function dispatchEmergency() {
-            showNotification('🚛 Emergency Dispatch', 'Nearest vehicle dispatched • ETA: 4 minutes');
-        }
-
-        function notifyEMS() {
-            showNotification('🚑 EMS Contacted', 'Emergency Medical Services notified and en route');
-        }
-
-        function alertSupervisor() {
-            showNotification('👨‍💼 Supervisor Alerted', 'Shift supervisor and management team notified');
-        }
-
-        function clearEmergency() {
-            document.getElementById('emergency-panel').style.display = 'none';
-            document.getElementById('emergency-count').textContent = '0';
-            showNotification('✅ Emergency Cleared', 'Emergency protocols deactivated • Normal operations resumed');
-        }
-
-        function dismissAlert() {
-            document.getElementById('alert-banner').style.display = 'none';
-        }
-
-        // Utility functions
-        function updateResponseTime(newTime) {
-            document.getElementById('response-time').textContent = newTime;
-        }
-
-        function updateEfficiency(newRate) {
-            document.getElementById('efficiency').textContent = newRate;
+            showNotification('🤖 AI Optimization', 'Analyzing routes and driver assignments...');
+            setTimeout(() => {
+                showNotification('✅ Optimized', 'Efficiency improved to 97% • Response time -12%');
+            }, 3000);
         }
 
         function showNotification(title, message) {
             const notification = document.createElement('div');
             notification.className = 'demo-notification';
             notification.innerHTML = `
-                <div class="flex items-start">
-                    <div class="flex-1">
-                        <h4 class="font-bold text-lg mb-1">${title}</h4>
-                        <p class="text-blue-100">${message}</p>
+                <div style="display:flex;justify-content:space-between;align-items:start;">
+                    <div>
+                        <h4 style="font-weight:bold;font-size:1.1rem;margin-bottom:4px;">${title}</h4>
+                        <p style="color:#e0e7ff;">${message}</p>
                     </div>
-                    <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-white opacity-70 hover:opacity-100 ml-4">
-                        ✕
-                    </button>
+                    <button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:white;cursor:pointer;font-size:1.2rem;margin-left:1rem;">×</button>
                 </div>
             `;
-            
             document.body.appendChild(notification);
-            
+            setTimeout(() => notification.classList.add('show'), 100);
             setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.classList.remove('show');
-                    setTimeout(() => {
-                        if (notification.parentElement) {
-                            notification.remove();
-                        }
-                    }, 500);
-                }
-            }, 5000);
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 500);
+            }, 4000);
         }
 
-        // Auto-update simulation
-        function startRealTimeUpdates() {
-            setInterval(() => {
-                // Simulate real-time data updates
-                const trips = document.getElementById('completed-trips');
-                const currentTrips = parseInt(trips.textContent);
-                if (Math.random() > 0.8) { // 20% chance to update
-                    trips.textContent = currentTrips + 1;
-                }
-                
-                // Update response time slightly
-                const responseTime = document.getElementById('response-time');
-                const currentTime = parseFloat(responseTime.textContent);
-                const variation = (Math.random() - 0.5) * 0.2; // ±0.1 variation
-                responseTime.textContent = Math.max(2.0, currentTime + variation).toFixed(1);
-            }, 10000); // Update every 10 seconds
-        }
-
-        // Initialize
+        // Welcome
         document.addEventListener('DOMContentLoaded', function() {
-            initializeIcons();
-            console.log('📡 Dispatch Operations Center loaded!');
-            
-            // Start real-time updates
-            startRealTimeUpdates();
-            
-            // Welcome notification
             setTimeout(() => {
                 showNotification('👋 Welcome Michael!', '12 active trips • 8 available drivers • All systems operational');
             }, 1000);
