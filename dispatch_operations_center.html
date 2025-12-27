@@ -420,106 +420,106 @@
                 
                 <!-- Active Trips -->
                 <div class="space-y-3 max-h-96 overflow-y-auto" id="trips-active">
-                    <div class="trip-queue-item priority-high" onclick="openAssignModal('GVT-20250819-001', 'Robert Johnson', 'Doctor Visit', 'Unassigned')">
+                    <div class="trip-queue-item priority-high" data-patient="Robert Johnson" onclick="openAssignModal('GVT-20250819-003', 'Robert Johnson', 'Doctor Visit', this.dataset.driver || 'Unassigned')">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Robert Johnson</span>
                             <div class="status-pickup">Pickup</div>
                         </div>
                         <div class="text-xs text-gray-400 mb-1">Doctor Visit • Trip #GVT-20250819-003</div>
-                        <div class="text-xs text-gray-400">Driver: David Chen</div>
+                        <div class="text-xs text-gray-400 driver-status">Driver: David Chen</div>
                         <div class="text-xs text-blue-400">ETA: 22 min</div>
                     </div>
                     
-                    <div class="trip-queue-item priority-high" onclick="openAssignModal('GVT-20250819-004', 'Carmen Rodriguez', 'Chemotherapy', 'Maria Lopez')">
+                    <div class="trip-queue-item priority-high" data-patient="Carmen Rodriguez" onclick="openAssignModal('GVT-20250819-004', 'Carmen Rodriguez', 'Chemotherapy', this.dataset.driver || 'Maria Lopez')">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Carmen Rodriguez</span>
                             <div class="status-active">In Transit</div>
                         </div>
                         <div class="text-xs text-gray-400 mb-1">Chemotherapy • Trip #GVT-20250819-004</div>
-                        <div class="text-xs text-gray-400">Driver: Maria Lopez</div>
+                        <div class="text-xs text-gray-400 driver-status">Driver: Maria Lopez</div>
                         <div class="text-xs text-blue-400">ETA: 12 min</div>
                     </div>
                     
-                    <div class="trip-queue-item priority-medium" onclick="openAssignModal('GVT-20250819-005', 'James Wilson', 'Surgery Consultation', 'Unassigned')">
+                    <div class="trip-queue-item priority-medium" data-patient="James Wilson" data-driver="Unassigned" onclick="openAssignModal('GVT-20250819-005', 'James Wilson', 'Surgery Consultation', this.dataset.driver)">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">James Wilson</span>
                             <div class="status-scheduled">Scheduled</div>
                         </div>
                         <div class="text-xs text-gray-400 mb-1">Surgery Consultation • Trip #GVT-20250819-005</div>
-                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400 font-semibold driver-status">Driver: Unassigned</div>
                         <div class="text-xs text-yellow-400">In 45 min</div>
                     </div>
                     
-                    <div class="trip-queue-item priority-low" onclick="openAssignModal('GVT-20250819-006', 'Patricia Moore', 'Lab Work', 'Unassigned')">
+                    <div class="trip-queue-item priority-low" data-patient="Patricia Moore" data-driver="Unassigned" onclick="openAssignModal('GVT-20250819-006', 'Patricia Moore', 'Lab Work', this.dataset.driver)">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Patricia Moore</span>
                             <div class="status-scheduled">Scheduled</div>
                         </div>
                         <div class="text-xs text-gray-400 mb-1">Lab Work • Trip #GVT-20250819-006</div>
-                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400 font-semibold driver-status">Driver: Unassigned</div>
                         <div class="text-xs text-yellow-400">In 1 hr 15 min</div>
                     </div>
                     
-                    <div class="trip-queue-item priority-medium" onclick="openAssignModal('GVT-20250819-007', 'Linda Chen', 'Physical Therapy', 'Unassigned')">
+                    <div class="trip-queue-item priority-medium" data-patient="Linda Chen" data-driver="Unassigned" onclick="openAssignModal('GVT-20250819-007', 'Linda Chen', 'Physical Therapy', this.dataset.driver)">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Linda Chen</span>
                             <div class="status-scheduled">Scheduled</div>
                         </div>
                         <div class="text-xs text-gray-400 mb-1">Physical Therapy • Trip #GVT-20250819-007</div>
-                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400 font-semibold driver-status">Driver: Unassigned</div>
                         <div class="text-xs text-yellow-400">In 1 hr 30 min</div>
                     </div>
                 </div>
                 
                 <!-- Scheduled Trips (hidden by default) -->
                 <div class="space-y-3 max-h-96 overflow-y-auto hidden" id="trips-scheduled">
-                    <div class="trip-queue-item priority-medium" onclick="openAssignModal('GVT-20250819-008', 'Michael Brown', 'Dialysis', 'Unassigned')">
+                    <div class="trip-queue-item priority-medium" data-patient="Michael Brown" data-driver="Unassigned" onclick="openAssignModal('GVT-20250819-008', 'Michael Brown', 'Dialysis', this.dataset.driver)">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Michael Brown</span>
                             <div class="status-scheduled">10:30 AM</div>
                         </div>
                         <div class="text-xs text-gray-400">Dialysis • DaVita Bakersfield</div>
-                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400 font-semibold driver-status">Driver: Unassigned</div>
                     </div>
-                    <div class="trip-queue-item priority-low" onclick="openAssignModal('GVT-20250819-009', 'Susan Williams', 'Doctor Visit', 'Unassigned')">
+                    <div class="trip-queue-item priority-low" data-patient="Susan Williams" data-driver="Unassigned" onclick="openAssignModal('GVT-20250819-009', 'Susan Williams', 'Doctor Visit', this.dataset.driver)">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Susan Williams</span>
                             <div class="status-scheduled">11:00 AM</div>
                         </div>
                         <div class="text-xs text-gray-400">Doctor Visit • Kaiser Permanente</div>
-                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400 font-semibold driver-status">Driver: Unassigned</div>
                     </div>
-                    <div class="trip-queue-item priority-high" onclick="openAssignModal('GVT-20250819-010', 'Thomas Garcia', 'Chemotherapy', 'Unassigned')">
+                    <div class="trip-queue-item priority-high" data-patient="Thomas Garcia" data-driver="Unassigned" onclick="openAssignModal('GVT-20250819-010', 'Thomas Garcia', 'Chemotherapy', this.dataset.driver)">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Thomas Garcia</span>
                             <div class="status-scheduled">11:30 AM</div>
                         </div>
                         <div class="text-xs text-gray-400">Chemotherapy • Comprehensive Blood & Cancer</div>
-                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400 font-semibold driver-status">Driver: Unassigned</div>
                     </div>
-                    <div class="trip-queue-item priority-medium" onclick="openAssignModal('GVT-20250819-011', 'Jennifer Lee', 'Physical Therapy', 'Unassigned')">
+                    <div class="trip-queue-item priority-medium" data-patient="Jennifer Lee" data-driver="Unassigned" onclick="openAssignModal('GVT-20250819-011', 'Jennifer Lee', 'Physical Therapy', this.dataset.driver)">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Jennifer Lee</span>
                             <div class="status-scheduled">12:00 PM</div>
                         </div>
                         <div class="text-xs text-gray-400">Physical Therapy • PT Solutions</div>
-                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400 font-semibold driver-status">Driver: Unassigned</div>
                     </div>
-                    <div class="trip-queue-item priority-low" onclick="openAssignModal('GVT-20250819-012', 'David Kim', 'Lab Work', 'Unassigned')">
+                    <div class="trip-queue-item priority-low" data-patient="David Kim" data-driver="Unassigned" onclick="openAssignModal('GVT-20250819-012', 'David Kim', 'Lab Work', this.dataset.driver)">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">David Kim</span>
                             <div class="status-scheduled">12:30 PM</div>
                         </div>
                         <div class="text-xs text-gray-400">Lab Work • Quest Diagnostics</div>
-                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400 font-semibold driver-status">Driver: Unassigned</div>
                     </div>
-                    <div class="trip-queue-item priority-medium" onclick="openAssignModal('GVT-20250819-013', 'Nancy Wilson', 'Dialysis', 'Unassigned')">
+                    <div class="trip-queue-item priority-medium" data-patient="Nancy Wilson" data-driver="Unassigned" onclick="openAssignModal('GVT-20250819-013', 'Nancy Wilson', 'Dialysis', this.dataset.driver)">
                         <div class="flex items-center justify-between mb-2">
                             <span class="font-semibold text-sm">Nancy Wilson</span>
                             <div class="status-scheduled">1:00 PM</div>
                         </div>
                         <div class="text-xs text-gray-400">Dialysis • Fresenius Kidney Care</div>
-                        <div class="text-xs text-yellow-400 font-semibold">Driver: Unassigned</div>
+                        <div class="text-xs text-yellow-400 font-semibold driver-status">Driver: Unassigned</div>
                     </div>
                 </div>
                 
@@ -870,6 +870,37 @@
                 showNotification('⚠️ Select Driver', 'Please select a driver to assign');
                 return;
             }
+            
+            // Find the trip card by patient name
+            const tripCard = document.querySelector(`[data-patient="${currentTrip.patientName}"]`);
+            if (tripCard) {
+                // Update the data attribute
+                tripCard.dataset.driver = selectedDriver.name;
+                
+                // Find and update the driver status line
+                const driverLine = tripCard.querySelector('.driver-status');
+                if (driverLine) {
+                    driverLine.textContent = `Driver: ${selectedDriver.name}`;
+                    driverLine.classList.remove('text-yellow-400', 'font-semibold');
+                    driverLine.classList.add('text-green-400');
+                }
+                
+                // Flash the card green to show update
+                tripCard.style.background = 'rgba(34, 197, 94, 0.3)';
+                tripCard.style.borderColor = '#22c55e';
+                setTimeout(() => {
+                    tripCard.style.background = '';
+                    tripCard.style.borderColor = '';
+                }, 2000);
+            }
+            
+            // Update available drivers count
+            const availCount = document.getElementById('available-drivers');
+            const current = parseInt(availCount.textContent);
+            if (current > 0 && selectedDriver.name !== currentTrip.currentDriver) {
+                availCount.textContent = current - 1;
+            }
+            
             closeAssignModal();
             showNotification('✅ Driver Assigned', `${selectedDriver.name} assigned to ${currentTrip.patientName}`);
         }
