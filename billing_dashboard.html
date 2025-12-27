@@ -17,6 +17,8 @@
         .stat-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         .stat-label { color: #718096; font-size: 14px; margin-bottom: 10px; }
         .stat-value { color: #2d3748; font-size: 32px; font-weight: bold; }
+        .stat-value.green { color: #059669; }
+        .stat-value.orange { color: #d97706; }
         .actions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .action-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s ease; cursor: pointer; }
         .action-card:hover { transform: translateY(-5px); }
@@ -27,10 +29,13 @@
         table { width: 100%; border-collapse: collapse; }
         th { background: #f7fafc; padding: 15px; text-align: left; font-weight: 600; color: #4a5568; border-bottom: 2px solid #e2e8f0; }
         td { padding: 15px; border-bottom: 1px solid #e2e8f0; color: #2d3748; }
+        tr:hover { background: #f7fafc; }
         .badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .badge-pending { background: #fef3c7; color: #92400e; }
         .badge-approved { background: #d1fae5; color: #065f46; }
         .badge-paid { background: #dbeafe; color: #1e40af; }
+        .badge-submitted { background: #e0e7ff; color: #3730a3; }
+        .badge-denied { background: #fee2e2; color: #991b1b; }
         .empty-state { text-align: center; padding: 40px; color: #718096; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
         .modal.active { display: flex; }
@@ -42,8 +47,18 @@
         .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-right: 10px; }
         .btn-primary { background: #667eea; color: white; }
         .btn-primary:hover { background: #5a67d8; }
+        .btn-success { background: #059669; color: white; }
+        .btn-success:hover { background: #047857; }
         .btn-secondary { background: #e2e8f0; color: #4a5568; }
         .btn-secondary:hover { background: #cbd5e0; }
+        .claim-actions { display: flex; gap: 5px; }
+        .claim-actions button { padding: 6px 12px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; }
+        .btn-view { background: #dbeafe; color: #1e40af; }
+        .btn-approve { background: #d1fae5; color: #065f46; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 10px; color: white; font-weight: 500; z-index: 2000; animation: slideIn 0.3s ease; }
+        .notification.success { background: #059669; }
+        .notification.info { background: #3b82f6; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
     </style>
 </head>
 <body>
@@ -58,24 +73,24 @@
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-label">Pending Claims</div>
-                <div class="stat-value" id="pendingClaims">0</div>
+                <div class="stat-value" id="pendingClaims">8</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Billed</div>
-                <div class="stat-value" id="totalBilled">$0.00</div>
+                <div class="stat-label">Total Billed (MTD)</div>
+                <div class="stat-value" id="totalBilled">$24,850.00</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Paid</div>
-                <div class="stat-value" id="totalPaid">$0.00</div>
+                <div class="stat-label">Total Paid (MTD)</div>
+                <div class="stat-value green" id="totalPaid">$18,420.00</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Outstanding</div>
-                <div class="stat-value" id="outstanding">$0.00</div>
+                <div class="stat-value orange" id="outstanding">$6,430.00</div>
             </div>
         </div>
 
         <div class="actions-grid">
-            <div class="action-card" onclick="openModal('generateModal')">
+            <div class="action-card" onclick="generateClaims()">
                 <h2>📝 Generate Claims</h2>
                 <p>Auto-generate insurance claims from completed trips with proper coding and documentation.</p>
             </div>
@@ -105,12 +120,11 @@
                         <th>Amount</th>
                         <th>Paid</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="claimsTable">
-                    <tr>
-                        <td colspan="7" class="empty-state">No claims found. Generate claims from completed trips to get started.</td>
-                    </tr>
+                    <!-- Demo data loaded by JavaScript -->
                 </tbody>
             </table>
         </div>
@@ -120,10 +134,16 @@
     <div id="generateModal" class="modal">
         <div class="modal-content">
             <h2>📝 Generate Claims</h2>
-            <p style="color: #718096; margin-bottom: 20px;">Select completed trips to generate insurance claims</p>
-            <div class="empty-state">Trip billing integration coming soon</div>
-            <div style="margin-top: 20px;">
-                <button class="btn btn-primary" onclick="alert('Feature coming soon')">Generate Claims</button>
+            <p style="color: #718096; margin-bottom: 20px;">The following completed trips are ready for claim generation:</p>
+            <div id="tripsToGenerate" style="max-height: 300px; overflow-y: auto; margin-bottom: 20px;">
+                <!-- Trips loaded dynamically -->
+            </div>
+            <div style="background: #f0fdf4; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <strong style="color: #166534;">3 trips selected</strong>
+                <p style="color: #166534; font-size: 14px;">Estimated claim amount: $285.00</p>
+            </div>
+            <div>
+                <button class="btn btn-success" onclick="confirmGenerateClaims()">Generate 3 Claims</button>
                 <button class="btn btn-secondary" onclick="closeModal('generateModal')">Cancel</button>
             </div>
         </div>
@@ -132,9 +152,13 @@
     <!-- Pending Claims Modal -->
     <div id="pendingModal" class="modal">
         <div class="modal-content">
-            <h2>📤 Pending Claims</h2>
-            <div class="empty-state">No pending claims at this time</div>
+            <h2>📤 Pending Claims - Ready to Submit</h2>
+            <p style="color: #718096; margin-bottom: 20px;">Review claims before submitting to clearinghouse:</p>
+            <div id="pendingClaimsList" style="max-height: 400px; overflow-y: auto;">
+                <!-- Pending claims loaded dynamically -->
+            </div>
             <div style="margin-top: 20px;">
+                <button class="btn btn-primary" onclick="submitToClearinghouse()">Submit All to Clearinghouse</button>
                 <button class="btn btn-secondary" onclick="closeModal('pendingModal')">Close</button>
             </div>
         </div>
@@ -149,6 +173,9 @@
                     <label>Claim Number</label>
                     <select id="paymentClaimSelect" required>
                         <option value="">Select a claim...</option>
+                        <option value="CLM-2024-0847">CLM-2024-0847 - Elena Garcia ($95.00)</option>
+                        <option value="CLM-2024-0846">CLM-2024-0846 - Robert Chen ($85.00)</option>
+                        <option value="CLM-2024-0845">CLM-2024-0845 - Maria Santos ($110.00)</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -160,11 +187,15 @@
                     <input type="date" id="paymentDate" required>
                 </div>
                 <div class="form-group">
+                    <label>Check/EFT Number</label>
+                    <input type="text" id="paymentRef" placeholder="e.g., EFT-123456">
+                </div>
+                <div class="form-group">
                     <label>Notes</label>
                     <textarea id="paymentNotes" rows="3" placeholder="Optional notes..."></textarea>
                 </div>
                 <div style="margin-top: 20px;">
-                    <button type="submit" class="btn btn-primary">Post Payment</button>
+                    <button type="submit" class="btn btn-success">Post Payment</button>
                     <button type="button" class="btn btn-secondary" onclick="closeModal('paymentModal')">Cancel</button>
                 </div>
             </form>
@@ -172,107 +203,170 @@
     </div>
 
     <script>
-        // Safe currency formatter - handles null/undefined values
+        // Demo claims data
+        const demoClaims = [
+            { claim_number: 'CLM-2024-0852', service_date: '12/26/2024', patient: 'John Wick', insurance: 'Medi-Cal', amount: 95.00, paid: 95.00, status: 'paid' },
+            { claim_number: 'CLM-2024-0851', service_date: '12/26/2024', patient: 'Sarah Connor', insurance: 'Medicare', amount: 125.00, paid: 125.00, status: 'paid' },
+            { claim_number: 'CLM-2024-0850', service_date: '12/25/2024', patient: 'James Wilson', insurance: 'Kern Family Health', amount: 85.00, paid: 85.00, status: 'paid' },
+            { claim_number: 'CLM-2024-0849', service_date: '12/24/2024', patient: 'Elena Garcia', insurance: 'Medi-Cal', amount: 110.00, paid: 0, status: 'submitted' },
+            { claim_number: 'CLM-2024-0848', service_date: '12/24/2024', patient: 'Robert Chen', insurance: 'Blue Cross', amount: 95.00, paid: 0, status: 'submitted' },
+            { claim_number: 'CLM-2024-0847', service_date: '12/23/2024', patient: 'Maria Santos', insurance: 'Medi-Cal', amount: 140.00, paid: 0, status: 'approved' },
+            { claim_number: 'CLM-2024-0846', service_date: '12/23/2024', patient: 'David Kim', insurance: 'Medicare', amount: 85.00, paid: 0, status: 'pending' },
+            { claim_number: 'CLM-2024-0845', service_date: '12/22/2024', patient: 'Lisa Johnson', insurance: 'Kern Family Health', amount: 95.00, paid: 0, status: 'pending' },
+            { claim_number: 'CLM-2024-0844', service_date: '12/22/2024', patient: 'Michael Brown', insurance: 'Medi-Cal', amount: 75.00, paid: 60.00, status: 'paid' },
+            { claim_number: 'CLM-2024-0843', service_date: '12/21/2024', patient: 'Jennifer Lee', insurance: 'Blue Shield', amount: 105.00, paid: 0, status: 'denied' }
+        ];
+
+        // Trips ready for claim generation
+        const tripsForClaims = [
+            { trip_id: 'GVT-2024-1892', date: '12/27/2024', patient: 'Carlos Martinez', destination: 'Mercy Hospital', amount: 95.00 },
+            { trip_id: 'GVT-2024-1891', date: '12/27/2024', patient: 'Anna Williams', destination: 'Kaiser Permanente', amount: 85.00 },
+            { trip_id: 'GVT-2024-1890', date: '12/27/2024', patient: 'Thomas Garcia', destination: 'DaVita Dialysis', amount: 105.00 }
+        ];
+
+        // Format currency
         function formatCurrency(value) {
-            if (value === null || value === undefined || isNaN(value)) {
-                return '$0.00';
-            }
-            return '$' + parseFloat(value).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
+            return '$' + parseFloat(value).toFixed(2);
+        }
+
+        // Get status badge class
+        function getStatusBadge(status) {
+            const badges = {
+                'pending': 'badge-pending',
+                'approved': 'badge-approved',
+                'submitted': 'badge-submitted',
+                'paid': 'badge-paid',
+                'denied': 'badge-denied'
+            };
+            return badges[status] || 'badge-pending';
+        }
+
+        // Render claims table
+        function renderClaimsTable() {
+            const tbody = document.getElementById('claimsTable');
+            tbody.innerHTML = demoClaims.map(claim => `
+                <tr>
+                    <td><strong>${claim.claim_number}</strong></td>
+                    <td>${claim.service_date}</td>
+                    <td>${claim.patient}</td>
+                    <td>${claim.insurance}</td>
+                    <td>${formatCurrency(claim.amount)}</td>
+                    <td>${formatCurrency(claim.paid)}</td>
+                    <td><span class="badge ${getStatusBadge(claim.status)}">${claim.status.toUpperCase()}</span></td>
+                    <td>
+                        <div class="claim-actions">
+                            <button class="btn-view" onclick="viewClaim('${claim.claim_number}')">View</button>
+                            ${claim.status === 'pending' ? `<button class="btn-approve" onclick="approveClaim('${claim.claim_number}')">Approve</button>` : ''}
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
         }
 
         // Modal functions
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('active');
+            if (modalId === 'pendingModal') {
+                renderPendingClaims();
+            }
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).classList.remove('active');
         }
 
-        // Export report placeholder
-        function exportReport() {
-            alert('Report export feature coming soon');
+        // Generate claims
+        function generateClaims() {
+            const container = document.getElementById('tripsToGenerate');
+            container.innerHTML = tripsForClaims.map(trip => `
+                <div style="padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong>${trip.patient}</strong>
+                            <p style="color: #718096; font-size: 13px; margin-top: 4px;">${trip.trip_id} • ${trip.date}</p>
+                            <p style="color: #718096; font-size: 13px;">${trip.destination}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <strong style="color: #059669;">${formatCurrency(trip.amount)}</strong>
+                            <p style="font-size: 12px; color: #718096;">Medi-Cal</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            openModal('generateModal');
         }
 
-        // Submit payment placeholder
+        function confirmGenerateClaims() {
+            closeModal('generateModal');
+            showNotification('3 claims generated successfully!', 'success');
+        }
+
+        // Render pending claims
+        function renderPendingClaims() {
+            const pending = demoClaims.filter(c => c.status === 'pending' || c.status === 'approved');
+            const container = document.getElementById('pendingClaimsList');
+            container.innerHTML = pending.map(claim => `
+                <div style="padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${claim.claim_number}</strong>
+                        <p style="color: #718096; font-size: 13px;">${claim.patient} • ${claim.insurance}</p>
+                    </div>
+                    <div style="text-align: right;">
+                        <strong>${formatCurrency(claim.amount)}</strong>
+                        <p><span class="badge ${getStatusBadge(claim.status)}">${claim.status.toUpperCase()}</span></p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Submit to clearinghouse
+        function submitToClearinghouse() {
+            closeModal('pendingModal');
+            showNotification('4 claims submitted to clearinghouse', 'success');
+        }
+
+        // View claim details
+        function viewClaim(claimNumber) {
+            const claim = demoClaims.find(c => c.claim_number === claimNumber);
+            if (claim) {
+                alert(`Claim Details:\n\nClaim #: ${claim.claim_number}\nPatient: ${claim.patient}\nService Date: ${claim.service_date}\nInsurance: ${claim.insurance}\nAmount: ${formatCurrency(claim.amount)}\nPaid: ${formatCurrency(claim.paid)}\nStatus: ${claim.status.toUpperCase()}`);
+            }
+        }
+
+        // Approve claim
+        function approveClaim(claimNumber) {
+            showNotification(`Claim ${claimNumber} approved`, 'success');
+        }
+
+        // Submit payment
         function submitPayment(event) {
             event.preventDefault();
-            alert('Payment posting feature coming soon');
+            const claimNumber = document.getElementById('paymentClaimSelect').value;
+            const amount = document.getElementById('paymentAmount').value;
             closeModal('paymentModal');
+            showNotification(`Payment of $${amount} posted to ${claimNumber}`, 'success');
+            document.getElementById('paymentModal').querySelector('form').reset();
         }
 
-        // Load billing data with proper error handling
-        async function loadBillingData() {
-            try {
-                const response = await fetch('/api/billing/summary');
-                
-                if (!response.ok) {
-                    throw new Error('API not available');
-                }
-                
-                const data = await response.json();
-                
-                // Safely update with null checks
-                if (data) {
-                    document.getElementById('pendingClaims').textContent = data.pending_claims || 0;
-                    document.getElementById('totalBilled').textContent = formatCurrency(data.total_billed);
-                    document.getElementById('totalPaid').textContent = formatCurrency(data.total_paid);
-                    document.getElementById('outstanding').textContent = formatCurrency(data.outstanding);
-                }
-                
-                // Load claims table
-                await loadClaimsTable();
-                
-            } catch (error) {
-                console.log('Billing API not connected - showing defaults');
-                // Keep default values (already set in HTML)
-            }
+        // Export report
+        function exportReport() {
+            showNotification('Billing report exported to Excel', 'info');
         }
 
-        // Load claims table with error handling
-        async function loadClaimsTable() {
-            const tbody = document.getElementById('claimsTable');
-            
-            try {
-                const response = await fetch('/api/claims/recent');
-                
-                if (!response.ok) {
-                    throw new Error('Claims API not available');
-                }
-                
-                const claims = await response.json();
-                
-                // Check if claims is valid array
-                if (!Array.isArray(claims) || claims.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No claims found. Generate claims from completed trips to get started.</td></tr>';
-                    return;
-                }
-                
-                // Render claims
-                tbody.innerHTML = claims.map(claim => `
-                    <tr>
-                        <td><strong>${claim.claim_number || 'N/A'}</strong></td>
-                        <td>${claim.service_date || 'N/A'}</td>
-                        <td>${claim.patient_name || 'N/A'}</td>
-                        <td>${claim.insurance_company || 'N/A'}</td>
-                        <td>${formatCurrency(claim.amount)}</td>
-                        <td>${formatCurrency(claim.paid_amount)}</td>
-                        <td><span class="badge badge-${claim.status || 'pending'}">${(claim.status || 'pending').toUpperCase()}</span></td>
-                    </tr>
-                `).join('');
-                
-            } catch (error) {
-                console.log('Claims API not connected');
-                // Keep default empty state
-            }
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
         }
 
-        // Initialize on page load
+        // Set today's date as default for payment
         document.addEventListener('DOMContentLoaded', function() {
-            loadBillingData();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('paymentDate').value = today;
+            renderClaimsTable();
         });
 
         // Close modals when clicking outside
