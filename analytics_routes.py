@@ -10,7 +10,7 @@ import pyodbc
 from flask import Blueprint, jsonify
 from datetime import datetime, timedelta
 
-analytics_bp = Blueprint('analytics', __name__)
+analytics_bp = Blueprint('analytics_warehouse', __name__)
 
 def get_analytics_connection():
     """Connect to the analytics warehouse on partnership-sql-server-v2"""
