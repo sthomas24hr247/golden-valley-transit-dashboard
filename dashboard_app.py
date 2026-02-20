@@ -7,18 +7,20 @@ import os
 from booking_routes import booking_bp
 from insurance_verification import insurance_bp
 from billing_system import billing_bp
-from analytics_system import analytics_bp
+from analytics_system import analytics_bp as analytics_system_bp
 from patient_api import patient_bp
+from analytics_routes import analytics_bp as analytics_warehouse_bp
 
 app = Flask(__name__)
 CORS(app)
 
-# Register booking blueprint
+# Register blueprints
 app.register_blueprint(booking_bp)
 app.register_blueprint(insurance_bp)
 app.register_blueprint(billing_bp)
-app.register_blueprint(analytics_bp)
+app.register_blueprint(analytics_system_bp)
 app.register_blueprint(patient_bp)
+app.register_blueprint(analytics_warehouse_bp)
 
 # Route mapping
 @app.route('/')
@@ -69,13 +71,6 @@ def billing():
 def user_management():
     return send_from_directory('.', 'user_management.html')
 
-@app.route('/health')
-def health():
-    return jsonify({"status": "healthy", "service": "Golden Valley Transit Dashboard"})
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8080))
-    app.run(host='0.0.0.0', port=port, debug=False)
 @app.route('/driver-dashboard-offline')
 def driver_dashboard_offline():
     return send_from_directory('.', 'driver-dashboard-offline.html')
@@ -87,3 +82,11 @@ def manifest():
 @app.route('/sw.js')
 def service_worker():
     return send_from_directory('.', 'sw.js', mimetype='application/javascript')
+
+@app.route('/health')
+def health():
+    return jsonify({"status": "healthy", "service": "Golden Valley Transit Dashboard"})
+
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 8080))
+    app.run(host='0.0.0.0', port=port, debug=False)
