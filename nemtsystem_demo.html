@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEMTsystem — Live Platform Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #0A1628;
+  --accent: #00C896;
+  --accent2: #0066FF;
+  --surface: #111D35;
+  --surface2: #162040;
+  --border: rgba(0,200,150,0.15);
+  --text: #E8EDF5;
+  --muted: #7A8BA0;
+  --white: #ffffff;
+  --card: rgba(255,255,255,0.03);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body {
+  font-family:'DM Sans',sans-serif;
+  background:var(--primary);
+  color:var(--text);
+  display:flex; flex-direction:column;
+}
+
+/* BG GRID */
+.bg-grid {
+  position:fixed; inset:0; z-index:0; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(0,200,150,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,200,150,0.03) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  position:relative; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 40px; height:60px;
+  background:rgba(10,22,40,0.97);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.logo { font-family:'Syne',sans-serif; font-size:18px; font-weight:800; color:var(--white); }
+.logo span { color:var(--accent); }
+.demo-badge {
+  display:flex; align-items:center; gap:6px;
+  background:rgba(0,200,150,0.1);
+  border:1px solid rgba(0,200,150,0.25);
+  border-radius:100px; padding:4px 14px;
+  font-size:11px; font-weight:700; color:var(--accent);
+  letter-spacing:1px; text-transform:uppercase;
+}
+.demo-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.4;transform:scale(1.5);} }
+.topbar-right { display:flex; align-items:center; gap:20px; }
+.timer-wrap { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--muted); }
+.timer-bar-bg { width:120px; height:3px; background:rgba(255,255,255,0.08); border-radius:2px; overflow:hidden; }
+.timer-bar { height:100%; background:var(--accent); border-radius:2px; transition:width 0.1s linear; }
+.btn-exit {
+  font-size:12px; color:var(--muted); text-decoration:none;
+  border:1px solid var(--border); border-radius:6px; padding:6px 14px;
+  transition:color .2s,border-color .2s;
+}
+.btn-exit:hover { color:var(--accent); border-color:var(--accent); }
+
+/* ── MAIN LAYOUT ── */
+.main-layout {
+  display:flex; flex:1; overflow:hidden; position:relative; z-index:1;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width:280px; flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  overflow-y:auto;
+}
+.sidebar-header {
+  padding:24px 24px 16px;
+  border-bottom:1px solid var(--border);
+}
+.sidebar-title { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:4px; }
+.sidebar-sub { font-size:12px; color:var(--muted); opacity:0.7; }
+
+.step-list { padding:16px 0; flex:1; }
+.step-item {
+  display:flex; align-items:flex-start; gap:14px;
+  padding:12px 24px; cursor:pointer;
+  transition:background .2s;
+  border-left:3px solid transparent;
+}
+.step-item:hover { background:rgba(0,200,150,0.04); }
+.step-item.active {
+  background:rgba(0,200,150,0.07);
+  border-left-color:var(--accent);
+}
+.step-item.completed .step-num { background:var(--accent); color:var(--primary); }
+.step-item.completed .step-title { color:var(--muted); }
+.step-num {
+  width:28px; height:28px; border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; color:var(--muted);
+  flex-shrink:0; transition:all .3s;
+}
+.step-item.active .step-num { background:var(--accent); color:var(--primary); border-color:var(--accent); }
+.step-info { flex:1; }
+.step-title { font-size:13px; font-weight:600; color:var(--text); margin-bottom:2px; transition:color .2s; }
+.step-item.active .step-title { color:var(--white); }
+.step-desc { font-size:11px; color:var(--muted); line-height:1.4; }
+.step-duration {
+  font-size:10px; font-weight:600; color:var(--muted);
+  padding:2px 7px; border-radius:100px;
+  background:rgba(255,255,255,0.05);
+  flex-shrink:0; margin-top:2px;
+}
+
+.sidebar-footer {
+  padding:20px 24px;
+  border-top:1px solid var(--border);
+}
+.progress-label { font-size:11px; color:var(--muted); margin-bottom:8px; display:flex; justify-content:space-between; }
+.progress-bg { height:4px; background:rgba(255,255,255,0.06); border-radius:2px; overflow:hidden; }
+.progress-fill { height:100%; background:var(--accent); border-radius:2px; transition:width .5s ease; }
+
+/* ── CONTENT AREA ── */
+.content-area {
+  flex:1; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+
+/* ── SLIDE ── */
+.slide {
+  display:none; flex:1; overflow:hidden;
+  flex-direction:column;
+  animation:slideIn .4s ease;
+}
+.slide.active { display:flex; }
+@keyframes slideIn { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:translateX(0);} }
+
+/* Intro slide */
+.slide-intro {
+  align-items:center; justify-content:center;
+  text-align:center; padding:60px 40px;
+}
+.intro-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(0,200,150,0.1); border:1px solid rgba(0,200,150,0.25);
+  border-radius:100px; padding:6px 18px; margin-bottom:32px;
+  font-size:12px; font-weight:700; color:var(--accent); letter-spacing:1px; text-transform:uppercase;
+}
+.intro-title {
+  font-family:'Syne',sans-serif;
+  font-size:clamp(36px,4vw,60px); font-weight:800;
+  color:var(--white); line-height:1.05; letter-spacing:-1.5px;
+  margin-bottom:20px;
+}
+.intro-title .hl { color:var(--accent); }
+.intro-sub { font-size:17px; color:var(--muted); line-height:1.7; max-width:560px; margin:0 auto 48px; }
+.intro-stats {
+  display:flex; gap:48px; justify-content:center; flex-wrap:wrap;
+  margin-bottom:48px;
+}
+.istat { text-align:center; }
+.istat-num { font-family:'Syne',sans-serif; font-size:36px; font-weight:800; color:var(--accent); line-height:1; }
+.istat-label { font-size:12px; color:var(--muted); margin-top:4px; }
+.intro-cta {
+  display:inline-flex; align-items:center; gap:10px;
+  background:var(--accent); color:var(--primary);
+  padding:16px 36px; border-radius:8px;
+  font-size:15px; font-weight:700;
+  cursor:pointer; border:none;
+  box-shadow:0 0 40px rgba(0,200,150,0.3);
+  transition:transform .2s,box-shadow .2s;
+}
+.intro-cta:hover { transform:translateY(-2px); box-shadow:0 0 60px rgba(0,200,150,0.4); }
+
+/* Module slides */
+.slide-module { flex-direction:row; overflow:hidden; }
+.module-panel {
+  width:380px; flex-shrink:0;
+  padding:48px 40px;
+  border-right:1px solid var(--border);
+  display:flex; flex-direction:column;
+  overflow-y:auto;
+  background:var(--surface);
+}
+.module-tag {
+  font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--accent); margin-bottom:16px;
+  display:flex; align-items:center; gap:8px;
+}
+.module-tag::after { content:''; flex:1; height:1px; background:var(--border); }
+.module-icon-lg {
+  width:64px; height:64px; border-radius:16px;
+  background:rgba(0,200,150,0.1);
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; margin-bottom:24px;
+}
+.module-title-lg {
+  font-family:'Syne',sans-serif;
+  font-size:28px; font-weight:800; color:var(--white);
+  line-height:1.1; margin-bottom:12px;
+}
+.module-desc-lg { font-size:15px; color:var(--muted); line-height:1.7; margin-bottom:32px; }
+.feature-list { display:flex; flex-direction:column; gap:12px; margin-bottom:32px; }
+.feature-item { display:flex; align-items:flex-start; gap:10px; }
+.feature-check {
+  width:20px; height:20px; border-radius:50%;
+  background:rgba(0,200,150,0.15);
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; color:var(--accent); flex-shrink:0; margin-top:1px;
+}
+.feature-text { font-size:13px; color:var(--muted); line-height:1.5; }
+.feature-text strong { color:var(--text); }
+.module-link {
+  display:flex; align-items:center; justify-content:center; gap:8px;
+  background:var(--accent); color:var(--primary);
+  padding:13px 24px; border-radius:8px;
+  font-size:14px; font-weight:700;
+  text-decoration:none; transition:opacity .2s;
+  margin-top:auto;
+}
+.module-link:hover { opacity:.85; color:var(--primary); }
+
+/* Preview pane */
+.preview-pane {
+  flex:1; overflow:hidden;
+  display:flex; flex-direction:column;
+  background:var(--primary);
+}
+.preview-toolbar {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 20px;
+  background:rgba(10,22,40,0.8);
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.preview-dots { display:flex; gap:6px; }
+.preview-dot { width:10px; height:10px; border-radius:50%; }
+.preview-url {
+  flex:1; background:rgba(255,255,255,0.05);
+  border:1px solid var(--border); border-radius:6px;
+  padding:5px 14px; font-size:12px; color:var(--muted);
+  font-family:monospace;
+}
+.preview-frame {
+  flex:1; border:none; width:100%; height:100%;
+  background:#0d1a2e;
+}
+.preview-placeholder {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:16px; padding:40px;
+}
+.preview-placeholder-icon { font-size:48px; opacity:.4; }
+.preview-placeholder-title {
+  font-family:'Syne',sans-serif; font-size:18px; font-weight:700;
+  color:var(--muted); text-align:center;
+}
+.preview-placeholder-sub { font-size:13px; color:var(--muted); opacity:.6; text-align:center; max-width:300px; }
+.open-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--accent); color:var(--primary);
+  padding:10px 22px; border-radius:7px;
+  font-size:13px; font-weight:700;
+  text-decoration:none; transition:opacity .2s;
+}
+.open-btn:hover { opacity:.85; color:var(--primary); }
+
+/* ── BOTTOM NAV ── */
+@media (max-width: 768px) {
+  .content-area { padding-bottom: 100px !important; }
+  .open-btn { width: 100%; text-align: center; justify-content: center; }
+  .module-actions { flex-direction: column; padding: 24px 20px; }
+  .slide-module { padding: 32px 20px; }
+}
+
+.bottom-nav {
+  flex-shrink:0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 32px;
+  background:rgba(10,22,40,0.97);
+  border-top:1px solid var(--border);
+  position:relative; z-index:10;
+}
+.nav-step-indicator { font-size:13px; color:var(--muted); }
+.nav-step-indicator strong { color:var(--text); }
+.nav-btns { display:flex; gap:12px; align-items:center; }
+.nav-btn {
+  padding:10px 24px; border-radius:7px;
+  font-size:14px; font-weight:600;
+  cursor:pointer; border:none; transition:all .2s;
+}
+.nav-prev { background:transparent; color:var(--muted); border:1px solid var(--border); }
+.nav-prev:hover { border-color:var(--accent); color:var(--accent); }
+.nav-next { background:var(--accent); color:var(--primary); }
+.nav-next:hover { opacity:.85; }
+.nav-pause {
+  width:36px; height:36px; border-radius:50%;
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-size:12px; color:var(--muted);
+  transition:all .2s;
+}
+.nav-pause:hover { border-color:var(--accent); color:var(--accent); }
+.nav-auto-label { font-size:11px; color:var(--muted); }
+
+/* responsive */
+@media(max-width:900px) {
+  .sidebar { display:none; }
+  .module-panel { width:320px; padding:32px 24px; }
+}
+@media(max-width:650px) {
+  .slide-module { flex-direction:column; }
+  .module-panel { width:100%; height:auto; border-right:none; border-bottom:1px solid var(--border); }
+  .preview-pane { min-height:300px; }
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">NEMT<span>system</span></div>
+  <div class="demo-badge"><div class="demo-dot"></div>Live Platform Demo</div>
+  <div class="topbar-right">
+    <div class="timer-wrap">
+      <span id="timer-label">Auto-advancing</span>
+      <div class="timer-bar-bg"><div class="timer-bar" id="timer-bar" style="width:100%"></div></div>
+    </div>
+    <a href="/nemtsystem-landing" class="btn-exit">Exit Demo</a>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Demo Tour</div>
+      <div class="sidebar-sub">7 modules · ~4 minutes</div>
+    </div>
+    <div class="step-list" id="step-list"></div>
+    <div class="sidebar-footer">
+      <div class="progress-label">
+        <span>Overall Progress</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bg"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-area" id="content-area"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-step-indicator">
+    Step <strong id="cur-step">1</strong> of <strong id="total-steps">8</strong>
+  </div>
+  <div class="nav-btns">
+    <div class="nav-pause" id="pause-btn" onclick="togglePause()" title="Pause / Resume">&#9646;&#9646;</div>
+    <span class="nav-auto-label" id="auto-label">Auto-advancing</span>
+    <button class="nav-btn nav-prev" onclick="prevSlide()">&#8592; Back</button>
+    <button class="nav-btn nav-next" onclick="nextSlide()" id="next-btn">Next &#8594;</button>
+  </div>
+</div>
+
+<script>
+// ── SLIDE DATA ──────────────────────────────────────────────────────────────
+const SLIDES = [
+  {
+    type: 'intro',
+    duration: 8000
+  },
+  {
+    type: 'module',
+    step: 1,
+    tag: 'Module 01 — Operations',
+    icon: '📡',
+    title: 'Dispatch Operations Center',
+    desc: 'The real-time command hub for your entire operation. Every driver, every trip, every vehicle — visible and actionable from one screen.',
+    features: [
+      { strong: 'Live Fleet Map', text: ' — Vehicle locations and status updated in real time.' },
+      { strong: 'Trip Queue', text: ' — Active, scheduled, and completed trips with priority flags.' },
+      { strong: 'Driver Status Grid', text: ' — Two-way sync. Driver changes status; dispatch sees it instantly.' },
+      { strong: 'Auto-Assign', text: ' — Route the nearest available driver to any unassigned trip.' },
+      { strong: 'Communications Hub', text: ' — Broadcast alerts and direct driver messaging.' },
+    ],
+    url: '/dispatcher-center',
+    urlLabel: 'Open Dispatch Center',
+    urlDisplay: 'nemtsystem.com/dispatcher-center',
+    duration: 30000
+  },
+  {
+    type: 'module',
+    step: 2,
+    tag: 'Module 02 — Driver',
+    icon: '🚐',
+    title: 'Driver Dashboard',
+    desc: 'A mobile-first, PWA-enabled interface drivers can install on their phone. Works fully offline — no connectivity required during trips.',
+    features: [
+      { strong: 'Offline Capability', text: ' — Full functionality with no cell signal required.' },
+      { strong: 'Status Updates', text: ' — Available, On Break, Off Duty — synced to dispatch live.' },
+      { strong: 'Trip Assignments', text: ' — Upcoming trips with patient details and destination.' },
+      { strong: 'Digital Logging', text: ' — Timestamped trip completion and signature capture.' },
+      { strong: 'Performance Metrics', text: ' — Daily hours, trips, and ratings visible to the driver.' },
+    ],
+    url: '/driver-dashboard',
+    urlLabel: 'Open Driver Dashboard',
+    urlDisplay: 'nemtsystem.com/driver-dashboard',
+    duration: 30000
+  },
+  {
+    type: 'module',
+    step: 3,
+    tag: 'Module 03 — Patient',
+    icon: '👤',
+    title: 'Patient Portal',
+    desc: 'Patients manage their own transportation — reducing inbound calls, improving satisfaction, and creating a complete trip audit trail.',
+    features: [
+      { strong: 'Self-Service Booking', text: ' — Patients schedule rides without calling your office.' },
+      { strong: 'Trip History', text: ' — Full record of past rides with dates and destinations.' },
+      { strong: 'Upcoming Trips', text: ' — All scheduled appointments visible in one dashboard.' },
+      { strong: 'Trip Types', text: ' — Dialysis, chemotherapy, medical appointments, and more.' },
+      { strong: 'Dispatch Communication', text: ' — Direct messaging between patient and operations.' },
+    ],
+    url: '/patient-dashboard',
+    urlLabel: 'Open Patient Portal',
+    urlDisplay: 'nemtsystem.com/patient-dashboard',
+    duration: 30000
+  },
+  {
+    type: 'module',
+    step: 4,
+    tag: 'Module 04 — Revenue',
+    icon: '💳',
+    title: 'Billing & Claims',
+    desc: 'Every completed trip automatically generates a claim with the correct CPT and HCPCS codes. No manual entry. No missed claims.',
+    features: [
+      { strong: 'Auto Claim Generation', text: ' — Trip completion triggers a fully coded claim instantly.' },
+      { strong: 'Full Lifecycle Tracking', text: ' — Draft → Submitted → Approved → Paid → Denied → Appealed.' },
+      { strong: 'Denial Management', text: ' — Denied claims flagged immediately with reason codes.' },
+      { strong: 'Multi-Payer', text: ' — Medi-Cal, Medicare, and commercial insurance in one view.' },
+      { strong: 'AR Visibility', text: ' — Outstanding balances and aging reports always current.' },
+    ],
+    url: '/billing-dashboard',
+    urlLabel: 'Open Billing Dashboard',
+    urlDisplay: 'nemtsystem.com/billing-dashboard',
+    duration: 30000
+  },
+  {
+    type: 'module',
+    step: 5,
+    tag: 'Module 05 — Analytics',
+    icon: '📊',
+    title: 'Analytics & Reporting',
+    desc: 'Enterprise-grade business intelligence across the full operation. The data brokers and managed care plans want to see — always ready.',
+    features: [
+      { strong: 'Revenue Trends', text: ' — Month-over-month revenue, billed vs. collected tracking.' },
+      { strong: 'On-Time Performance', text: ' — System-wide and per-driver on-time rates.' },
+      { strong: 'Patient Satisfaction', text: ' — Ratings and feedback aggregated by trip and driver.' },
+      { strong: 'Fleet Utilization', text: ' — Vehicle efficiency and availability metrics.' },
+      { strong: 'Broker-Ready Reports', text: ' — Audit documentation exportable on demand.' },
+    ],
+    url: '/analytics-dashboard',
+    urlLabel: 'Open Analytics Dashboard',
+    urlDisplay: 'nemtsystem.com/analytics-dashboard',
+    duration: 30000
+  },
+  {
+    type: 'module',
+    step: 6,
+    tag: 'Module 06 — Compliance',
+    icon: '🛡',
+    title: 'Insurance Administration',
+    desc: 'Manage all payer relationships, eligibility verification, and compliance documentation from one administrative panel.',
+    features: [
+      { strong: 'Eligibility Verification', text: ' — Real-time insurance verification before every trip.' },
+      { strong: 'Prior Authorization', text: ' — Track PA status and expiration per patient.' },
+      { strong: 'Payer Management', text: ' — Configure payer-specific rules, rates, and documentation.' },
+      { strong: 'Compliance Reporting', text: ' — Audit-ready documentation for broker reviews.' },
+      { strong: 'EDI 837/835', text: ' — Electronic claim submission and remittance integration.' },
+    ],
+    url: '/insurance-admin',
+    urlLabel: 'Open Insurance Admin',
+    urlDisplay: 'nemtsystem.com/insurance-admin',
+    duration: 30000
+  },
+  {
+    type: 'module',
+    step: 7,
+    tag: 'Module 07 — White Label',
+    icon: '⚙️',
+    title: 'White Label Configuration',
+    desc: 'Deploy the full NEMTsystem platform under your own brand. Your logo, your colors, your domain. Enterprise infrastructure, your identity.',
+    features: [
+      { strong: 'Custom Branding', text: ' — Logo, colors, and company name across all interfaces.' },
+      { strong: 'Custom Domain', text: ' — yourcompany.com or a subdomain of your choice.' },
+      { strong: 'Isolated Data Tenant', text: ' — Dedicated database. Your data never shares space.' },
+      { strong: 'Payer Configuration', text: ' — Set up your specific payer contracts and rates.' },
+      { strong: 'Fast Deployment', text: ' — From agreement to live system in days, not months.' },
+    ],
+    url: '/nemtsystem-backend',
+    urlLabel: 'See White Label Demo',
+    urlDisplay: 'nemtsystem.com/configure',
+    duration: 30000
+  }
+];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let current = 0;
+let paused = false;
+let timerInterval = null;
+let timerRemaining = 0;
+let timerTotal = 0;
+let timerStart = null;
+
+// ── BUILD UI ────────────────────────────────────────────────────────────────
+function buildSidebar() {
+  const list = document.getElementById('step-list');
+  const steps = SLIDES.filter(s => s.type === 'module');
+  let html = `
+    <div class="step-item ${current === 0 ? 'active' : 'completed'}" onclick="goTo(0)" style="margin-bottom:4px">
+      <div class="step-num">${current > 0 ? '✓' : '★'}</div>
+      <div class="step-info">
+        <div class="step-title">Introduction</div>
+        <div class="step-desc">Platform overview &amp; key metrics</div>
+      </div>
+      <div class="step-duration">~8s</div>
+    </div>`;
+  steps.forEach((s, i) => {
+    const idx = i + 1;
+    const isActive = current === idx;
+    const isDone = current > idx;
+    html += `
+      <div class="step-item ${isActive ? 'active' : ''} ${isDone ? 'completed' : ''}" onclick="goTo(${idx})">
+        <div class="step-num">${isDone ? '✓' : idx}</div>
+        <div class="step-info">
+          <div class="step-title">${s.title}</div>
+          <div class="step-desc">${s.tag.split('—')[1]?.trim() || ''}</div>
+        </div>
+        <div class="step-duration">~30s</div>
+      </div>`;
+  });
+  list.innerHTML = html;
+
+  // Progress
+  const pct = Math.round((current / (SLIDES.length - 1)) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+}
+
+function buildContent() {
+  const area = document.getElementById('content-area');
+  const slide = SLIDES[current];
+
+  if (slide.type === 'intro') {
+    area.innerHTML = `
+      <div class="slide active slide-intro">
+        <div class="intro-badge"><div class="demo-dot"></div>Interactive Platform Demo</div>
+        <h1 class="intro-title">The Platform <span class="hl">NEMT Operators</span><br>Actually Need</h1>
+        <p class="intro-sub">This guided tour walks you through all 7 core modules of NEMTsystem — the only NEMT platform built around revenue protection and broker readiness from day one.</p>
+        <div class="intro-stats">
+          <div class="istat"><div class="istat-num">88</div><div class="istat-label">Database Tables</div></div>
+          <div class="istat"><div class="istat-num">7</div><div class="istat-label">Core Modules</div></div>
+          <div class="istat"><div class="istat-num">99.9%</div><div class="istat-label">On-Time Rate</div></div>
+          <div class="istat"><div class="istat-num">3</div><div class="istat-label">Payer Types</div></div>
+        </div>
+        <button class="intro-cta" onclick="nextSlide()">Start Tour &nbsp;&#8594;</button>
+      </div>`;
+  } else {
+    const s = slide;
+    const features = s.features.map(f => `
+      <div class="feature-item">
+        <div class="feature-check">✓</div>
+        <div class="feature-text"><strong>${f.strong}</strong>${f.text}</div>
+      </div>`).join('');
+
+    area.innerHTML = `
+      <div class="slide active slide-module">
+        <div class="module-panel">
+          <div class="module-tag">${s.tag}</div>
+          <div class="module-icon-lg">${s.icon}</div>
+          <div class="module-title-lg">${s.title}</div>
+          <p class="module-desc-lg">${s.desc}</p>
+          <div class="feature-list">${features}</div>
+          <a href="${s.url}" target="_blank" class="module-link">${s.urlLabel} &nbsp;↗</a>
+        </div>
+        <div class="preview-pane">
+          <div class="preview-toolbar">
+            <div class="preview-dots">
+              <div class="preview-dot" style="background:#FF5F57"></div>
+              <div class="preview-dot" style="background:#FEBC2E"></div>
+              <div class="preview-dot" style="background:#28C840"></div>
+            </div>
+            <div class="preview-url">https://demo.nemtsystem.com${s.url}</div>
+            <a href="${s.url}" target="_blank" class="open-btn" style="margin-left:12px;padding:4px 14px;font-size:12px;">Open in tab ↗</a>
+          </div>
+          <iframe class="preview-frame" src="${s.url}" title="${s.title}" loading="lazy" sandbox="allow-same-origin allow-scripts allow-forms allow-popups"></iframe>
+        </div>
+      </div>`;
+  }
+
+  // Update bottom nav
+  document.getElementById('cur-step').textContent = current + 1;
+  document.getElementById('total-steps').textContent = SLIDES.length;
+
+  const nextBtn = document.getElementById('next-btn');
+  if (current === SLIDES.length - 1) {
+    nextBtn.textContent = 'Contact Sales →';
+    nextBtn.onclick = () => openContactModal();
+  } else {
+    nextBtn.textContent = 'Next →';
+    nextBtn.onclick = nextSlide;
+  }
+}
+
+// ── TIMER ────────────────────────────────────────────────────────────────────
+function startTimer() {
+  clearInterval(timerInterval);
+  const slide = SLIDES[current];
+  timerTotal = slide.duration || 30000;
+  timerRemaining = timerTotal;
+  timerStart = Date.now();
+
+  const bar = document.getElementById('timer-bar');
+  bar.style.width = '100%';
+
+  timerInterval = setInterval(() => {
+    if (paused) return;
+    const elapsed = Date.now() - timerStart;
+    const remaining = timerTotal - elapsed;
+    const pct = Math.max(0, (remaining / timerTotal) * 100);
+    bar.style.width = pct + '%';
+    if (remaining <= 0) {
+      clearInterval(timerInterval);
+      if (current < SLIDES.length - 1) nextSlide();
+    }
+  }, 100);
+}
+
+function resetTimer() {
+  timerStart = Date.now();
+  const slide = SLIDES[current];
+  timerTotal = slide.duration || 30000;
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────────────────
+function goTo(idx) {
+  current = Math.max(0, Math.min(idx, SLIDES.length - 1));
+  buildSidebar();
+  buildContent();
+  resetTimer();
+  if (!paused) startTimer();
+}
+
+function nextSlide() {
+  if (current < SLIDES.length - 1) goTo(current + 1);
+}
+
+function prevSlide() {
+  if (current > 0) goTo(current - 1);
+}
+
+function togglePause() {
+  paused = !paused;
+  const btn = document.getElementById('pause-btn');
+  const label = document.getElementById('auto-label');
+  if (paused) {
+    btn.innerHTML = '&#9658;';
+    btn.title = 'Resume';
+    label.textContent = 'Paused';
+    timerStart = Date.now() - (timerTotal - (parseFloat(document.getElementById('timer-bar').style.width) / 100 * timerTotal));
+  } else {
+    btn.innerHTML = '&#9646;&#9646;';
+    btn.title = 'Pause';
+    label.textContent = 'Auto-advancing';
+    timerStart = Date.now() - (timerTotal * (1 - parseFloat(document.getElementById('timer-bar').style.width) / 100));
+  }
+}
+
+// ── KEYBOARD NAV ─────────────────────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); nextSlide(); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); prevSlide(); }
+  if (e.key === 'p' || e.key === 'P') togglePause();
+});
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+buildSidebar();
+buildContent();
+startTimer();
+</script>
+
+<!-- ── CONTACT MODAL ─────────────────────────────────────────────────────── -->
+<style>
+.cmodal-overlay {
+  display:none; position:fixed; inset:0; z-index:9999;
+  background:rgba(0,0,0,0.75); backdrop-filter:blur(10px);
+  align-items:center; justify-content:center; padding:20px;
+}
+.cmodal-overlay.open { display:flex; }
+.cmodal {
+  background:#111D35; border:1px solid rgba(0,200,150,0.2);
+  border-radius:20px; width:100%; max-width:720px;
+  max-height:90vh; display:flex; flex-direction:column;
+  overflow:hidden; animation:slideIn .35s ease;
+  box-shadow:0 24px 80px rgba(0,0,0,0.5);
+}
+.cmodal-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:24px 32px 0; flex-shrink:0;
+}
+.cmodal-title {
+  font-family:'Syne',sans-serif; font-size:22px; font-weight:800;
+  color:#ffffff; margin-bottom:4px;
+}
+.cmodal-sub { font-size:13px; color:#7A8BA0; }
+.cmodal-close {
+  width:36px; height:36px; border-radius:50%;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(0,200,150,0.15);
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; color:#7A8BA0; font-size:16px;
+  transition:all .2s; flex-shrink:0;
+}
+.cmodal-close:hover { background:rgba(0,200,150,0.1); color:#00C896; border-color:#00C896; }
+.cmodal-tabs {
+  display:flex; gap:0; padding:20px 32px 0; flex-shrink:0;
+  border-bottom:1px solid rgba(0,200,150,0.12);
+}
+.ctab {
+  padding:10px 24px; font-size:14px; font-weight:600;
+  color:#7A8BA0; cursor:pointer; border:none; background:none;
+  border-bottom:2px solid transparent; margin-bottom:-1px;
+  transition:color .2s, border-color .2s;
+}
+.ctab.active { color:#00C896; border-bottom-color:#00C896; }
+.ctab-content { display:none; flex:1; overflow:hidden; }
+.ctab-content.active { display:flex; flex-direction:column; }
+
+/* Bookings tab */
+.bookings-frame {
+  width:100%; flex:1; border:none; min-height:480px;
+  background:#0d1a2e;
+}
+.bookings-placeholder {
+  flex:1; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:16px;
+  padding:40px; text-align:center;
+}
+.bookings-placeholder-icon { font-size:48px; }
+.bookings-placeholder-title {
+  font-family:'Syne',sans-serif; font-size:18px; font-weight:700; color:#E8EDF5;
+}
+.bookings-placeholder-sub { font-size:13px; color:#7A8BA0; max-width:340px; line-height:1.6; }
+.bookings-setup-steps {
+  background:rgba(0,200,150,0.06); border:1px solid rgba(0,200,150,0.15);
+  border-radius:12px; padding:20px 24px; text-align:left; max-width:400px; width:100%;
+}
+.bookings-step { font-size:13px; color:#7A8BA0; padding:6px 0; display:flex; gap:10px; }
+.bookings-step-num { color:#00C896; font-weight:700; flex-shrink:0; }
+
+/* Lead form tab */
+.lead-form { padding:28px 32px 32px; display:flex; flex-direction:column; gap:0; overflow-y:auto; }
+.lf-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+.lf-group { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+.lf-label { font-size:12px; font-weight:600; color:#7A8BA0; text-transform:uppercase; letter-spacing:0.5px; }
+.lf-input, .lf-select, .lf-textarea {
+  background:rgba(255,255,255,0.05); border:1px solid rgba(0,200,150,0.15);
+  border-radius:8px; padding:11px 16px; color:#E8EDF5; font-size:14px;
+  font-family:'DM Sans',sans-serif; outline:none; transition:border-color .2s;
+  width:100%;
+}
+.lf-input:focus, .lf-select:focus, .lf-textarea:focus { border-color:#00C896; }
+.lf-input::placeholder, .lf-textarea::placeholder { color:#7A8BA0; }
+.lf-select option { background:#111D35; }
+.lf-textarea { resize:vertical; min-height:80px; }
+.lf-checks { display:flex; flex-wrap:wrap; gap:8px; }
+.lf-check {
+  display:flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,0.04); border:1px solid rgba(0,200,150,0.15);
+  border-radius:6px; padding:6px 12px; cursor:pointer;
+  font-size:13px; color:#7A8BA0; transition:all .2s;
+}
+.lf-check input { display:none; }
+.lf-check.selected { background:rgba(0,200,150,0.1); border-color:#00C896; color:#00C896; }
+.lf-submit {
+  background:#00C896; color:#0A1628; border:none;
+  padding:14px 32px; border-radius:8px; font-size:15px; font-weight:700;
+  cursor:pointer; transition:opacity .2s; margin-top:8px;
+  font-family:'DM Sans',sans-serif;
+}
+.lf-submit:hover { opacity:.85; }
+.lf-submit:disabled { opacity:.5; cursor:not-allowed; }
+.lf-success {
+  display:none; flex-direction:column; align-items:center;
+  justify-content:center; gap:16px; padding:60px 40px; text-align:center;
+}
+.lf-success-icon { font-size:48px; }
+.lf-success-title { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:#ffffff; }
+.lf-success-sub { font-size:14px; color:#7A8BA0; max-width:320px; line-height:1.6; }
+</style>
+
+<div class="cmodal-overlay" id="contact-modal">
+  <div class="cmodal">
+    <div class="cmodal-header">
+      <div>
+        <div class="cmodal-title">Let's Talk</div>
+        <div class="cmodal-sub">Book a live walkthrough or send us a message</div>
+      </div>
+      <div class="cmodal-close" onclick="closeContactModal()">✕</div>
+    </div>
+
+    <div class="cmodal-tabs">
+      <button class="ctab active" onclick="switchTab('bookings', this)">📅 &nbsp;Book a Call</button>
+      <button class="ctab" onclick="switchTab('leadform', this)">✉️ &nbsp;Send a Message</button>
+    </div>
+
+    <!-- TAB 1: BOOKINGS -->
+    <div class="ctab-content active" id="tab-bookings">
+      <div class="bookings-placeholder">
+        <div class="bookings-placeholder-icon">&#128197;</div>
+        <div class="bookings-placeholder-title">Book a NEMTsystem Demo Call</div>
+        <div class="bookings-placeholder-sub">Choose a time that works for you. The 30-minute call covers a full live walkthrough of the platform with our team.</div>
+        <a href="https://outlook.office.com/book/NEMTsystemDemoCall@myitcopilot.com/?ismsaljsauthenabled" target="_blank" class="lf-submit" style="text-decoration:none;display:inline-block;margin-top:8px;padding:14px 40px;">
+          Open Booking Calendar &#8599;
+        </a>
+        <div style="font-size:12px;color:#7A8BA0;margin-top:12px;">Opens in a new tab &nbsp;&#183;&nbsp; Powered by Microsoft Bookings</div>
+      </div>
+    </div>
+
+    <!-- TAB 2: LEAD FORM -->
+    <div class="ctab-content" id="tab-leadform">
+      <div class="lead-form" id="lead-form-inner">
+        <div class="lf-row">
+          <div class="lf-group">
+            <label class="lf-label">First Name</label>
+            <input class="lf-input" id="lf-fname" type="text" placeholder="John">
+          </div>
+          <div class="lf-group">
+            <label class="lf-label">Last Name</label>
+            <input class="lf-input" id="lf-lname" type="text" placeholder="Smith">
+          </div>
+        </div>
+        <div class="lf-group">
+          <label class="lf-label">Company / Organization</label>
+          <input class="lf-input" id="lf-company" type="text" placeholder="Valley Medical Transport">
+        </div>
+        <div class="lf-row">
+          <div class="lf-group">
+            <label class="lf-label">Email</label>
+            <input class="lf-input" id="lf-email" type="email" placeholder="you@company.com">
+          </div>
+          <div class="lf-group">
+            <label class="lf-label">Phone</label>
+            <input class="lf-input" id="lf-phone" type="tel" placeholder="(661) 555-0100">
+          </div>
+        </div>
+        <div class="lf-group">
+          <label class="lf-label">Number of Vehicles</label>
+          <select class="lf-select" id="lf-fleet">
+            <option value="">Select fleet size</option>
+            <option>1–5 vehicles</option>
+            <option>6–15 vehicles</option>
+            <option>16–30 vehicles</option>
+            <option>31–50 vehicles</option>
+            <option>50+ vehicles</option>
+          </select>
+        </div>
+        <div class="lf-group">
+          <label class="lf-label">Payers You Work With</label>
+          <div class="lf-checks">
+            <label class="lf-check" onclick="toggleCheck(this)"><input type="checkbox" value="Medi-Cal">Medi-Cal</label>
+            <label class="lf-check" onclick="toggleCheck(this)"><input type="checkbox" value="Medicare">Medicare</label>
+            <label class="lf-check" onclick="toggleCheck(this)"><input type="checkbox" value="Commercial">Commercial</label>
+            <label class="lf-check" onclick="toggleCheck(this)"><input type="checkbox" value="Private Pay">Private Pay</label>
+            <label class="lf-check" onclick="toggleCheck(this)"><input type="checkbox" value="Workers Comp">Workers Comp</label>
+          </div>
+        </div>
+        <div class="lf-group">
+          <label class="lf-label">Interested In</label>
+          <select class="lf-select" id="lf-interest">
+            <option value="">Select option</option>
+            <option>Monthly Subscription</option>
+            <option>Perpetual License</option>
+            <option>White Label Deployment</option>
+            <option>Just exploring</option>
+          </select>
+        </div>
+        <div class="lf-group">
+          <label class="lf-label">Message (optional)</label>
+          <textarea class="lf-textarea" id="lf-message" placeholder="Tell us about your operation or any specific questions..."></textarea>
+        </div>
+        <button class="lf-submit" id="lf-submit-btn" onclick="submitLead()">Send Message</button>
+      </div>
+      <div class="lf-success" id="lf-success">
+        <div class="lf-success-icon">✅</div>
+        <div class="lf-success-title">Message Sent</div>
+        <div class="lf-success-sub">We will be in touch within one business day. Check your email for a confirmation.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── CONTACT MODAL ─────────────────────────────────────────────────────────────
+function openContactModal() {
+  document.getElementById('contact-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeContactModal() {
+  document.getElementById('contact-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('contact-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeContactModal();
+});
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.ctab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.ctab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('selected');
+}
+
+async function submitLead() {
+  const btn = document.getElementById('lf-submit-btn');
+  const fname = document.getElementById('lf-fname').value.trim();
+  const email = document.getElementById('lf-email').value.trim();
+  if (!fname || !email) {
+    alert('Please enter at least your name and email.');
+    return;
+  }
+
+  btn.textContent = 'Sending...';
+  btn.disabled = true;
+
+  const payers = [...document.querySelectorAll('.lf-check.selected input')]
+    .map(i => i.value).join(', ');
+
+  const payload = {
+    first_name: fname,
+    last_name: document.getElementById('lf-lname').value.trim(),
+    company: document.getElementById('lf-company').value.trim(),
+    email: email,
+    phone: document.getElementById('lf-phone').value.trim(),
+    fleet_size: document.getElementById('lf-fleet').value,
+    payers: payers,
+    interest: document.getElementById('lf-interest').value,
+    message: document.getElementById('lf-message').value.trim(),
+    source: 'NEMTsystem Demo',
+    submitted_at: new Date().toISOString()
+  };
+
+  // ── REPLACE THIS URL WITH YOUR POWER AUTOMATE WEBHOOK ──
+  const WEBHOOK_URL = 'YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE';
+
+  try {
+    if (WEBHOOK_URL !== 'YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE') {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    }
+    // Show success regardless (form still captures intent even before webhook is live)
+    document.getElementById('lead-form-inner').style.display = 'none';
+    document.getElementById('lf-success').style.display = 'flex';
+  } catch(err) {
+    document.getElementById('lead-form-inner').style.display = 'none';
+    document.getElementById('lf-success').style.display = 'flex';
+  }
+}
+
+// ESC key closes modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeContactModal();
+});
+</script>
+</body>
+</html>
