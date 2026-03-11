@@ -67,11 +67,23 @@ def billing():
 def user_management():
     return send_from_directory('.', 'user_management.html')
 
+@app.route('/nemtsystem-backend')
+def nemtsystem_backend():
+    return send_file('nemtsystem_backend.html')
+
+@app.route('/partnership-demo')
+def partnership_demo():
+    return send_file('partnership_demo.html')
+
 @app.route('/demo')
 def demo():
     return send_file('nemtsystem_demo.html')
 
-@app.route('/health')
+@app.route("/credentialing")
+def credentialing_module():
+    return send_file("credentialing_module.html")
+
+@app.route("/health")
 def health():
     return jsonify({"status": "healthy", "service": "Golden Valley Transit Dashboard"})
 
