@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from flask import Flask, send_file, jsonify, send_from_directory
+from flask import Flask, send_file, jsonify, send_from_directory, redirect, request
 from flask_cors import CORS
 import os
 
@@ -8,6 +8,7 @@ from booking_routes import booking_bp
 from insurance_verification import insurance_bp
 from billing_system import billing_bp
 from analytics_system import analytics_bp
+from core_routes import core_bp
 
 app = Flask(__name__)
 CORS(app)
@@ -17,8 +18,15 @@ app.register_blueprint(booking_bp)
 app.register_blueprint(insurance_bp)
 app.register_blueprint(billing_bp)
 app.register_blueprint(analytics_bp)
+app.register_blueprint(core_bp)
 
 # Route mapping
+
+@app.before_request
+def redirect_credentialing_subdomain():
+    if request.host == 'credentialing.nemtsystem.com' and request.path == '/':
+        return redirect('/credentialing', code=301)
+
 @app.route('/')
 def index():
     return send_file('src/new_dashboard_landing.html')
@@ -78,6 +86,11 @@ def partnership_demo():
 @app.route('/demo')
 def demo():
     return send_file('nemtsystem_demo.html')
+
+
+@app.route("/health")
+def health_check():
+    return {"status": "healthy", "service": "gvt-dashboard"}, 200
 
 @app.route("/credentialing")
 def credentialing_module():
