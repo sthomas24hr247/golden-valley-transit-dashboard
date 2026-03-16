@@ -584,7 +584,7 @@
                 <div class="contact-item">
                     <div class="contact-item-icon">📞</div>
                     <h3>Phone</h3>
-                    <p>(661) 555-RIDE</p>
+                    <p>+1 877-378-6368</p>
                     <p>24/7 Dispatch</p>
                 </div>
                 <div class="contact-item">
@@ -688,11 +688,11 @@
                     this.style.display = 'none';
                     document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
                 } else {
-                    alert('Error submitting request. Please call (661) 555-RIDE');
+                    alert('Error submitting request. Please call +1 877-378-6368');
                 }
             } catch (error) {
                 console.error('Booking error:', error);
-                alert('Unable to submit booking. Please call (661) 555-RIDE');
+                alert('Unable to submit booking. Please call +1 877-378-6368');
             }
         });
 
@@ -706,5 +706,88 @@
             });
         });
     </script>
+
+
+
+
+
+
+
+
+<!-- NEMTsystem Demo Overlay -->
+<style>
+#demo-return-btn {
+  position:fixed; bottom:24px; right:24px; z-index:99999;
+  display:none;
+  background:#00C896; color:#0A1628;
+  padding:11px 20px; border-radius:8px;
+  font-family:sans-serif;
+  font-size:13px; font-weight:700;
+  box-shadow:0 4px 24px rgba(0,200,150,0.4);
+  cursor:pointer;
+  align-items:center; gap:8px;
+}
+</style>
+<div id="demo-return-btn" onclick="window.close()">
+  &#8592; Return to Demo
+</div>
+<script>
+(function(){
+  var inIframe = (function(){ try { return window.self !== window.top; } catch(e){ return true; } })();
+  var hasParam = window.location.search.indexOf('demo=1') > -1;
+  var fromDemo = inIframe || hasParam || (document.referrer && document.referrer.indexOf('/demo') > -1) || sessionStorage.getItem('nemtsystem_demo') === '1';
+
+  if (!fromDemo) return;
+  sessionStorage.setItem('nemtsystem_demo', '1');
+
+  // Show return button
+  var btn = document.getElementById('demo-return-btn');
+  if (btn) btn.style.display = 'flex';
+
+  function applyOverrides() {
+    // Hide all back-to-dashboard links
+    var links = document.querySelectorAll('a.back-link, a[href="/"], a[href="/dashboard"]');
+    links.forEach(function(el) { el.style.setProperty('display','none','important'); });
+
+    // Hide user_management back button span
+    document.querySelectorAll('span').forEach(function(el) {
+      if (el.textContent.trim() === 'Back to Dashboard') {
+        var parent = el.closest('a, button');
+        if (parent) parent.style.setProperty('display','none','important');
+      }
+    });
+
+    // Replace GVT branding in patient portal
+    var brand = document.getElementById('portal-brand');
+    if (brand) brand.textContent = 'NEMTsystem';
+
+    // Also scan all h1 elements for Golden Valley Transit
+    document.querySelectorAll('h1').forEach(function(el) {
+      if (el.textContent.trim() === 'Golden Valley Transit') {
+        el.textContent = 'NEMTsystem';
+      }
+    });
+
+    // Replace dispatch center branding
+    var dispatchBrand = document.getElementById('dispatch-brand');
+    if (dispatchBrand) dispatchBrand.textContent = 'NEMTsystem • Live Control Room';
+
+    // Also scan all p elements for Golden Valley Transit
+    document.querySelectorAll('p').forEach(function(el) {
+      if (el.textContent.indexOf('Golden Valley Transit') > -1) {
+        el.textContent = el.textContent.replace('Golden Valley Transit', 'NEMTsystem');
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', applyOverrides);
+  } else {
+    applyOverrides();
+  }
+  setTimeout(applyOverrides, 600);
+})();
+</script>
+<!-- End NEMTsystem Demo Overlay -->
 </body>
 </html>
